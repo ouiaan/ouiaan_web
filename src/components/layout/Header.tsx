@@ -60,7 +60,7 @@ export function Header() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className={cn(
-                'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300',
+                'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
                 pathname.startsWith('/store')
                   ? 'text-accent'
                   : 'text-foreground/70 hover:text-foreground'
