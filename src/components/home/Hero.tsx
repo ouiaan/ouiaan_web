@@ -1,6 +1,12 @@
+import { Spotlight } from "@/components/ui/Spotlight";
+
 export function Hero() {
   return (
-    <section className="relative h-[calc(100vh-5rem)] w-full overflow-hidden">
+    <section className="relative h-[calc(100vh-5rem)] w-full overflow-hidden flex items-center justify-center bg-black/[0.96] antialiased bg-grid-white/[0.02]">
+      <Spotlight
+        className="-top-40 left-0 md:left-60 md:-top-20"
+        fill="white"
+      />
       {/* Video Background Placeholder */}
       <div className="absolute top-0 left-0 w-full h-full bg-black z-0">
         {/* In a real application, a <video> tag would go here. */}
@@ -12,11 +18,11 @@ export function Hero() {
       <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10"></div>
       
       {/* Content */}
-      <div className="relative z-20 flex h-full flex-col items-center justify-center text-center text-white">
-        <h1 className="font-headline text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter">
+      <div className="relative z-20 flex h-full flex-col items-center justify-center text-center text-white p-4">
+        <h1 className="font-headline text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
           Ouiaan
         </h1>
-        <p className="mt-4 text-lg md:text-xl text-foreground/80 font-body">
+        <p className="mt-4 font-normal text-base text-neutral-300 max-w-lg text-center mx-auto">
           Digital assets for the modern creator.
         </p>
       </div>
