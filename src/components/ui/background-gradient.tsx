@@ -30,54 +30,58 @@ export const BackgroundGradient = ({
     setIsMounted(true);
   }, []);
 
+  if (!isMounted) {
+    return (
+        <div className={cn("relative p-[4px] group", containerClassName)}>
+            <div className={cn("relative z-10", className)}>{children}</div>
+        </div>
+    );
+  }
+
   return (
     <div className={cn("relative p-[4px] group", containerClassName)}>
-      {isMounted && (
-        <>
-          <motion.div
-            variants={animate ? variants : undefined}
-            initial={animate ? "initial" : undefined}
-            animate={animate ? "animate" : undefined}
-            transition={
-              animate
-                ? {
-                    duration: 5,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                  }
-                : undefined
-            }
-            style={{
-              backgroundSize: "400% 400%",
-            }}
-            className={cn(
-              "absolute inset-0 rounded-3xl z-[1] opacity-0 group-hover:opacity-100 blur-xl transition duration-500 will-change-transform",
-              "bg-[radial-gradient(circle_farthest-side_at_0_100%,#D6FF55,transparent),radial-gradient(circle_farthest-side_at_100%_0,#D6FF55,transparent),radial-gradient(circle_farthest-side_at_100%_100%,#D6FF55,transparent),radial-gradient(circle_farthest-side_at_0_0,#D6FF55,transparent)]"
-            )}
-          />
-          <motion.div
-            variants={animate ? variants : undefined}
-            initial={animate ? "initial" : undefined}
-            animate={animate ? "animate" : undefined}
-            transition={
-              animate
-                ? {
-                    duration: 5,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                  }
-                : undefined
-            }
-            style={{
-              backgroundSize: "400% 400%",
-            }}
-            className={cn(
-              "absolute inset-0 rounded-3xl z-[1] will-change-transform",
-              "bg-[radial-gradient(circle_farthest-side_at_0_100%,#D6FF55,transparent),radial-gradient(circle_farthest-side_at_100%_0,#D6FF55,transparent),radial-gradient(circle_farthest-side_at_100%_100%,#D6FF55,transparent),radial-gradient(circle_farthest-side_at_0_0,#D6FF55,transparent)]"
-            )}
-          />
-        </>
-      )}
+      <motion.div
+        variants={animate ? variants : undefined}
+        initial={animate ? "initial" : undefined}
+        animate={animate ? "animate" : undefined}
+        transition={
+          animate
+            ? {
+                duration: 5,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }
+            : undefined
+        }
+        style={{
+          backgroundSize: "400% 400%",
+        }}
+        className={cn(
+          "absolute inset-0 rounded-3xl z-[1] opacity-0 group-hover:opacity-100 blur-xl transition duration-500 will-change-transform",
+          "bg-[radial-gradient(circle_farthest-side_at_0_100%,#FFFFFF,transparent),radial-gradient(circle_farthest-side_at_100%_0,#D6FF55,transparent),radial-gradient(circle_farthest-side_at_100%_100%,#D6FF55,transparent),radial-gradient(circle_farthest-side_at_0_0,#FFFFFF,transparent)]"
+        )}
+      />
+      <motion.div
+        variants={animate ? variants : undefined}
+        initial={animate ? "initial" : undefined}
+        animate={animate ? "animate" : undefined}
+        transition={
+          animate
+            ? {
+                duration: 5,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }
+            : undefined
+        }
+        style={{
+          backgroundSize: "400% 400%",
+        }}
+        className={cn(
+          "absolute inset-0 rounded-3xl z-[1] will-change-transform",
+          "bg-[radial-gradient(circle_farthest-side_at_0_100%,#FFFFFF,transparent),radial-gradient(circle_farthest-side_at_100%_0,#D6FF55,transparent),radial-gradient(circle_farthest-side_at_100%_100%,#D6FF55,transparent),radial-gradient(circle_farthest-side_at_0_0,#FFFFFF,transparent)]"
+        )}
+      />
 
       <div className={cn("relative z-10", className)}>{children}</div>
     </div>
