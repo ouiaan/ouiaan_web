@@ -3,7 +3,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ArrowDown } from 'lucide-react';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
@@ -15,8 +14,6 @@ const freebies = [
 ];
 
 export default function FreebiesPage() {
-  const [hoveredId, setHoveredId] = useState<number | null>(null);
-
   return (
     <div className="container mx-auto py-16 md:py-24 px-4">
       <SectionTitle>Free Resources</SectionTitle>
@@ -26,12 +23,8 @@ export default function FreebiesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {freebies.map((item) => (
-          <div
-            key={item.id}
-            onMouseEnter={() => setHoveredId(item.id)}
-            onMouseLeave={() => setHoveredId(null)}
-          >
-            <BackgroundGradient animate={hoveredId === item.id} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
+          <div key={item.id}>
+            <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
               <div className="overflow-hidden rounded-md mb-4">
                 <Image
                   src={item.image}
