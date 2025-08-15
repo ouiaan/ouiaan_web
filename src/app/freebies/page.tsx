@@ -20,7 +20,7 @@ export default function FreebiesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {freebies.map((item) => (
-          <BackgroundGradient key={item.id} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
+          <BackgroundGradient key={item.id} animate={false} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
             <div className="overflow-hidden rounded-md mb-4">
               <Image
                 src={item.image}
