@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ArrowDown } from 'lucide-react';
+import { BackgroundGradient } from '@/components/ui/background-gradient';
 
 const freebies = [
   { id: 1, name: 'Free Sample LUT', description: 'A versatile LUT for a clean cinematic look.', image: 'https://placehold.co/600x400.png', data_ai_hint: 'cinematic still' },
@@ -19,7 +20,7 @@ export default function FreebiesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {freebies.map((item) => (
-          <div key={item.id} className="bg-card p-6 rounded-lg flex flex-col">
+          <BackgroundGradient key={item.id} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
             <div className="overflow-hidden rounded-md mb-4">
               <Image
                 src={item.image}
@@ -36,7 +37,7 @@ export default function FreebiesPage() {
               <span>Download</span>
               <ArrowDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-1" />
             </Link>
-          </div>
+          </BackgroundGradient>
         ))}
       </div>
     </div>
