@@ -2,16 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, Film } from 'lucide-react';
+import { Menu, Film, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const navLinks = [
   { href: '/', label: 'Home' },
-  { href: '/store', label: 'Store' },
+  // Store is now a dropdown
   { href: '/freebies', label: 'Freebies' },
   { href: '/color-ai', label: 'Color AI' },
   { href: '/contact', label: 'Contact' },
@@ -49,7 +55,31 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
+          <NavLink href="/" label="Home" />
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={cn(
+                'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300',
+                pathname.startsWith('/store')
+                  ? 'text-accent'
+                  : 'text-foreground/70 hover:text-foreground'
+              )}>
+                Store
+                <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link href="/store/photo">Photo</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/store/video">Video</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {navLinks.slice(1).map((link) => ( // Render remaining links
             <NavLink key={link.href} {...link} />
           ))}
         </nav>
@@ -65,12 +95,15 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[80vw] bg-background">
               <SheetHeader>
-                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                <SheetTitle className="sr-only">Navigation</SheetTitle>
               </SheetHeader>
               <nav className="flex h-full flex-col items-center justify-center gap-10">
-                {navLinks.map((link) => (
-                  <NavLink key={link.href} {...link} />
-                ))}
+                <NavLink href="/" label="Home" />
+                <NavLink href="/store/photo" label="Photo Store" />
+                <NavLink href="/store/video" label="Video Store" />
+                <NavLink href="/freebies" label="Freebies" />
+                <NavLink href="/color-ai" label="Color AI" />
+                <NavLink href="/contact" label="Contact" />
               </nav>
             </SheetContent>
           </Sheet>
