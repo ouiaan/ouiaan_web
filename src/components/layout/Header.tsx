@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -64,6 +64,9 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[80vw] bg-background">
+              <SheetHeader>
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+              </SheetHeader>
               <nav className="flex h-full flex-col items-center justify-center gap-10">
                 {navLinks.map((link) => (
                   <NavLink key={link.href} {...link} />
