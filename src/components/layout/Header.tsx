@@ -58,8 +58,8 @@ export function Header() {
         <div className="md:hidden">
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
+              <Button variant="ghost" size="icon" className="group">
+                <Menu className="h-6 w-6 transition-transform duration-300 group-hover:rotate-6" />
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
