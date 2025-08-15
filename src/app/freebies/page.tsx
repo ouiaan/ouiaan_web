@@ -1,5 +1,9 @@
+
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ArrowDown } from 'lucide-react';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
@@ -11,6 +15,8 @@ const freebies = [
 ];
 
 export default function FreebiesPage() {
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
+
   return (
     <div className="container mx-auto py-16 md:py-24 px-4">
       <SectionTitle>Free Resources</SectionTitle>
@@ -20,24 +26,30 @@ export default function FreebiesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {freebies.map((item) => (
-          <BackgroundGradient key={item.id} animate={false} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
-            <div className="overflow-hidden rounded-md mb-4">
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={600}
-                height={400}
-                className="w-full h-auto object-cover"
-                data-ai-hint={item.data_ai_hint}
-              />
-            </div>
-            <h3 className="font-headline text-2xl text-foreground">{item.name}</h3>
-            <p className="text-foreground/70 mt-2 flex-grow">{item.description}</p>
-            <Link href="#" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider mt-6">
-              <span>Download</span>
-              <ArrowDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-1" />
-            </Link>
-          </BackgroundGradient>
+          <div
+            key={item.id}
+            onMouseEnter={() => setHoveredId(item.id)}
+            onMouseLeave={() => setHoveredId(null)}
+          >
+            <BackgroundGradient animate={hoveredId === item.id} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
+              <div className="overflow-hidden rounded-md mb-4">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={600}
+                  height={400}
+                  className="w-full h-auto object-cover"
+                  data-ai-hint={item.data_ai_hint}
+                />
+              </div>
+              <h3 className="font-headline text-2xl text-foreground">{item.name}</h3>
+              <p className="text-foreground/70 mt-2 flex-grow">{item.description}</p>
+              <Link href="#" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider mt-6">
+                <span>Download</span>
+                <ArrowDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-1" />
+              </Link>
+            </BackgroundGradient>
+          </div>
         ))}
       </div>
     </div>
