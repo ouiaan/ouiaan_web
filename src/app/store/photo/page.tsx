@@ -66,7 +66,7 @@ export default function PhotoStorePage() {
 
       <div className="max-w-5xl mx-auto">
         <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-4 flex flex-col">
-          <Carousel className="w-full" opts={{ dragFree: false }}>
+          <Carousel className="w-full" opts={{ draggable: false }}>
             <CarouselContent>
               {product.images.map((img, index) => (
                 <CarouselItem key={index}>
