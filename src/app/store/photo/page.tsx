@@ -1,17 +1,7 @@
 
 'use client';
 
-import Image from 'next/image';
-import { useState } from 'react';
-import { SectionTitle } from '@/components/ui/SectionTitle';
-import { Button } from '@/components/ui/button';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { BackgroundGradient } from '@/components/ui/background-gradient';
+import * as React from 'react';
 import {
   Carousel,
   CarouselContent,
@@ -19,6 +9,15 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { SectionTitle } from '@/components/ui/SectionTitle';
+import { Button } from '@/components/ui/button';
+import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { ImageComparisonSlider } from '@/components/ui/ImageComparisonSlider';
 
 const product = { 
@@ -28,16 +27,16 @@ const product = {
   category: 'Presets', 
   description: 'Brings out rich, deep greens and adds a touch of moody contrast, perfect for forest and nature photography. This pack contains 10 unique presets.',
   images: [
-    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Moody forest scene 1", data_ai_hint: 'moody forest' },
-    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Moody nature scene 2", data_ai_hint: 'moody nature' },
-    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Dark forest scene 3", data_ai_hint: 'dark forest' },
-    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Green woods scene 4", data_ai_hint: 'green woods' },
-    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Enchanted forest scene 5", data_ai_hint: 'enchanted forest' },
-    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Moody path scene 6", data_ai_hint: 'moody path' },
-    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Deep woods scene 7", data_ai_hint: 'deep woods' },
-    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Forest light scene 8", data_ai_hint: 'forest light' },
-    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Misty forest scene 9", data_ai_hint: 'misty forest' },
-    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Sunlit forest scene 10", data_ai_hint: 'sunlit forest' },
+    { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 1", data_ai_hint: 'moody forest' },
+    { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Moody nature scene 2", data_ai_hint: 'moody nature' },
+    { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Dark forest scene 3", data_ai_hint: 'dark forest' },
+    { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Green woods scene 4", data_ai_hint: 'green woods' },
+    { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Enchanted forest scene 5", data_ai_hint: 'enchanted forest' },
+    { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Moody path scene 6", data_ai_hint: 'moody path' },
+    { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Deep woods scene 7", data_ai_hint: 'deep woods' },
+    { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Forest light scene 8", data_ai_hint: 'forest light' },
+    { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Misty forest scene 9", data_ai_hint: 'misty forest' },
+    { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Sunlit forest scene 10", data_ai_hint: 'sunlit forest' },
   ]
 };
 
@@ -123,4 +122,3 @@ export default function PhotoStorePage() {
     </div>
   );
 }
-
