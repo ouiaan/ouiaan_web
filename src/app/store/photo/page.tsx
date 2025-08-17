@@ -10,7 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { BackgroundGradient } from '@/components/ui/background-gradient';
 
 const product = { 
   id: 2, 
@@ -49,27 +49,27 @@ export default function PhotoStorePage() {
       </p>
 
       <div className="max-w-4xl mx-auto">
-        <Card className="overflow-hidden">
-            <CardContent className="p-0 grid md:grid-cols-2">
-                <div className="aspect-video relative">
-                    <Image
-                        src={product.image.src}
-                        alt={product.image.alt}
-                        fill
-                        className="object-cover"
-                        data-ai-hint={product.image.data_ai_hint}
-                    />
-                </div>
-                <div className="flex flex-col p-8 md:p-12">
-                    <h3 className="font-headline text-3xl text-foreground">{product.name}</h3>
-                    <p className="text-foreground/70 mt-4 flex-grow">{product.description}</p>
-                    <div className="flex items-center justify-between mt-8">
-                        <span className="text-accent font-headline text-4xl">{product.price}</span>
-                        <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">Add to Cart</Button>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
+        <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card p-0">
+          <div className="grid md:grid-cols-2">
+              <div className="aspect-video relative rounded-t-xl md:rounded-l-xl md:rounded-tr-none overflow-hidden">
+                  <Image
+                      src={product.image.src}
+                      alt={product.image.alt}
+                      fill
+                      className="object-cover"
+                      data-ai-hint={product.image.data_ai_hint}
+                  />
+              </div>
+              <div className="flex flex-col p-8 md:p-12">
+                  <h3 className="font-headline text-3xl text-foreground">{product.name}</h3>
+                  <p className="text-foreground/70 mt-4 flex-grow">{product.description}</p>
+                  <div className="flex items-center justify-between mt-8">
+                      <span className="text-accent font-headline text-4xl">{product.price}</span>
+                      <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">Add to Cart</Button>
+                  </div>
+              </div>
+          </div>
+        </BackgroundGradient>
       </div>
       
       <div className="max-w-3xl mx-auto mt-20">
