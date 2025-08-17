@@ -55,19 +55,23 @@ export function Header() {
           <NavLink href="/" label="Home" />
           
           <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
-            <div onMouseEnter={() => setStoreMenuOpen(true)} onMouseLeave={() => setStoreMenuOpen(false)}>
-              <DropdownMenuTrigger asChild>
-                <button className={cn(
-                  'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
-                  pathname.startsWith('/store')
-                    ? 'text-accent'
-                    : 'text-foreground/70 hover:text-foreground'
-                )}>
-                  Store
-                  <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
+            <div 
+                className="relative"
+                onMouseEnter={() => setStoreMenuOpen(true)} 
+                onMouseLeave={() => setStoreMenuOpen(false)}
+            >
+              <Link href="/store" passHref>
+                  <span className={cn(
+                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
+                    pathname.startsWith('/store')
+                      ? 'text-accent'
+                      : 'text-foreground/70 hover:text-foreground'
+                  )}>
+                    Store
+                    <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
+                  </span>
+              </Link>
+              <DropdownMenuContent className="mt-2" onMouseLeave={() => setStoreMenuOpen(false)}>
                 <DropdownMenuItem asChild>
                   <Link href="/store/photo">Photo</Link>
                 </DropdownMenuItem>
