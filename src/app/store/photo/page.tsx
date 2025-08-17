@@ -2,6 +2,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useState } from 'react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +19,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { ImageComparisonSlider } from '@/components/ui/ImageComparisonSlider';
 
 const product = { 
   id: 2, 
@@ -26,16 +28,16 @@ const product = {
   category: 'Presets', 
   description: 'Brings out rich, deep greens and adds a touch of moody contrast, perfect for forest and nature photography. This pack contains 10 unique presets.',
   images: [
-    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 1", data_ai_hint: 'moody forest' },
-    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 2", data_ai_hint: 'moody nature' },
-    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 3", data_ai_hint: 'dark forest' },
-    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 4", data_ai_hint: 'green woods' },
-    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 5", data_ai_hint: 'enchanted forest' },
-    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 6", data_ai_hint: 'moody path' },
-    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 7", data_ai_hint: 'deep woods' },
-    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 8", data_ai_hint: 'forest light' },
-    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 9", data_ai_hint: 'misty forest' },
-    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 10", data_ai_hint: 'sunlit forest' },
+    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Moody forest scene 1", data_ai_hint: 'moody forest' },
+    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Moody nature scene 2", data_ai_hint: 'moody nature' },
+    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Dark forest scene 3", data_ai_hint: 'dark forest' },
+    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Green woods scene 4", data_ai_hint: 'green woods' },
+    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Enchanted forest scene 5", data_ai_hint: 'enchanted forest' },
+    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Moody path scene 6", data_ai_hint: 'moody path' },
+    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Deep woods scene 7", data_ai_hint: 'deep woods' },
+    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Forest light scene 8", data_ai_hint: 'forest light' },
+    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Misty forest scene 9", data_ai_hint: 'misty forest' },
+    { before: 'https://placehold.co/1600x900.png?text=Before', after: 'https://placehold.co/1600x900.png?text=After', alt: "Sunlit forest scene 10", data_ai_hint: 'sunlit forest' },
   ]
 };
 
@@ -83,15 +85,12 @@ export default function PhotoStorePage() {
                 <CarouselContent>
                   {product.images.map((image, index) => (
                     <CarouselItem key={index}>
-                      <div className="aspect-video relative rounded-xl overflow-hidden">
-                        <Image
-                          src={image.src}
-                          alt={image.alt}
-                          fill
-                          className="object-cover"
-                          data-ai-hint={image.data_ai_hint}
-                        />
-                      </div>
+                       <ImageComparisonSlider
+                        before={image.before}
+                        after={image.after}
+                        alt={image.alt}
+                        data_ai_hint={image.data_ai_hint}
+                      />
                     </CarouselItem>
                   ))}
                 </CarouselContent>
@@ -124,3 +123,4 @@ export default function PhotoStorePage() {
     </div>
   );
 }
+
