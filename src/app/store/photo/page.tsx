@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/accordion";
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Button } from '@/components/ui/button';
-import { BackgroundGradient } from '@/components/ui/background-gradient';
+import { PhotoBackgroundGradient } from '@/components/ui/PhotoBackgroundGradient';
 import { ImageComparisonSlider } from '@/components/ui/ImageComparisonSlider';
 
 const product = { 
@@ -68,7 +68,7 @@ export default function PhotoStorePage() {
       </p>
 
       <div className="max-w-4xl mx-auto">
-        <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card p-6 md:p-8">
+        <PhotoBackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card p-6 md:p-8">
           <div className="flex flex-col gap-8">
               <Carousel 
                 className="relative"
@@ -97,7 +97,7 @@ export default function PhotoStorePage() {
                   <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl">Buy Now</Button>
               </div>
           </div>
-        </BackgroundGradient>
+        </PhotoBackgroundGradient>
       </div>
       
       <div className="max-w-3xl mx-auto mt-20">
