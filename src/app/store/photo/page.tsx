@@ -71,6 +71,7 @@ export default function PhotoStorePage() {
           <div className="relative w-full">
               <Carousel
                 opts={{
+                  dragFree: false,
                   draggable: false,
                 }}
                 className="w-full"
