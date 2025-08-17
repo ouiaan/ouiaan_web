@@ -22,7 +22,7 @@ import { ImageComparisonSlider } from '@/components/ui/ImageComparisonSlider';
 
 const product = { 
   id: 2, 
-  name: 'Moody Greens Preset Pack', 
+  name: 'Ouiaan V1 Preset Pack', 
   price: '$15', 
   category: 'Presets', 
   description: 'Brings out rich, deep greens and adds a touch of moody contrast, perfect for forest and nature photography. This pack contains 10 unique presets.',
@@ -70,11 +70,6 @@ export default function PhotoStorePage() {
       <div className="max-w-4xl mx-auto">
         <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card p-6 md:p-8">
           <div className="flex flex-col gap-8">
-              <div className="text-center">
-                  <h3 className="font-headline text-3xl text-foreground">{product.name}</h3>
-                  <p className="text-foreground/70 mt-2 max-w-xl mx-auto">{product.description}</p>
-              </div>
-
               <Carousel 
                 className="relative"
                 opts={{
