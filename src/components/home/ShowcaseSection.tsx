@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -13,7 +14,7 @@ export function ShowcaseSection() {
           Craft your unique visual identity with professionally designed LUTs and presets.
         </p>
         
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-stretch">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 lg:gap-12 items-stretch">
           <BackgroundGradient containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 md:p-8 flex flex-col">
             <div className="flex-grow">
               <h3 className="font-headline text-3xl text-foreground">Cinematic LUTs</h3>
