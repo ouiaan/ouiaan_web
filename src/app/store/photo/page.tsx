@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { Button } from '@/components/ui/button';
@@ -12,8 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardContent } from '@/components/ui/card';
-import { ImageComparisonSlider } from '@/components/ui/image-comparison-slider';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const products = [
   { 
@@ -49,22 +49,7 @@ const faqs = [
 ];
 
 export default function PhotoStorePage() {
-  const product = products[0]; // For this example, we're focusing on one product
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const goToPrevious = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
-    );
-  };
-
-  const goToNext = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === product.images.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const currentImage = product.images[currentImageIndex];
+  const product = products[0];
 
   return (
     <div className="container mx-auto py-16 md:py-24 px-4">
@@ -76,29 +61,33 @@ export default function PhotoStorePage() {
       <div className="max-w-5xl mx-auto">
         <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-4 flex flex-col">
           <div className="relative w-full">
-            <div className="p-1">
-              <Card>
-                <CardContent className="p-4 bg-secondary rounded-lg">
-                  <ImageComparisonSlider
-                    beforeImage={{ src: currentImage.before, alt: `Before ${currentImage.alt}`, 'data-ai-hint': currentImage.data_ai_hint_before }}
-                    afterImage={{ src: currentImage.after, alt: `After ${currentImage.alt}`, 'data-ai-hint': currentImage.data_ai_hint_after }}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-            
-            {product.images.length > 1 && (
-              <>
-                <Button variant="outline" size="icon" className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full" onClick={goToPrevious}>
-                  <ChevronLeft className="h-4 w-4" />
-                  <span className="sr-only">Previous Image</span>
-                </Button>
-                <Button variant="outline" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full" onClick={goToNext}>
-                  <ChevronRight className="h-4 w-4" />
-                  <span className="sr-only">Next Image</span>
-                </Button>
-              </>
-            )}
+              <Carousel
+                opts={{
+                  draggable: false,
+                }}
+                className="w-full"
+              >
+                <CarouselContent>
+                  {product.images.map((image, index) => (
+                    <CarouselItem key={index}>
+                        <Card>
+                            <CardContent className="p-4 bg-secondary rounded-lg aspect-[16/9]">
+                                <Image
+                                    src={image.after}
+                                    alt={`After applying ${product.name} to ${image.alt}`}
+                                    width={1600}
+                                    height={900}
+                                    className="w-full h-full object-cover rounded-md"
+                                    data-ai-hint={image.data_ai_hint_after}
+                                />
+                            </CardContent>
+                        </Card>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full" />
+                <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full" />
+              </Carousel>
           </div>
           <div className="flex justify-between items-center mt-6 px-2">
             <span className="text-accent font-headline text-3xl">{product.price}</span>
