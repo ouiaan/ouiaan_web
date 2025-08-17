@@ -66,44 +66,7 @@ export default function PhotoStorePage() {
         {product.description}
       </p>
 
-      <div className="max-w-5xl mx-auto">
-        <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-4 flex flex-col">
-          <div className="relative w-full">
-              <Carousel
-                opts={{
-                  dragFree: false,
-                  draggable: false,
-                }}
-                className="w-full"
-              >
-                <CarouselContent>
-                  {product.images.map((image, index) => (
-                    <CarouselItem key={index}>
-                        <Card>
-                            <CardContent className="p-4 bg-secondary rounded-lg aspect-[16/9]">
-                                <Image
-                                    src={image.src}
-                                    alt={image.alt}
-                                    width={1600}
-                                    height={900}
-                                    className="w-full h-full object-cover rounded-md"
-                                    data-ai-hint={image.data_ai_hint}
-                                />
-                            </CardContent>
-                        </Card>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full" />
-                <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full" />
-              </Carousel>
-          </div>
-          <div className="flex justify-between items-center mt-6 px-2">
-            <span className="text-accent font-headline text-3xl">{product.price}</span>
-            <Button size="lg" className="bg-primary">Add to Cart</Button>
-          </div>
-        </BackgroundGradient>
-      </div>
+      {/* The Carousel and Card section has been removed */}
       
       <div className="max-w-3xl mx-auto mt-20">
         <h3 className="font-headline text-3xl text-center mb-8">Frequently Asked Questions</h3>
