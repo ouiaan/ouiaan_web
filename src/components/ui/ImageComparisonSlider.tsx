@@ -109,7 +109,7 @@ export const ImageComparisonSlider: React.FC<ImageComparisonSliderProps> = ({
         style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
       >
         <div className="absolute top-1/2 -translate-y-1/2 -left-5 flex items-center justify-center h-10 w-10">
-            <LogoIcon className="h-5 w-5" />
+            <LogoIcon className="h-10 w-10" />
         </div>
       </div>
       
