@@ -42,6 +42,7 @@ export function FeaturedWork() {
             opts={{
               align: "start",
               loop: true,
+              dragFree: true,
             }}
             className="w-full cursor-grab active:cursor-grabbing"
           >
