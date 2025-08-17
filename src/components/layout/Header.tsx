@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Logo } from './Logo';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -45,9 +46,7 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-headline text-2xl font-bold text-foreground">
-            Ouiaan
-          </span>
+          <Logo className="h-8 w-auto text-foreground" />
         </Link>
 
         {/* Desktop Navigation */}
