@@ -109,11 +109,9 @@ export const ImageComparisonSlider: React.FC<ImageComparisonSliderProps> = ({
         className="absolute top-0 bottom-0 w-1 bg-white/50 cursor-ew-resize pointer-events-none"
         style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
       >
-        <div className="absolute top-1/2 -translate-y-1/2 -left-4 bg-white/80 backdrop-blur-sm text-black p-1 rounded-full shadow-md">
-          <ChevronLeft size={16} />
-        </div>
-        <div className="absolute top-1/2 -translate-y-1/2 -right-4 bg-white/80 backdrop-blur-sm text-black p-1 rounded-full shadow-md">
-          <ChevronRight size={16} />
+        <div className="absolute top-1/2 -translate-y-1/2 -left-5 bg-white/80 backdrop-blur-sm text-black p-1 rounded-full shadow-md flex items-center justify-center">
+          <ChevronLeft size={24} />
+          <ChevronRight size={24} />
         </div>
       </div>
       
