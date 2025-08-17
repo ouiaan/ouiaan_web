@@ -4,8 +4,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -32,7 +30,7 @@ export function FeaturedWork() {
               align: "start",
               loop: true,
             }}
-            className="w-full"
+            className="w-full cursor-grab active:cursor-grabbing"
           >
             <CarouselContent>
               {images.map((image, index) => (
@@ -56,8 +54,6 @@ export function FeaturedWork() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="left-[-50px]" />
-            <CarouselNext className="right-[-50px]" />
           </Carousel>
         </div>
       </div>
