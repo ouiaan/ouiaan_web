@@ -6,8 +6,8 @@ import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { Button } from '@/components/ui/button';
 
 const products = [
-  { id: 2, name: 'Moody Greens Preset', price: '$15', image: 'https://placehold.co/600x400.png', category: 'Presets', data_ai_hint: 'moody forest' },
-  { id: 4, name: 'Desert Tone Presets', price: '$19', image: 'https://placehold.co/600x400.png', category: 'Presets', data_ai_hint: 'desert landscape' },
+  { id: 2, name: 'Moody Greens Preset', price: '$15', image: 'https://placehold.co/1600x900.png', category: 'Presets', data_ai_hint: 'moody forest' },
+  { id: 4, name: 'Desert Tone Presets', price: '$19', image: 'https://placehold.co/1600x900.png', category: 'Presets', data_ai_hint: 'desert landscape' },
 ];
 
 export default function PhotoStorePage() {
@@ -22,13 +22,13 @@ export default function PhotoStorePage() {
         {products.map((product) => (
           <Link href="#" key={product.id}>
              <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-4 flex flex-col">
-                <div className="overflow-hidden rounded-md mb-4">
+                <div className="overflow-hidden rounded-md mb-4 aspect-video">
                     <Image
                     src={product.image}
                     alt={product.name}
-                    width={600}
-                    height={400}
-                    className="w-full h-auto object-cover"
+                    width={1600}
+                    height={900}
+                    className="w-full h-full object-cover"
                     data-ai-hint={product.data_ai_hint}
                     />
                 </div>

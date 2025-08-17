@@ -6,10 +6,10 @@ import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { Button } from '@/components/ui/button';
 
 const products = [
-  { id: 1, name: 'Vintage Film LUT Pack', price: '$29', image: 'https://placehold.co/600x400.png', category: 'LUTs', data_ai_hint: 'film camera' },
-  { id: 3, name: 'Urban Night LUTs', price: '$25', image: 'https://placehold.co/600x400.png', category: 'LUTs', data_ai_hint: 'city night' },
-  { id: 5, name: '8mm Film Grain Overlay', price: '$10', image: 'https://placehold.co/600x400.png', category: 'Overlays', data_ai_hint: 'film grain' },
-  { id: 6, name: 'Teal & Orange LUT', price: '$12', image: 'https://placehold.co/600x400.png', category: 'LUTs', data_ai_hint: 'beach sunset' },
+  { id: 1, name: 'Vintage Film LUT Pack', price: '$29', image: 'https://placehold.co/1600x900.png', category: 'LUTs', data_ai_hint: 'film camera' },
+  { id: 3, name: 'Urban Night LUTs', price: '$25', image: 'https://placehold.co/1600x900.png', category: 'LUTs', data_ai_hint: 'city night' },
+  { id: 5, name: '8mm Film Grain Overlay', price: '$10', image: 'https://placehold.co/1600x900.png', category: 'Overlays', data_ai_hint: 'film grain' },
+  { id: 6, name: 'Teal & Orange LUT', price: '$12', image: 'https://placehold.co/1600x900.png', category: 'LUTs', data_ai_hint: 'beach sunset' },
 ];
 
 export default function VideoStorePage() {
@@ -24,13 +24,13 @@ export default function VideoStorePage() {
         {products.map((product) => (
           <Link href="#" key={product.id}>
              <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-4 flex flex-col">
-                <div className="overflow-hidden rounded-md mb-4">
+                <div className="overflow-hidden rounded-md mb-4 aspect-video">
                     <Image
                     src={product.image}
                     alt={product.name}
-                    width={600}
-                    height={400}
-                    className="w-full h-auto object-cover"
+                    width={1600}
+                    height={900}
+                    className="w-full h-full object-cover"
                     data-ai-hint={product.data_ai_hint}
                     />
                 </div>

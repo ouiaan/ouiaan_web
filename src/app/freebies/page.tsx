@@ -8,9 +8,9 @@ import { ArrowDown } from 'lucide-react';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 
 const freebies = [
-  { id: 1, name: 'Free Sample LUT', description: 'A versatile LUT for a clean cinematic look.', image: 'https://placehold.co/600x400.png', data_ai_hint: 'cinematic still' },
-  { id: 2, name: 'BW Film Preset', description: 'A classic black and white preset for timeless photos.', image: 'https://placehold.co/600x400.png', data_ai_hint: 'black white' },
-  { id: 3, name: '4K Film Grain Overlay', description: 'Add authentic film texture to your videos.', image: 'https://placehold.co/600x400.png', data_ai_hint: 'abstract texture' },
+  { id: 1, name: 'Free Sample LUT', description: 'A versatile LUT for a clean cinematic look.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'cinematic still' },
+  { id: 2, name: 'BW Film Preset', description: 'A classic black and white preset for timeless photos.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'black white' },
+  { id: 3, name: '4K Film Grain Overlay', description: 'Add authentic film texture to your videos.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'abstract texture' },
 ];
 
 export default function FreebiesPage() {
@@ -25,13 +25,13 @@ export default function FreebiesPage() {
         {freebies.map((item) => (
           <div key={item.id}>
             <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
-              <div className="overflow-hidden rounded-md mb-4">
+              <div className="overflow-hidden rounded-md mb-4 aspect-video">
                 <Image
                   src={item.image}
                   alt={item.name}
-                  width={600}
-                  height={400}
-                  className="w-full h-auto object-cover"
+                  width={1600}
+                  height={900}
+                  className="w-full h-full object-cover"
                   data-ai-hint={item.data_ai_hint}
                 />
               </div>
