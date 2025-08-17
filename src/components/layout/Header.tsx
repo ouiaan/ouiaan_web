@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
+import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 import {
@@ -22,6 +23,7 @@ const navLinks = [
 
 export function Header() {
   const pathname = usePathname();
+  const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link href={href} passHref>
@@ -51,26 +53,28 @@ export function Header() {
         <nav className="hidden items-center gap-8 md:flex">
           <NavLink href="/" label="Home" />
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className={cn(
-                'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
-                pathname.startsWith('/store')
-                  ? 'text-accent'
-                  : 'text-foreground/70 hover:text-foreground'
-              )}>
-                Store
-                <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem asChild>
-                <Link href="/store/photo">Photo</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/store/video">Video</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
+          <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
+            <div onMouseEnter={() => setStoreMenuOpen(true)} onMouseLeave={() => setStoreMenuOpen(false)}>
+              <DropdownMenuTrigger asChild>
+                <button className={cn(
+                  'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
+                  pathname.startsWith('/store')
+                    ? 'text-accent'
+                    : 'text-foreground/70 hover:text-foreground'
+                )}>
+                  Store
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem asChild>
+                  <Link href="/store/photo">Photo</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/store/video">Video</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </div>
           </DropdownMenu>
 
           <NavLink href="/freebies" label="Freebies" />
