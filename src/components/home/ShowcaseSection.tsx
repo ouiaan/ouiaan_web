@@ -22,13 +22,13 @@ export function ShowcaseSection() {
               </p>
             </div>
             <div className="mt-6">
-                <div className="rounded-lg overflow-hidden mb-6">
+                <div className="rounded-lg overflow-hidden mb-6 aspect-video">
                   <Image
-                    src="https://placehold.co/800x600.png"
+                    src="https://placehold.co/1600x900.png"
                     alt="LUTs Showcase"
-                    width={800}
-                    height={600}
-                    className="w-full h-auto object-cover"
+                    width={1600}
+                    height={900}
+                    className="w-full h-full object-cover"
                     data-ai-hint="cinematic video"
                   />
                 </div>
@@ -47,13 +47,13 @@ export function ShowcaseSection() {
                 </p>
             </div>
             <div className="mt-6">
-                <div className="rounded-lg overflow-hidden mb-6">
+                <div className="rounded-lg overflow-hidden mb-6 aspect-video">
                   <Image
-                      src="https://placehold.co/800x600.png"
+                      src="https://placehold.co/1600x900.png"
                       alt="Presets Showcase"
-                      width={800}
-                      height={600}
-                      className="w-full h-auto object-cover"
+                      width={1600}
+                      height={900}
+                      className="w-full h-full object-cover"
                       data-ai-hint="photo editing"
                     />
                 </div>

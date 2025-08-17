@@ -8,12 +8,12 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 
 const images = [
-  { src: "https://placehold.co/800x1200.png", alt: "Abstract cityscape", data_ai_hint: "abstract cityscape" },
-  { src: "https://placehold.co/800x800.png", alt: "Minimalist portrait", data_ai_hint: "minimalist portrait" },
-  { src: "https://placehold.co/800x600.png", alt: "Moody landscape", data_ai_hint: "moody landscape" },
-  { src: "https://placehold.co/800x1000.png", alt: "Street photography", data_ai_hint: "street photography" },
-  { src: "https://placehold.co/800x700.png", alt: "Nature detail", data_ai_hint: "nature detail" },
-  { src: "https://placehold.co/800x1100.png", alt: "Fashion shot", data_ai_hint: "fashion shot" },
+  { src: "https://placehold.co/1600x900.png", alt: "Abstract cityscape", data_ai_hint: "abstract cityscape" },
+  { src: "https://placehold.co/1600x900.png", alt: "Minimalist portrait", data_ai_hint: "minimalist portrait" },
+  { src: "https://placehold.co/1600x900.png", alt: "Moody landscape", data_ai_hint: "moody landscape" },
+  { src: "https://placehold.co/1600x900.png", alt: "Street photography", data_ai_hint: "street photography" },
+  { src: "https://placehold.co/1600x900.png", alt: "Nature detail", data_ai_hint: "nature detail" },
+  { src: "https://placehold.co/1600x900.png", alt: "Fashion shot", data_ai_hint: "fashion shot" },
 ];
 
 export function FeaturedWork() {
@@ -38,7 +38,7 @@ export function FeaturedWork() {
                   <div className="p-1">
                     <Card className="overflow-hidden">
                       <CardContent className="p-0">
-                        <div className="aspect-[3/4] relative group">
+                        <div className="aspect-video relative group">
                           <Image
                             src={image.src}
                             alt={image.alt}
