@@ -2,22 +2,19 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const navLinks = [
   { href: '/', label: 'Home' },
-  // Store is now a dropdown
+  { href: '/store', label: 'Store' },
   { href: '/freebies', label: 'Freebies' },
   { href: '/color-ai', label: 'Color AI' },
   { href: '/contact', label: 'Contact' },
@@ -25,7 +22,6 @@ const navLinks = [
 
 export function Header() {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link href={href} passHref>
@@ -36,7 +32,6 @@ export function Header() {
             ? 'text-accent'
             : 'text-foreground/70 hover:text-foreground'
         )}
-        onClick={() => setIsMobileMenuOpen(false)}
       >
         {label}
       </span>
@@ -78,35 +73,37 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {navLinks.slice(1).map((link) => ( // Render remaining links
-            <NavLink key={link.href} {...link} />
-          ))}
+          <NavLink href="/freebies" label="Freebies" />
+          <NavLink href="/color-ai" label="Color AI" />
+          <NavLink href="/contact" label="Contact" />
         </nav>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="group">
-                <Menu className="h-6 w-6 transition-transform duration-300 group-hover:rotate-6" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[80vw] bg-background">
-              <SheetHeader>
-                <SheetTitle className="sr-only">Navigation</SheetTitle>
-              </SheetHeader>
-              <nav className="flex h-full flex-col items-center justify-center gap-10">
-                <NavLink href="/" label="Home" />
-                <NavLink href="/store/photo" label="Photo Store" />
-                <NavLink href="/store/video" label="Video Store" />
-                <NavLink href="/freebies" label="Freebies" />
-                <NavLink href="/color-ai" label="Color AI" />
-                <NavLink href="/contact" label="Contact" />
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
+        <nav className="flex items-center gap-4 md:hidden">
+            <NavLink href="/" label="Home" />
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                <button className={cn(
+                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
+                    pathname.startsWith('/store')
+                    ? 'text-accent'
+                    : 'text-foreground/70 hover:text-foreground'
+                )}>
+                    Store
+                    <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                <DropdownMenuItem asChild>
+                    <Link href="/store/photo">Photo</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href="/store/video">Video</Link>
+                </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            <NavLink href="/contact" label="Contact" />
+        </nav>
       </div>
     </header>
   );
