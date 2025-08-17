@@ -1,7 +1,6 @@
 
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
@@ -20,6 +19,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardContent } from '@/components/ui/card';
+import { ImageComparisonSlider } from '@/components/ui/image-comparison-slider';
 
 const products = [
   { 
@@ -29,8 +29,8 @@ const products = [
     category: 'Presets', 
     description: 'Brings out rich, deep greens and adds a touch of moody contrast, perfect for forest and nature photography.',
     images: [
-      { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', data_ai_hint_before: 'forest path', data_ai_hint_after: 'moody forest' },
-      { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', data_ai_hint_before: 'mountain lake', data_ai_hint_after: 'moody landscape' },
+      { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', data_ai_hint_before: 'forest path', data_ai_hint_after: 'moody forest', alt: "Forest path" },
+      { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', data_ai_hint_before: 'mountain lake', data_ai_hint_after: 'moody landscape', alt: "Mountain lake" },
     ]
   },
 ];
@@ -72,31 +72,11 @@ export default function PhotoStorePage() {
                 <CarouselItem key={index}>
                   <div className="p-1">
                     <Card>
-                      <CardContent className="p-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <h4 className="font-headline text-lg mb-2 text-center text-foreground/70">Before</h4>
-                            <Image
-                              src={img.before}
-                              alt={`Before ${index + 1}`}
-                              width={800}
-                              height={450}
-                              className="rounded-md object-cover"
-                              data-ai-hint={img.data_ai_hint_before}
-                            />
-                          </div>
-                          <div>
-                            <h4 className="font-headline text-lg mb-2 text-center text-accent">After</h4>
-                            <Image
-                              src={img.after}
-                              alt={`After ${index + 1}`}
-                              width={800}
-                              height={450}
-                              className="rounded-md object-cover"
-                              data-ai-hint={img.data_ai_hint_after}
-                            />
-                          </div>
-                        </div>
+                      <CardContent className="p-4 bg-secondary rounded-lg">
+                          <ImageComparisonSlider
+                            beforeImage={{ src: img.before, alt: `Before ${img.alt}`, 'data-ai-hint': img.data_ai_hint_before }}
+                            afterImage={{ src: img.after, alt: `After ${img.alt}`, 'data-ai-hint': img.data_ai_hint_after }}
+                          />
                       </CardContent>
                     </Card>
                   </div>
