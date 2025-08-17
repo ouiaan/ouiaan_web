@@ -1,10 +1,8 @@
 
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import { SectionTitle } from '@/components/ui/SectionTitle';
-import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { Button } from '@/components/ui/button';
 import {
   Accordion,
@@ -12,30 +10,16 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Card, CardContent } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 
-const products = [
-  { 
-    id: 2, 
-    name: 'Moody Greens Preset', 
-    price: '$15', 
-    category: 'Presets', 
-    description: 'Brings out rich, deep greens and adds a touch of moody contrast, perfect for forest and nature photography.',
-    images: [
-      { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene", data_ai_hint: 'moody forest' },
-      { src: 'https://placehold.co/1600x900.png', alt: "Lush green landscape", data_ai_hint: 'lush landscape' },
-      { src: 'https://placehold.co/1600x900.png', alt: "Dark and moody portrait", data_ai_hint: 'moody portrait' },
-      { src: 'https://placehold.co/1600x900.png', alt: "Ferns in a forest", data_ai_hint: 'forest ferns' },
-      { src: 'https://placehold.co/1600x900.png', alt: "Mountain with green tones", data_ai_hint: 'green mountain' },
-      { src: 'https://placehold.co/1600x900.png', alt: "Woman in a green dress", data_ai_hint: 'woman nature' },
-      { src: 'https://placehold.co/1600x900.png', alt: "Close up of leaves", data_ai_hint: 'green leaves' },
-      { src: 'https://placehold.co/1600x900.png', alt: "Jungle canopy", data_ai_hint: 'jungle canopy' },
-      { src: 'https://placehold.co/1600x900.png', alt: "Path through a green tunnel", data_ai_hint: 'garden path' },
-      { src: 'https://placehold.co/1600x900.png', alt: "Overhead shot of a forest", data_ai_hint: 'forest drone' },
-    ]
-  },
-];
+const product = { 
+  id: 2, 
+  name: 'Moody Greens Preset Pack', 
+  price: '$15', 
+  category: 'Presets', 
+  description: 'Brings out rich, deep greens and adds a touch of moody contrast, perfect for forest and nature photography. This pack contains 10 unique presets.',
+  image: { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene", data_ai_hint: 'moody forest' },
+};
 
 const faqs = [
   {
@@ -57,8 +41,6 @@ const faqs = [
 ];
 
 export default function PhotoStorePage() {
-  const product = products[0];
-
   return (
     <div className="container mx-auto py-16 md:py-24 px-4">
       <SectionTitle>{product.name}</SectionTitle>
@@ -66,7 +48,29 @@ export default function PhotoStorePage() {
         {product.description}
       </p>
 
-      {/* The Carousel and Card section has been removed */}
+      <div className="max-w-4xl mx-auto">
+        <Card className="overflow-hidden">
+            <CardContent className="p-0 grid md:grid-cols-2">
+                <div className="aspect-video relative">
+                    <Image
+                        src={product.image.src}
+                        alt={product.image.alt}
+                        fill
+                        className="object-cover"
+                        data-ai-hint={product.image.data_ai_hint}
+                    />
+                </div>
+                <div className="flex flex-col p-8 md:p-12">
+                    <h3 className="font-headline text-3xl text-foreground">{product.name}</h3>
+                    <p className="text-foreground/70 mt-4 flex-grow">{product.description}</p>
+                    <div className="flex items-center justify-between mt-8">
+                        <span className="text-accent font-headline text-4xl">{product.price}</span>
+                        <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">Add to Cart</Button>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+      </div>
       
       <div className="max-w-3xl mx-auto mt-20">
         <h3 className="font-headline text-3xl text-center mb-8">Frequently Asked Questions</h3>
