@@ -14,40 +14,46 @@ interface ImageComparisonSliderProps {
 export function ImageComparisonSlider({ beforeImage, afterImage, className }: ImageComparisonSliderProps) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
 
-  const handleMove = useCallback((event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+  const handleMove = useCallback((clientX: number) => {
     if (!containerRef.current) return;
 
     const rect = containerRef.current.getBoundingClientRect();
-    const x = 'touches' in event ? event.touches[0].clientX - rect.left : event.clientX - rect.left;
+    const x = clientX - rect.left;
     const position = Math.max(0, Math.min(100, (x / rect.width) * 100));
     setSliderPosition(position);
   }, []);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-        handleMove(moveEvent as unknown as React.MouseEvent<HTMLDivElement>);
-    };
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    event.stopPropagation(); // Prevent carousel drag
+    isDragging.current = true;
   };
   
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
-    const handleTouchMove = (moveEvent: TouchEvent) => {
-        handleMove(moveEvent as unknown as React.TouchEvent<HTMLDivElement>);
-    };
-    const handleTouchEnd = () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-    document.addEventListener('touchmove', handleTouchMove);
-    document.addEventListener('touchend', handleTouchEnd);
+    event.stopPropagation(); // Prevent carousel drag
+    isDragging.current = true;
   };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const handleTouchEnd = () => {
+    isDragging.current = false;
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging.current) return;
+    handleMove(event.clientX);
+  };
+  
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!isDragging.current) return;
+    handleMove(event.touches[0].clientX);
+  };
+
 
   return (
     <div
@@ -55,22 +61,27 @@ export function ImageComparisonSlider({ beforeImage, afterImage, className }: Im
       className={cn("relative w-full aspect-[16/9] overflow-hidden rounded-md cursor-ew-resize select-none", className)}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
+      onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp} // Stop dragging if mouse leaves container
+      onTouchEnd={handleTouchEnd}
     >
       <Image
         {...beforeImage}
         alt={beforeImage.alt || 'Before'}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         width={1600}
         height={900}
       />
       <div
-        className="absolute inset-0 w-full h-full object-cover overflow-hidden"
+        className="absolute inset-0 w-full h-full object-cover overflow-hidden pointer-events-none"
         style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
       >
         <Image
           {...afterImage}
           alt={afterImage.alt || 'After'}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
           width={1600}
           height={900}
         />
@@ -88,8 +99,8 @@ export function ImageComparisonSlider({ beforeImage, afterImage, className }: Im
       </div>
 
        {/* Before/After Labels */}
-       <div className="absolute top-2 left-2 bg-black/50 text-white text-xs uppercase px-2 py-1 rounded">Before</div>
-       <div className="absolute top-2 right-2 bg-black/50 text-white text-xs uppercase px-2 py-1 rounded" style={{ opacity: sliderPosition > 60 ? 1 : 0, transition: 'opacity 0.2s' }}>After</div>
+       <div className="absolute top-2 left-2 bg-black/50 text-white text-xs uppercase px-2 py-1 rounded pointer-events-none">Before</div>
+       <div className="absolute top-2 right-2 bg-black/50 text-white text-xs uppercase px-2 py-1 rounded pointer-events-none" style={{ opacity: sliderPosition > 60 ? 1 : 0, transition: 'opacity 0.2s' }}>After</div>
     </div>
   );
 }
