@@ -99,7 +99,7 @@ export default function PhotoStorePage() {
 
               <div className="flex items-center justify-between mt-4">
                   <span className="text-accent font-headline text-4xl">{product.price}</span>
-                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">Buy Now</Button>
+                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl">Buy Now</Button>
               </div>
           </div>
         </BackgroundGradient>
