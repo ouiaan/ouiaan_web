@@ -49,9 +49,14 @@ export default function PhotoStorePage() {
       </p>
 
       <div className="max-w-4xl mx-auto">
-        <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card p-0">
-          <div className="grid md:grid-cols-2">
-              <div className="aspect-video relative rounded-t-xl md:rounded-l-xl md:rounded-tr-none overflow-hidden">
+        <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card p-6 md:p-8">
+          <div className="flex flex-col gap-8">
+              <div className="text-center">
+                  <h3 className="font-headline text-3xl text-foreground">{product.name}</h3>
+                  <p className="text-foreground/70 mt-2 max-w-xl mx-auto">{product.description}</p>
+              </div>
+
+              <div className="aspect-video relative rounded-xl overflow-hidden">
                   <Image
                       src={product.image.src}
                       alt={product.image.alt}
@@ -60,13 +65,10 @@ export default function PhotoStorePage() {
                       data-ai-hint={product.image.data_ai_hint}
                   />
               </div>
-              <div className="flex flex-col p-8 md:p-12">
-                  <h3 className="font-headline text-3xl text-foreground">{product.name}</h3>
-                  <p className="text-foreground/70 mt-4 flex-grow">{product.description}</p>
-                  <div className="flex items-center justify-between mt-8">
-                      <span className="text-accent font-headline text-4xl">{product.price}</span>
-                      <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">Add to Cart</Button>
-                  </div>
+
+              <div className="flex items-center justify-between mt-4">
+                  <span className="text-accent font-headline text-4xl">{product.price}</span>
+                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">Add to Cart</Button>
               </div>
           </div>
         </BackgroundGradient>
