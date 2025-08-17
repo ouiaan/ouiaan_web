@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 
 export const Logo = (props: React.SVGProps<SVGSVGElement>) => (
@@ -5,6 +6,7 @@ export const Logo = (props: React.SVGProps<SVGSVGElement>) => (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 637 735"
+    className="h-10 w-auto text-foreground"
     {...props}
   >
     <path
