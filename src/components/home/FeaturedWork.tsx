@@ -1,4 +1,10 @@
+
+'use client';
+
+import * as React from 'react';
 import Image from "next/image";
+import Autoplay from "embla-carousel-autoplay";
+
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import {
   Carousel,
@@ -19,6 +25,10 @@ const images = [
 ];
 
 export function FeaturedWork() {
+  const plugin = React.useRef(
+    Autoplay({ delay: 2000, stopOnInteraction: true, stopOnMouseEnter: true })
+  );
+
   return (
     <section className="py-20 md:py-32 bg-background">
       <div className="container mx-auto px-4">
@@ -28,6 +38,7 @@ export function FeaturedWork() {
         </p>
         <div className="relative">
           <Carousel
+            plugins={[plugin.current]}
             opts={{
               align: "start",
               loop: true,
@@ -36,7 +47,7 @@ export function FeaturedWork() {
           >
             <CarouselContent>
               {images.map((image, index) => (
-                <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/4">
+                <CarouselItem key={index} className="sm:basis-1/2 md:basis-1/2 lg:basis-1/3">
                   <div className="p-1">
                     <Card className="overflow-hidden">
                       <CardContent className="p-0">
