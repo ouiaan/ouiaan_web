@@ -34,11 +34,11 @@ export default function StorePage() {
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {photoProducts.slice(0, 3).map((product) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {photoProducts.slice(0, 4).map((product) => (
             <Link href="/store/photo" key={product.id}>
               <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-4 flex flex-col">
-                  <div className="overflow-hidden rounded-md mb-4 aspect-video">
+                  <div className="overflow-hidden rounded-md mb-4 aspect-[16/9]">
                       <Image
                       src={product.image}
                       alt={product.name}
@@ -67,11 +67,11 @@ export default function StorePage() {
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {videoProducts.slice(0, 3).map((product) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {videoProducts.slice(0, 4).map((product) => (
             <Link href="/store/video" key={product.id}>
               <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-4 flex flex-col">
-                  <div className="overflow-hidden rounded-md mb-4 aspect-video">
+                  <div className="overflow-hidden rounded-md mb-4 aspect-[16/9]">
                       <Image
                       src={product.image}
                       alt={product.name}

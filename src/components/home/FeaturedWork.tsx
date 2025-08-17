@@ -14,6 +14,8 @@ const images = [
   { src: "https://placehold.co/1600x900.png", alt: "Street photography", data_ai_hint: "street photography" },
   { src: "https://placehold.co/1600x900.png", alt: "Nature detail", data_ai_hint: "nature detail" },
   { src: "https://placehold.co/1600x900.png", alt: "Fashion shot", data_ai_hint: "fashion shot" },
+  { src: "https://placehold.co/1600x900.png", alt: "Architecture", data_ai_hint: "architecture details" },
+  { src: "https://placehold.co/1600x900.png", alt: "Product Shot", data_ai_hint: "product shot" },
 ];
 
 export function FeaturedWork() {
@@ -34,11 +36,11 @@ export function FeaturedWork() {
           >
             <CarouselContent>
               {images.map((image, index) => (
-                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/4">
                   <div className="p-1">
                     <Card className="overflow-hidden">
                       <CardContent className="p-0">
-                        <div className="aspect-video relative group">
+                        <div className="aspect-[16/9] relative group">
                           <Image
                             src={image.src}
                             alt={image.alt}

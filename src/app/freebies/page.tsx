@@ -11,6 +11,7 @@ const freebies = [
   { id: 1, name: 'Free Sample LUT', description: 'A versatile LUT for a clean cinematic look.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'cinematic still' },
   { id: 2, name: 'BW Film Preset', description: 'A classic black and white preset for timeless photos.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'black white' },
   { id: 3, name: '4K Film Grain Overlay', description: 'Add authentic film texture to your videos.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'abstract texture' },
+  { id: 4, name: 'Light Leak Effect', description: 'A beautiful light leak overlay for a dreamy effect.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'light leak' },
 ];
 
 export default function FreebiesPage() {
@@ -21,11 +22,11 @@ export default function FreebiesPage() {
         Enjoy a selection of free tools to get a taste of the quality and style of my products.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {freebies.map((item) => (
           <div key={item.id}>
             <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
-              <div className="overflow-hidden rounded-md mb-4 aspect-video">
+              <div className="overflow-hidden rounded-md mb-4 aspect-[16/9]">
                 <Image
                   src={item.image}
                   alt={item.name}

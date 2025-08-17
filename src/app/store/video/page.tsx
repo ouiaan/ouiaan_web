@@ -10,6 +10,10 @@ const products = [
   { id: 3, name: 'Urban Night LUTs', price: '$25', image: 'https://placehold.co/1600x900.png', category: 'LUTs', data_ai_hint: 'city night' },
   { id: 5, name: '8mm Film Grain Overlay', price: '$10', image: 'https://placehold.co/1600x900.png', category: 'Overlays', data_ai_hint: 'film grain' },
   { id: 6, name: 'Teal & Orange LUT', price: '$12', image: 'https://placehold.co/1600x900.png', category: 'LUTs', data_ai_hint: 'beach sunset' },
+  { id: 9, name: 'Cyberpunk LUTs', price: '$25', image: 'https://placehold.co/1600x900.png', category: 'LUTs', data_ai_hint: 'neon city' },
+  { id: 10, name: 'Matte Film Tones', price: '$29', image: 'https://placehold.co/1600x900.png', category: 'LUTs', data_ai_hint: 'matte film' },
+  { id: 11, name: 'VHS Glitch Effects', price: '$10', image: 'https://placehold.co/1600x900.png', category: 'Overlays', data_ai_hint: 'glitch effect' },
+  { id: 12, name: 'Dreamy Glow LUT', price: '$12', image: 'https://placehold.co/1600x900.png', category: 'LUTs', data_ai_hint: 'dreamy portrait' },
 ];
 
 export default function VideoStorePage() {
@@ -20,11 +24,11 @@ export default function VideoStorePage() {
         Transform your footage with cinematic LUTs and high-quality video overlays.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {products.map((product) => (
           <Link href="#" key={product.id}>
              <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-4 flex flex-col">
-                <div className="overflow-hidden rounded-md mb-4 aspect-video">
+                <div className="overflow-hidden rounded-md mb-4 aspect-[16/9]">
                     <Image
                     src={product.image}
                     alt={product.name}

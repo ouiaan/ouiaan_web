@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 const products = [
   { id: 2, name: 'Moody Greens Preset', price: '$15', image: 'https://placehold.co/1600x900.png', category: 'Presets', data_ai_hint: 'moody forest' },
   { id: 4, name: 'Desert Tone Presets', price: '$19', image: 'https://placehold.co/1600x900.png', category: 'Presets', data_ai_hint: 'desert landscape' },
+  { id: 7, name: 'Urban Exploration', price: '$15', image: 'https://placehold.co/1600x900.png', category: 'Presets', data_ai_hint: 'urban street' },
+  { id: 8, name: 'Golden Hour Glow', price: '$19', image: 'https://placehold.co/1600x900.png', category: 'Presets', data_ai_hint: 'sunset portrait' },
 ];
 
 export default function PhotoStorePage() {
@@ -18,11 +20,11 @@ export default function PhotoStorePage() {
         Achieve a consistent, polished look across your photography with high-quality presets.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {products.map((product) => (
           <Link href="#" key={product.id}>
              <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-4 flex flex-col">
-                <div className="overflow-hidden rounded-md mb-4 aspect-video">
+                <div className="overflow-hidden rounded-md mb-4 aspect-[16/9]">
                     <Image
                     src={product.image}
                     alt={product.name}
