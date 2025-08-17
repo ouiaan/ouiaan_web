@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Film, Instagram, Youtube, Twitter } from "lucide-react";
+import { Instagram, Youtube, Twitter } from "lucide-react";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -9,7 +9,6 @@ export function Footer() {
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between md:flex-row gap-8">
           <Link href="/" className="flex items-center gap-2">
-            <Film className="h-6 w-6 text-accent" />
             <span className="font-headline text-2xl font-bold text-foreground">
               Ouiaan
             </span>

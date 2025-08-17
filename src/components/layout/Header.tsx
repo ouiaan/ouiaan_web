@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, Film, ChevronDown } from 'lucide-react';
+import { Menu, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -47,7 +47,6 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <Film className="h-6 w-6 text-accent" />
           <span className="font-headline text-2xl font-bold text-foreground">
             Ouiaan
           </span>
