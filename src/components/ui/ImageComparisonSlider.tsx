@@ -4,7 +4,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogoIcon } from '@/components/ui/LogoIcon';
 
 interface ImageComparisonSliderProps {
   before: string;
@@ -109,11 +109,8 @@ export const ImageComparisonSlider: React.FC<ImageComparisonSliderProps> = ({
         className="absolute top-0 bottom-0 w-1 bg-white/50 cursor-ew-resize pointer-events-none"
         style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
       >
-        <div className="absolute top-1/2 -translate-y-1/2 -left-5 bg-white/80 backdrop-blur-sm text-black p-1 rounded-full shadow-md flex items-center justify-center">
-            <div className="flex text-black">
-                <ChevronLeft className="h-4 w-4" />
-                <ChevronRight className="h-4 w-4" />
-            </div>
+        <div className="absolute top-1/2 -translate-y-1/2 -left-4 bg-white/80 backdrop-blur-sm text-black p-2 rounded-full shadow-md flex items-center justify-center h-9 w-9">
+            <LogoIcon className="h-5 w-5 text-black" />
         </div>
       </div>
       
