@@ -11,6 +11,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { BackgroundGradient } from '@/components/ui/background-gradient';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const product = { 
   id: 2, 
@@ -18,7 +25,18 @@ const product = {
   price: '$15', 
   category: 'Presets', 
   description: 'Brings out rich, deep greens and adds a touch of moody contrast, perfect for forest and nature photography. This pack contains 10 unique presets.',
-  image: { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene", data_ai_hint: 'moody forest' },
+  images: [
+    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 1", data_ai_hint: 'moody forest' },
+    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 2", data_ai_hint: 'moody nature' },
+    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 3", data_ai_hint: 'dark forest' },
+    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 4", data_ai_hint: 'green woods' },
+    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 5", data_ai_hint: 'enchanted forest' },
+    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 6", data_ai_hint: 'moody path' },
+    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 7", data_ai_hint: 'deep woods' },
+    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 8", data_ai_hint: 'forest light' },
+    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 9", data_ai_hint: 'misty forest' },
+    { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 10", data_ai_hint: 'sunlit forest' },
+  ]
 };
 
 const faqs = [
@@ -56,15 +74,30 @@ export default function PhotoStorePage() {
                   <p className="text-foreground/70 mt-2 max-w-xl mx-auto">{product.description}</p>
               </div>
 
-              <div className="aspect-video relative rounded-xl overflow-hidden">
-                  <Image
-                      src={product.image.src}
-                      alt={product.image.alt}
-                      fill
-                      className="object-cover"
-                      data-ai-hint={product.image.data_ai_hint}
-                  />
-              </div>
+              <Carousel 
+                className="relative"
+                opts={{
+                  watchDrag: false,
+                }}
+              >
+                <CarouselContent>
+                  {product.images.map((image, index) => (
+                    <CarouselItem key={index}>
+                      <div className="aspect-video relative rounded-xl overflow-hidden">
+                        <Image
+                          src={image.src}
+                          alt={image.alt}
+                          fill
+                          className="object-cover"
+                          data-ai-hint={image.data_ai_hint}
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="absolute left-[-50px] top-1/2 -translate-y-1/2" />
+                <CarouselNext className="absolute right-[-50px] top-1/2 -translate-y-1/2" />
+              </Carousel>
 
               <div className="flex items-center justify-between mt-4">
                   <span className="text-accent font-headline text-4xl">{product.price}</span>
