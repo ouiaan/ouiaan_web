@@ -23,8 +23,16 @@ const products = [
     category: 'Presets', 
     description: 'Brings out rich, deep greens and adds a touch of moody contrast, perfect for forest and nature photography.',
     images: [
-      { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', data_ai_hint_before: 'forest path', data_ai_hint_after: 'moody forest', alt: "Forest path" },
-      { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', data_ai_hint_before: 'mountain lake', data_ai_hint_after: 'moody landscape', alt: "Mountain lake" },
+      { src: 'https://placehold.co/1600x900.png', alt: "Moody forest scene", data_ai_hint: 'moody forest' },
+      { src: 'https://placehold.co/1600x900.png', alt: "Lush green landscape", data_ai_hint: 'lush landscape' },
+      { src: 'https://placehold.co/1600x900.png', alt: "Dark and moody portrait", data_ai_hint: 'moody portrait' },
+      { src: 'https://placehold.co/1600x900.png', alt: "Ferns in a forest", data_ai_hint: 'forest ferns' },
+      { src: 'https://placehold.co/1600x900.png', alt: "Mountain with green tones", data_ai_hint: 'green mountain' },
+      { src: 'https://placehold.co/1600x900.png', alt: "Woman in a green dress", data_ai_hint: 'woman nature' },
+      { src: 'https://placehold.co/1600x900.png', alt: "Close up of leaves", data_ai_hint: 'green leaves' },
+      { src: 'https://placehold.co/1600x900.png', alt: "Jungle canopy", data_ai_hint: 'jungle canopy' },
+      { src: 'https://placehold.co/1600x900.png', alt: "Path through a green tunnel", data_ai_hint: 'garden path' },
+      { src: 'https://placehold.co/1600x900.png', alt: "Overhead shot of a forest", data_ai_hint: 'forest drone' },
     ]
   },
 ];
@@ -73,12 +81,12 @@ export default function PhotoStorePage() {
                         <Card>
                             <CardContent className="p-4 bg-secondary rounded-lg aspect-[16/9]">
                                 <Image
-                                    src={image.after}
-                                    alt={`After applying ${product.name} to ${image.alt}`}
+                                    src={image.src}
+                                    alt={image.alt}
                                     width={1600}
                                     height={900}
                                     className="w-full h-full object-cover rounded-md"
-                                    data-ai-hint={image.data_ai_hint_after}
+                                    data-ai-hint={image.data_ai_hint}
                                 />
                             </CardContent>
                         </Card>
