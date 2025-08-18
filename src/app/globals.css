@@ -80,16 +80,4 @@ body {
   .text-link-active {
       @apply text-accent;
   }
-
-  #logo-shadow, #logo-main {
-    transition: transform 0.3s ease-in-out;
-  }
-
-  .logo-container:hover #logo-shadow {
-    transform: translate(365.72314453125px, 179.794189453125px) scale(1.02);
-  }
-
-  .logo-container:hover #logo-main {
-    transform: translate(388.4375px, 503.6875px) scale(1.02);
-  }
 }
