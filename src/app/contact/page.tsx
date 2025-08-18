@@ -1,3 +1,4 @@
+
 'use client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,7 +47,7 @@ export default function ContactPage() {
 
   return (
     <motion.div
-      className="container mx-auto py-16 md:py-24 px-4"
+      className="container mx-auto py-16 md:py-24 px-4 relative grainy-background overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
