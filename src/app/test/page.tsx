@@ -1,117 +1,115 @@
 
 'use client';
 
-import { useState, useTransition, ChangeEvent, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Wand2, Loader2, AlertCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Wand2, RefreshCw } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import { runGenerateRgbCurves } from './actions';
-import type { GenerateRgbCurvesOutput } from '@/ai/flows/generate-rgb-curves';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 
+// Helper function to generate a plausible random curve
+const generateRandomCurve = (): string => {
+  const points = 12;
+  const values = Array(points).fill(0).map(() => Math.random());
+  
+  // Basic smoothing
+  const smoothed = values.map((val, i, arr) => {
+    if (i > 0 && i < arr.length - 1) {
+      return (arr[i-1] + val + arr[i+1]) / 3;
+    }
+    return val;
+  });
+
+  // Ensure start and end points are reasonable
+  smoothed[0] = Math.min(0.2, smoothed[0]);
+  smoothed[points - 1] = Math.max(0.8, smoothed[points - 1]);
+  
+  return smoothed.map(v => v.toFixed(3)).join(' ');
+};
+
+const CurveDisplay = ({ values, color, label }: { values: string, color: string, label: string }) => {
+    const points = values.split(' ').map(Number);
+    const pathD = points.map((p, i) => {
+        const x = (i / (points.length - 1)) * 100;
+        const y = 100 - (p * 100);
+        return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+    }).join(' ');
+
+    return (
+        <div className="flex items-center gap-4">
+             <div className="w-16 font-bold text-lg" style={{ color }}>{label}</div>
+             <div className="flex-grow h-24 bg-card rounded-md p-2">
+                <svg viewBox="0 0 100 100" className="w-full h-full" preserveAspectRatio="none">
+                    <path d={pathD} stroke={color} strokeWidth="2" fill="none" />
+                </svg>
+             </div>
+        </div>
+    )
+}
+
 export default function TestPage() {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [results, setResults] = useState<GenerateRgbCurvesOutput | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
+  const [curves, setCurves] = useState({ r: '0 0.25 0.5 0.75 1', g: '0 0.25 0.5 0.75 1', b: '0 0.25 0.5 0.75 1' });
+  const [isClient, setIsClient] = useState(false);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setResults(null);
-      setError(null);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(selectedFile);
-    }
-  };
+  useEffect(() => {
+    // This ensures the component only renders on the client, avoiding hydration mismatches with Math.random()
+    setIsClient(true);
+    handleRandomize(); // Initial randomization on mount
+  }, []);
 
-  const handleGenerate = () => {
-    if (!file) {
-      toast({
-        title: 'No file selected',
-        description: 'Please upload an image first.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    startTransition(async () => {
-      setError(null);
-      setResults(null);
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = async () => {
-        const base64Image = reader.result as string;
-        const response = await runGenerateRgbCurves({ photoDataUri: base64Image });
-        if ('error' in response) {
-          setError(response.error);
-        } else {
-          setResults(response);
-        }
-      };
-      reader.onerror = () => {
-        setError('Failed to read the file.');
-      };
+  const handleRandomize = () => {
+    setCurves({
+      r: generateRandomCurve(),
+      g: generateRandomCurve(),
+      b: generateRandomCurve(),
     });
   };
 
+  if (!isClient) {
+    return null; // Or a loading spinner
+  }
+
   return (
     <div className="container mx-auto py-16 md:py-24 px-4">
-        <SectionTitle>RGB Curves AI Test</SectionTitle>
+        <SectionTitle>RGB Curves Animation Test</SectionTitle>
         <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
-            Experimental page to generate SVG color curves from an image.
+            Click the button to generate random SVG color curves and see the effect on the image below. This is a proof-of-concept for the animation and rendering logic.
         </p>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Uploader Card */}
+            {/* Controls Card */}
             <Card className="bg-card">
-                <CardContent className="p-6">
-                <div 
-                    className="relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg h-80 cursor-pointer hover:bg-secondary transition-colors"
-                    onClick={() => fileInputRef.current?.click()}
-                    >
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        className="hidden"
-                        accept="image/png, image/jpeg"
-                    />
-                    {imagePreview ? (
-                        <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="contain" className="rounded-lg" />
-                    ) : (
-                        <>
-                        <UploadCloud className="h-12 w-12 text-muted-foreground mb-4" />
-                        <p className="text-center text-muted-foreground">
-                            Click to browse or drag & drop an image
-                        </p>
-                        </>
-                    )}
+                <CardContent className="p-6 flex flex-col justify-between h-full">
+                    <div>
+                        <h3 className="font-headline text-2xl mb-4">Live Preview</h3>
+                        <div className="aspect-video w-full rounded-lg overflow-hidden relative">
+                            <svg className="absolute w-0 h-0">
+                                <filter id="random-color-curve">
+                                <feComponentTransfer>
+                                    <feFuncR type="table" tableValues={curves.r} />
+                                    <feFuncG type="table" tableValues={curves.g} />
+                                    <feFuncB type="table" tableValues={curves.b} />
+                                </feComponentTransfer>
+                                </filter>
+                            </svg>
+                            <Image
+                                src="https://placehold.co/1600x900.png"
+                                alt="Filter Applied"
+                                width={1600}
+                                height={900}
+                                className="w-full h-full object-cover"
+                                style={{ filter: 'url(#random-color-curve)' }}
+                                data-ai-hint="neutral portrait"
+                            />
+                        </div>
                     </div>
                     <div className="mt-6 flex flex-col items-center">
-                        <Button onClick={handleGenerate} disabled={isPending || !file} size="lg">
-                        {isPending ? (
-                            <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Analyzing Curves...
-                            </>
-                        ) : (
-                            <>
-                            <Wand2 className="mr-2 h-4 w-4" />
-                            Generate Curves
-                            </>
-                        )}
+                        <Button onClick={handleRandomize} size="lg">
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Randomize Curves
                         </Button>
                     </div>
                 </CardContent>
@@ -120,67 +118,22 @@ export default function TestPage() {
             {/* Results Card */}
             <Card className="bg-card">
                 <CardContent className="p-6">
-                    <AnimatePresence mode="wait">
-                        {isPending && (
-                            <motion.div key="loader" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center h-full">
-                                <Loader2 className="h-12 w-12 text-accent animate-spin mx-auto" />
-                                <p className="mt-4 text-muted-foreground">AI is inspecting the light spectrum...</p>
-                            </motion.div>
-                        )}
-
-                        {error && (
-                            <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center justify-center h-full">
-                                <div className="bg-destructive/20 border border-destructive text-destructive-foreground p-4 rounded-lg flex items-center gap-4">
-                                <AlertCircle className="h-6 w-6" />
-                                <p>{error}</p>
-                                </div>
-                            </motion.div>
-                        )}
-                        
-                        {!isPending && !error && !results && (
-                             <motion.div key="placeholder" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center h-full text-center">
-                                <p className="text-muted-foreground">The generated SVG filter will be applied here.</p>
-                             </motion.div>
-                        )}
-
-                        {results && (
-                        <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                            <h3 className="font-headline text-2xl mb-4">Generated Filter Preview</h3>
-                            <p className="text-sm text-muted-foreground mb-4">{results.description}</p>
-                            
-                            <svg className="absolute w-0 h-0">
-                                <filter id="ai-color-curve">
-                                <feComponentTransfer>
-                                    <feFuncR type="table" tableValues={results.r} />
-                                    <feFuncG type="table" tableValues={results.g} />
-                                    <feFuncB type="table" tableValues={results.b} />
-                                </feComponentTransfer>
-                                </filter>
-                            </svg>
-
-                            <div className="aspect-video w-full rounded-lg overflow-hidden">
-                                <Image
-                                    src="https://placehold.co/1600x900.png"
-                                    alt="AI Filter Applied"
-                                    width={1600}
-                                    height={900}
-                                    className="w-full h-full object-cover"
-                                    style={{ filter: 'url(#ai-color-curve)' }}
-                                    data-ai-hint="neutral portrait"
-                                />
-                            </div>
-                            <div className="mt-4 space-y-2 text-xs font-mono text-muted-foreground">
-                                <p><span className="font-bold text-red-400">R:</span> {results.r}</p>
-                                <p><span className="font-bold text-green-400">G:</span> {results.g}</p>
-                                <p><span className="font-bold text-blue-400">B:</span> {results.b}</p>
-                            </div>
-                        </motion.div>
-                        )}
-                    </AnimatePresence>
+                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <h3 className="font-headline text-2xl mb-4">Generated Curves</h3>
+                        <div className="space-y-4">
+                            <CurveDisplay values={curves.r} color="hsl(var(--chart-1))" label="Red" />
+                            <CurveDisplay values={curves.g} color="hsl(var(--chart-2))" label="Green" />
+                            <CurveDisplay values={curves.b} color="hsl(var(--chart-3))" label="Blue" />
+                        </div>
+                        <div className="mt-6 space-y-2 text-xs font-mono text-muted-foreground bg-secondary p-3 rounded-md">
+                            <p><span className="font-bold" style={{color: "hsl(var(--chart-1))"}}>R:</span> {curves.r}</p>
+                            <p><span className="font-bold" style={{color: "hsl(var(--chart-2))"}}>G:</span> {curves.g}</p>
+                            <p><span className="font-bold" style={{color: "hsl(var(--chart-3))"}}>B:</span> {curves.b}</p>
+                        </div>
+                    </motion.div>
                 </CardContent>
             </Card>
         </div>
     </div>
   );
 }
-
