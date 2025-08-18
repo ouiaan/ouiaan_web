@@ -104,9 +104,9 @@ export function ColorAIClient() {
         });
         return;
     }
-    // @ts-ignore
-    const eyeDropper = new window.EyeDropper();
     try {
+        // @ts-ignore
+        const eyeDropper = new window.EyeDropper();
         const { sRGBHex } = await eyeDropper.open();
         setter(sRGBHex);
         toast({
