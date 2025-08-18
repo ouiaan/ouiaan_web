@@ -23,51 +23,26 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname();
   const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
-  const triggerRef = React.useRef<HTMLButtonElement>(null);
-  const contentRef = React.useRef<HTMLDivElement>(null);
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleOpenChange = (open: boolean) => {
-    setStoreMenuOpen(open);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
     if (timerRef.current) {
-        clearTimeout(timerRef.current);
+      clearTimeout(timerRef.current);
     }
-    const trigger = triggerRef.current;
-    if (!trigger || !e.currentTarget.contains(e.target as Node)) {
-        return;
-    }
-
-    const triggerRect = trigger.getBoundingClientRect();
-
-    if (
-        e.clientX >= triggerRect.left &&
-        e.clientX <= triggerRect.right &&
-        e.clientY >= triggerRect.top &&
-        e.clientY <= triggerRect.bottom
-    ) {
-        // User is moving towards the trigger
-    } else {
-        // User has moved away
-        timerRef.current = setTimeout(() => {
-            setStoreMenuOpen(false);
-        }, 100);
-    }
+    setStoreMenuOpen(open);
   };
 
   const handlePointerLeave = () => {
     timerRef.current = setTimeout(() => {
       setStoreMenuOpen(false);
-    }, 100);
+    }, 150); // A small delay to allow moving to the content
   };
 
-  const handleContentPointerEnter = () => {
-      if (timerRef.current) {
-          clearTimeout(timerRef.current);
-      }
-  }
+  const handleContentEnter = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+  };
 
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
@@ -114,13 +89,7 @@ export function Header() {
           <DropdownMenu open={storeMenuOpen} onOpenChange={handleOpenChange}>
             <DropdownMenuTrigger asChild>
                 <button
-                    ref={triggerRef}
-                    onPointerEnter={() => {
-                        if (timerRef.current) {
-                            clearTimeout(timerRef.current);
-                        }
-                        setStoreMenuOpen(true);
-                    }}
+                    onPointerEnter={() => handleOpenChange(true)}
                     onPointerLeave={handlePointerLeave}
                     className={cn(
                         'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
@@ -133,17 +102,15 @@ export function Header() {
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-                ref={contentRef}
-                onPointerMove={handlePointerMove}
+                onPointerEnter={handleContentEnter}
                 onPointerLeave={handlePointerLeave}
-                onPointerEnter={handleContentPointerEnter}
                 className="mt-2"
                 >
                 <DropdownMenuItem asChild>
-                <Link href="/store/photo">Photo</Link>
+                  <Link href="/store/photo">Photo</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                <Link href="/store/video">Video</Link>
+                  <Link href="/store/video">Video</Link>
                 </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -183,5 +150,3 @@ export function Header() {
     </header>
   );
 }
-
-    
