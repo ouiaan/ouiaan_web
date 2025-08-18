@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ArrowRight } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { motion } from 'framer-motion';
 
 const gear = [
@@ -95,7 +95,7 @@ export default function GearPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
           >
-            <Card className="bg-card text-card-foreground p-6 flex flex-col h-full rounded-2xl border-border/50">
+            <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
               <div className="overflow-hidden rounded-md mb-4 aspect-[16/9] relative">
                 <Image
                   src={item.image}
@@ -112,7 +112,7 @@ export default function GearPage() {
               <div className="font-headline text-accent uppercase tracking-wider mt-6">
                 <span>{item.category}</span>
               </div>
-            </Card>
+            </BackgroundGradient>
           </motion.div>
         ))}
       </div>
