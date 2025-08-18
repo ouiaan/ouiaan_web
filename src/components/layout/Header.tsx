@@ -23,6 +23,52 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname();
   const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const timerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const handleOpenChange = (open: boolean) => {
+    setStoreMenuOpen(open);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (timerRef.current) {
+        clearTimeout(timerRef.current);
+    }
+    const trigger = triggerRef.current;
+    if (!trigger || !e.currentTarget.contains(e.target as Node)) {
+        return;
+    }
+
+    const triggerRect = trigger.getBoundingClientRect();
+
+    if (
+        e.clientX >= triggerRect.left &&
+        e.clientX <= triggerRect.right &&
+        e.clientY >= triggerRect.top &&
+        e.clientY <= triggerRect.bottom
+    ) {
+        // User is moving towards the trigger
+    } else {
+        // User has moved away
+        timerRef.current = setTimeout(() => {
+            setStoreMenuOpen(false);
+        }, 100);
+    }
+  };
+
+  const handlePointerLeave = () => {
+    timerRef.current = setTimeout(() => {
+      setStoreMenuOpen(false);
+    }, 100);
+  };
+
+  const handleContentPointerEnter = () => {
+      if (timerRef.current) {
+          clearTimeout(timerRef.current);
+      }
+  }
+
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link href={href} passHref>
@@ -65,34 +111,41 @@ export function Header() {
         <nav className="hidden items-center gap-8 md:flex">
           <NavLink href="/" label="Home" />
           
-          <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
-            <div 
-                className="relative"
-                onMouseEnter={() => setStoreMenuOpen(true)} 
-                onMouseLeave={() => setStoreMenuOpen(false)}
-            >
-              <DropdownMenuTrigger asChild>
-                <button className={cn(
-                  'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
-                  pathname.startsWith('/store')
-                    ? 'text-accent'
-                    : 'text-foreground/70 hover:text-foreground'
-                )}>
+          <DropdownMenu open={storeMenuOpen} onOpenChange={handleOpenChange}>
+            <DropdownMenuTrigger asChild>
+                <button
+                    ref={triggerRef}
+                    onPointerEnter={() => {
+                        if (timerRef.current) {
+                            clearTimeout(timerRef.current);
+                        }
+                        setStoreMenuOpen(true);
+                    }}
+                    onPointerLeave={handlePointerLeave}
+                    className={cn(
+                        'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
+                        pathname.startsWith('/store')
+                        ? 'text-accent'
+                        : 'text-foreground/70 hover:text-foreground'
+                    )}>
                   Store
                   <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
                 </button>
-              </DropdownMenuTrigger>
-               <div className="absolute pt-2">
-                <DropdownMenuContent onMouseLeave={() => setStoreMenuOpen(false)}>
-                  <DropdownMenuItem asChild>
-                    <Link href="/store/photo">Photo</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/store/video">Video</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </div>
-            </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+                ref={contentRef}
+                onPointerMove={handlePointerMove}
+                onPointerLeave={handlePointerLeave}
+                onPointerEnter={handleContentPointerEnter}
+                className="mt-2"
+                >
+                <DropdownMenuItem asChild>
+                <Link href="/store/photo">Photo</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                <Link href="/store/video">Video</Link>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
           </DropdownMenu>
 
           {navLinks.map((link) => (
@@ -130,3 +183,5 @@ export function Header() {
     </header>
   );
 }
+
+    
