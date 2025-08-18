@@ -99,8 +99,8 @@ export function ColorAIClient() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
-    // Set canvas dimensions to match the image's natural dimensions
+
+    // Set canvas dimensions to match the image's natural dimensions for accurate color picking
     canvas.width = image.naturalWidth;
     canvas.height = image.naturalHeight;
 
@@ -112,7 +112,8 @@ export function ColorAIClient() {
   useEffect(() => {
     // Redraw when imagePreview changes
     if (imageRef.current) {
-        drawImageToCanvas();
+        // The onLoad event on the Image component will also trigger this
+        imageRef.current.onload = drawImageToCanvas;
     }
   }, [imagePreview]);
 
@@ -138,11 +139,16 @@ export function ColorAIClient() {
     const image = imageRef.current;
     const rect = canvas.getBoundingClientRect();
     
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+    // Calculate scale
+    const scaleX = canvas.width / image.naturalWidth;
+    const scaleY = canvas.height / image.naturalHeight;
+    const actualScale = Math.min(rect.width / canvas.width, rect.height / canvas.height);
 
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
+    const offsetX = (rect.width - canvas.width * actualScale) / 2;
+    const offsetY = (rect.height - canvas.height * actualScale) / 2;
+    
+    const x = Math.floor((e.clientX - rect.left - offsetX) / actualScale);
+    const y = Math.floor((e.clientY - rect.top - offsetY) / actualScale);
     
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -247,7 +253,12 @@ export function ColorAIClient() {
                             ref={canvasRef}
                             className="absolute inset-0 w-full h-full"
                             onClick={handleCanvasClick}
-                            style={{ display: imagePreview ? 'block' : 'none', opacity: 0, pointerEvents: pickingColorFor ? 'auto' : 'none' }}
+                            style={{ 
+                                display: imagePreview ? 'block' : 'none', 
+                                opacity: pickingColorFor ? 1 : 0, 
+                                pointerEvents: pickingColorFor ? 'auto' : 'none',
+                                objectFit: 'contain'
+                            }}
                         />
                    </div>
                 ) : (
@@ -343,5 +354,7 @@ export function ColorAIClient() {
     </div>
   );
 }
+
+    
 
     
