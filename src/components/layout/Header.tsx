@@ -12,7 +12,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 
 const navLinks = [
@@ -24,6 +23,20 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname();
   const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
+  const leaveTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const handleStoreMenuEnter = () => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+    }
+    setStoreMenuOpen(true);
+  };
+
+  const handleStoreMenuLeave = () => {
+    leaveTimeoutRef.current = setTimeout(() => {
+      setStoreMenuOpen(false);
+    }, 150);
+  };
   
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link href={href} passHref>
@@ -67,30 +80,30 @@ export function Header() {
           <NavLink href="/" label="Home" />
           
           <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
-            <DropdownMenuGroup onMouseLeave={() => setStoreMenuOpen(false)}>
-              <DropdownMenuTrigger
-                onMouseEnter={() => setStoreMenuOpen(true)}
-                className={cn(
-                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
-                    pathname.startsWith('/store')
-                    ? 'text-accent'
-                    : 'text-foreground/70 hover:text-foreground'
-                )}>
-                Store
-                <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                onMouseEnter={() => setStoreMenuOpen(true)}
-                className="mt-2"
-              >
-                  <DropdownMenuItem asChild>
-                    <Link href="/store/photo">Photo</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/store/video">Video</Link>
-                  </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenuGroup>
+            <DropdownMenuTrigger
+              onMouseEnter={handleStoreMenuEnter}
+              onMouseLeave={handleStoreMenuLeave}
+              className={cn(
+                  'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
+                  pathname.startsWith('/store')
+                  ? 'text-accent'
+                  : 'text-foreground/70 hover:text-foreground'
+              )}>
+              Store
+              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              onMouseEnter={handleStoreMenuEnter}
+              onMouseLeave={handleStoreMenuLeave}
+              className="mt-2"
+            >
+                <DropdownMenuItem asChild>
+                  <Link href="/store/photo">Photo</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/store/video">Video</Link>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
           </DropdownMenu>
 
           {navLinks.map((link) => (
