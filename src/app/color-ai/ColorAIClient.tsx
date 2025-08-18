@@ -2,7 +2,7 @@
 
 import { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Droplets } from 'lucide-react';
+import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Droplets, Contrast, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -12,32 +12,17 @@ import { runGeneratePalette } from './actions';
 import type { GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
 import { Badge } from '@/components/ui/badge';
 
-const TonalColorSwatch = ({ color, label }: { color: string; label: string }) => {
-    const { toast } = useToast();
-    const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text);
-        toast({
-          title: 'Copied to Clipboard!',
-          description: `Color ${text} copied.`,
-        });
-    }
-
+const TonalAnalysisCard = ({ icon, title, description }: { icon: React.ReactNode, title: string; description: string }) => {
     return (
-        <div className="flex flex-col items-center gap-2">
-            <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="w-24 h-24 rounded-full cursor-pointer relative group border-4 border-border/50"
-                style={{ backgroundColor: color }}
-                onClick={() => copyToClipboard(color)}
-            >
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-full">
-                    <span className="text-white text-sm font-mono">{color}</span>
-                </div>
-            </motion.div>
-            <h5 className="font-headline text-lg text-foreground/80">{label}</h5>
-        </div>
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-card/50 rounded-lg p-4 border border-border/50 flex flex-col items-center text-center"
+        >
+            <div className="text-accent mb-2">{icon}</div>
+            <h5 className="font-headline text-lg text-foreground/90 mb-2">{title}</h5>
+            <p className="text-sm text-foreground/70">{description}</p>
+        </motion.div>
     );
 };
 
@@ -196,11 +181,11 @@ export function ColorAIClient() {
             </div>
 
             <div className="mt-12">
-                <h4 className="font-headline text-2xl mb-6 flex items-center gap-2"><Droplets /> Tonal Range</h4>
-                <div className="flex flex-wrap justify-center md:justify-start gap-8">
-                    <TonalColorSwatch color={results.tonalColors.shadows} label="Shadows" />
-                    <TonalColorSwatch color={results.tonalColors.midtones} label="Midtones" />
-                    <TonalColorSwatch color={results.tonalColors.highlights} label="Highlights" />
+                <h4 className="font-headline text-2xl mb-6 flex items-center gap-2"><Droplets /> Tonal Analysis</h4>
+                <div className="grid md:grid-cols-3 gap-4">
+                    <TonalAnalysisCard icon={<Moon size={24} />} title="Shadows" description={results.tonalAnalysis.shadows} />
+                    <TonalAnalysisCard icon={<Contrast size={24} />} title="Midtones" description={results.tonalAnalysis.midtones} />
+                    <TonalAnalysisCard icon={<Sun size={24} />} title="Highlights" description={results.tonalAnalysis.highlights} />
                 </div>
             </div>
             
