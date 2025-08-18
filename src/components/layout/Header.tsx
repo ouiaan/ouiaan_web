@@ -53,7 +53,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-24 items-center justify-between">
-      <Link href="/" className="flex items-center gap-2 group relative h-24 w-48">
+      <Link href="/" className="group flex items-center gap-2 relative h-24 w-48">
           <div className="logo-main absolute inset-0">
             <svg
               version="1.1"
@@ -108,7 +108,6 @@ export function Header() {
             <DropdownMenuContent 
               onMouseEnter={() => setStoreMenuOpen(true)}
               onMouseLeave={() => setStoreMenuOpen(false)}
-              className="mt-2"
             >
               <DropdownMenuItem asChild>
                 <Link href="/store/photo">Photo</Link>
