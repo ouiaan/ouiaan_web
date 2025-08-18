@@ -76,7 +76,7 @@ body {
   left: -100%;
   opacity: 0.1;
   pointer-events: none;
-  position: fixed;
+  position: absolute;
   top: -100%;
   width: 300%;
   z-index: -1;
