@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const desktopNavLinks = [
+  { href: '/gear', label: 'Gear' },
   { href: '/freebies', label: 'Freebies' },
   { href: '/color-ai', label: 'Color AI' },
   { href: '/contact', label: 'Contact' },
@@ -25,6 +26,7 @@ const mobileNavLinks = [
   { href: '/', label: 'Home' },
   { href: '/store/photo', label: 'Photo' },
   { href: '/store/video', label: 'Video' },
+  { href: '/gear', label: 'Gear' },
   { href: '/freebies', label: 'Freebies' },
   { href: '/color-ai', label: 'Color AI' },
   { href: '/contact', label: 'Contact' },
@@ -184,10 +186,10 @@ export function Header() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             className="absolute top-24 left-0 w-full bg-background/95 backdrop-blur-sm md:hidden flex flex-col items-center gap-6 py-8 z-50">
               {mobileNavLinks.map((link) => (
                   <NavLink key={link.href} href={link.href} label={link.label} className="text-2xl"/>
@@ -198,3 +200,5 @@ export function Header() {
     </motion.header>
   );
 }
+
+    
