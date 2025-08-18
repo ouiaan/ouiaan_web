@@ -22,7 +22,7 @@ import { ImageComparisonSlider } from '@/components/ui/ImageComparisonSlider';
 
 const product = { 
   id: 1, 
-  name: 'Ouiaan film lut pack V1', 
+  name: 'Ouiaan V1 LUT Pack', 
   price: '$29', 
   category: 'LUTs', 
   description: 'A collection of 15 unique LUTs designed to give your footage a nostalgic, cinematic film look. Perfect for everything from travel videos to short films.',
