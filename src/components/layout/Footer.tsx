@@ -43,7 +43,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 text-center text-sm text-foreground/50">
-          <p>&copy; {year} Ouiaan Studio. All Rights Reserved.</p>
+          <p>&copy; {year} Ouiaan</p>
         </div>
       </div>
     </footer>
