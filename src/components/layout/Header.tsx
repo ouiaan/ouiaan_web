@@ -91,16 +91,21 @@ export function Header() {
           </div>
         </Link>
         {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-8 md:flex">
+        <motion.nav 
+          className="hidden items-center gap-8 md:flex"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+        >
           <NavLink href="/" label="Home" />
           
           <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
             <DropdownMenuTrigger
               asChild
-              onMouseEnter={() => setStoreMenuOpen(true)}
-              onMouseLeave={() => setStoreMenuOpen(false)}
             >
               <div
+                onMouseEnter={() => setStoreMenuOpen(true)}
+                onMouseLeave={() => setStoreMenuOpen(false)}
                 className={cn(
                   'group flex items-center gap-1 font-headline uppercase tracking-wider text-xl transition-colors duration-300 outline-none cursor-pointer',
                   pathname.startsWith('/store')
@@ -129,7 +134,7 @@ export function Header() {
           {desktopNavLinks.map((link) => (
             <NavLink key={link.href} href={link.href} label={link.label} />
           ))}
-        </nav>
+        </motion.nav>
 
         {/* Mobile Navigation */}
         <div className="flex items-center md:hidden">
