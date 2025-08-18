@@ -1,3 +1,4 @@
+
 'use server';
 
 import { generateColorPalette } from '@/ai/flows/generate-color-palette';
@@ -12,7 +13,7 @@ export async function runGeneratePalette(input: GenerateColorPaletteInput): Prom
     }
 
     const result = await generateColorPalette(input);
-    if (!result.colorPalette || !result.suggestedLuts) {
+    if (!result.colorPalette || !result.tonalAnalysis) {
         throw new Error("AI failed to return expected data structure.");
     }
     return result;

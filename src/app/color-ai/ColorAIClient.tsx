@@ -3,15 +3,43 @@
 
 import { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Copy } from 'lucide-react';
+import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Copy, Pipette } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { runGeneratePalette } from './actions';
 import type { GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
-import { Badge } from '@/components/ui/badge';
+
+const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { description: string, color: string } }) => {
+    const { toast } = useToast();
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast({
+          title: 'Copied to Clipboard!',
+          description: `Color ${text} copied.`,
+        });
+      }
+
+    return (
+        <Card className="bg-secondary/50">
+            <CardHeader>
+                <CardTitle className="text-xl font-headline flex items-center gap-2">{title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                 <div 
+                    className="w-full h-16 rounded-md cursor-pointer border border-border"
+                    style={{ backgroundColor: analysis.color }}
+                    onClick={() => copyToClipboard(analysis.color)}
+                />
+                 <p className="font-mono text-sm mt-2 text-muted-foreground">{analysis.color}</p>
+                 <p className="text-sm text-foreground/80 mt-2">{analysis.description}</p>
+            </CardContent>
+        </Card>
+    );
+}
 
 export function ColorAIClient() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -107,7 +135,7 @@ export function ColorAIClient() {
             <div className="flex flex-col justify-center space-y-6">
               <div>
                 <h3 className="font-headline text-2xl mb-2">Generate Palette</h3>
-                <p className="text-muted-foreground">Let AI find the perfect colors and recommend LUTs based on your image.</p>
+                <p className="text-muted-foreground">Let AI find the perfect colors and analyze your image's tonal balance.</p>
               </div>
               
               <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
@@ -167,13 +195,11 @@ export function ColorAIClient() {
             </div>
             
             <div className="mt-12">
-                <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2"><Wand2 /> Suggested LUTs</h4>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {results.suggestedLuts.map((lut) => (
-                    <Badge key={lut} variant="secondary" className="text-lg py-1 px-3 bg-secondary text-secondary-foreground border-border">
-                      {lut}
-                    </Badge>
-                  ))}
+                <h4 className="font-headline text-2xl mb-8 flex items-center justify-center gap-2"><Pipette /> Tonal Analysis</h4>
+                <div className="grid md:grid-cols-3 gap-6">
+                    <TonalAnalysisCard title="Shadows" analysis={results.tonalAnalysis.shadows} />
+                    <TonalAnalysisCard title="Midtones" analysis={results.tonalAnalysis.midtones} />
+                    <TonalAnalysisCard title="Highlights" analysis={results.tonalAnalysis.highlights} />
                 </div>
             </div>
           </motion.div>
