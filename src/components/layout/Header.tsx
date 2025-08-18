@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -23,27 +22,6 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname();
   const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
-  const timerRef = React.useRef<NodeJS.Timeout | null>(null);
-
-  const handleOpenChange = (open: boolean) => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-    setStoreMenuOpen(open);
-  };
-
-  const handlePointerLeave = () => {
-    timerRef.current = setTimeout(() => {
-      setStoreMenuOpen(false);
-    }, 150); // A small delay to allow moving to the content
-  };
-
-  const handleContentEnter = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-  };
-
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link href={href} passHref>
@@ -86,11 +64,9 @@ export function Header() {
         <nav className="hidden items-center gap-8 md:flex">
           <NavLink href="/" label="Home" />
           
-          <DropdownMenu open={storeMenuOpen} onOpenChange={handleOpenChange}>
+          <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
             <DropdownMenuTrigger asChild>
                 <button
-                    onPointerEnter={() => handleOpenChange(true)}
-                    onPointerLeave={handlePointerLeave}
                     className={cn(
                         'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
                         pathname.startsWith('/store')
@@ -101,11 +77,7 @@ export function Header() {
                   <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
                 </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-                onPointerEnter={handleContentEnter}
-                onPointerLeave={handlePointerLeave}
-                className="mt-2"
-                >
+            <DropdownMenuContent>
                 <DropdownMenuItem asChild>
                   <Link href="/store/photo">Photo</Link>
                 </DropdownMenuItem>
