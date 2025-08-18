@@ -42,17 +42,29 @@ const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { des
     );
 }
 
-const ColorPicker = ({ label, value, onChange, disabled }: { label: string, value: string, onChange: (e: ChangeEvent<HTMLInputElement>) => void, disabled?: boolean }) => (
+const ColorPicker = ({ label, value, onChange, onEyeDropper, disabled }: { label: string, value: string, onChange: (e: ChangeEvent<HTMLInputElement>) => void, onEyeDropper: () => Promise<void>, disabled?: boolean }) => (
     <div className="flex items-center gap-4">
       <Label htmlFor={`${label}-color`} className="font-headline text-lg text-foreground/80 w-28">{label}</Label>
-      <Input
-        id={`${label}-color`}
-        type="color"
-        value={value}
-        onChange={onChange}
-        className="w-16 h-10 p-1 bg-card border-border/50 cursor-pointer disabled:cursor-not-allowed"
-        disabled={disabled}
-      />
+      <div className="flex items-center gap-2">
+        <Input
+          id={`${label}-color`}
+          type="color"
+          value={value}
+          onChange={onChange}
+          className="w-16 h-10 p-1 bg-card border-border/50 cursor-pointer disabled:cursor-not-allowed"
+          disabled={disabled}
+        />
+        <Button
+            variant="outline"
+            size="icon"
+            onClick={onEyeDropper}
+            disabled={disabled}
+            aria-label={`Pick ${label} color`}
+            className="h-10 w-10"
+        >
+            <Pipette className="h-5 w-5" />
+        </Button>
+      </div>
     </div>
   );
 
@@ -82,6 +94,29 @@ export function ColorAIClient() {
       reader.readAsDataURL(selectedFile);
     }
   };
+
+  const handleEyeDropper = async (setter: (color: string) => void) => {
+    if (!('EyeDropper' in window)) {
+        toast({
+            variant: 'destructive',
+            title: 'Unsupported Browser',
+            description: 'The eye dropper feature is not supported in your browser.',
+        });
+        return;
+    }
+    // @ts-ignore
+    const eyeDropper = new window.EyeDropper();
+    try {
+        const { sRGBHex } = await eyeDropper.open();
+        setter(sRGBHex);
+        toast({
+            title: 'Color Picked!',
+            description: `Set color to ${sRGBHex}`,
+        });
+    } catch (e) {
+        // User canceled the eyedropper
+    }
+  }
   
   const handleGenerate = () => {
     if (!file) {
@@ -165,9 +200,9 @@ export function ColorAIClient() {
               </div>
 
               <div className="space-y-4">
-                <ColorPicker label="Shadows" value={shadows} onChange={(e) => setShadows(e.target.value)} disabled={!file} />
-                <ColorPicker label="Midtones" value={midtones} onChange={(e) => setMidtones(e.target.value)} disabled={!file} />
-                <ColorPicker label="Highlights" value={highlights} onChange={(e) => setHighlights(e.target.value)} disabled={!file} />
+                <ColorPicker label="Shadows" value={shadows} onChange={(e) => setShadows(e.target.value)} onEyeDropper={() => handleEyeDropper(setShadows)} disabled={!file} />
+                <ColorPicker label="Midtones" value={midtones} onChange={(e) => setMidtones(e.target.value)} onEyeDropper={() => handleEyeDropper(setMidtones)} disabled={!file} />
+                <ColorPicker label="Highlights" value={highlights} onChange={(e) => setHighlights(e.target.value)} onEyeDropper={() => handleEyeDropper(setHighlights)} disabled={!file} />
               </div>
               
               <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
@@ -229,9 +264,9 @@ export function ColorAIClient() {
             <div className="mt-12">
                 <h4 className="font-headline text-2xl mb-8 flex items-center justify-center gap-2"><Pipette /> Tonal Analysis</h4>
                 <div className="grid md:grid-cols-3 gap-6">
-                    <TonalAnalysisCard title="Shadows" analysis={results.tonalAnalysis.shadows} />
-                    <TonalAnalysisCard title="Midtones" analysis={results.tonalAnalysis.midtones} />
-                    <TonalAnalysisCard title="Highlights" analysis={results.tonalAnalysis.highlights} />
+                    {results.tonalAnalysis.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalAnalysis.shadows} />}
+                    {results.tonalAnalysis.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalAnalysis.midtones} />}
+                    {results.tonalAnalysis.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalAnalysis.highlights} />}
                 </div>
             </div>
           </motion.div>
