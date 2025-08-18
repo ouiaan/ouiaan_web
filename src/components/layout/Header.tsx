@@ -43,7 +43,7 @@ export function Header() {
     <Link href={href} passHref>
       <span
         className={cn(
-          'font-headline uppercase tracking-wider text-sm transition-colors duration-300',
+          'font-headline uppercase tracking-wider text-base transition-colors duration-300',
           pathname === href
             ? 'text-accent'
             : 'text-foreground/70 hover:text-foreground'
@@ -56,13 +56,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm">
-      <div className="container mx-auto flex h-20 items-center justify-between">
+      <div className="container mx-auto flex h-24 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <svg
             version="1.1"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 637 735"
-            className="h-10 w-auto text-foreground"
+            className="h-12 w-auto text-foreground"
             fill="currentColor"
           >
             <path
@@ -85,7 +85,7 @@ export function Header() {
               onMouseEnter={handleMenuEnter}
               onMouseLeave={handleMenuLeave}
               className={cn(
-                'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
+                'group flex items-center gap-1 font-headline uppercase tracking-wider text-base transition-colors duration-300 outline-none',
                 pathname.startsWith('/store')
                   ? 'text-accent'
                   : 'text-foreground/70 hover:text-foreground'
@@ -119,7 +119,7 @@ export function Header() {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                 <button className={cn(
-                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
+                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-base transition-colors duration-300 outline-none',
                     pathname.startsWith('/store')
                     ? 'text-accent'
                     : 'text-foreground/70 hover:text-foreground'
