@@ -32,7 +32,6 @@ const mobileNavLinks = [
 
 export function Header() {
   const pathname = usePathname();
-  const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const NavLink = ({ href, label, className }: { href: string; label: string, className?: string }) => (
@@ -109,7 +108,7 @@ export function Header() {
         >
           <NavLink href="/" label="Home" />
           
-          <DropdownMenu onOpenChange={setStoreMenuOpen}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div
                 className={cn(
@@ -120,10 +119,10 @@ export function Header() {
                 )}
               >
                 Store
-                <ChevronDown className={cn("h-5 w-5 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
+                <ChevronDown className={cn("h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-180")} />
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent sideOffset={0}>
+            <DropdownMenuContent>
               <DropdownMenuItem asChild>
                 <Link href="/store/photo">Photo</Link>
               </DropdownMenuItem>
