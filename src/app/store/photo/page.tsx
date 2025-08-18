@@ -19,6 +19,7 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import { Button } from '@/components/ui/button';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { ImageComparisonSlider } from '@/components/ui/ImageComparisonSlider';
+import { motion } from 'framer-motion';
 
 const product = { 
   id: 2, 
@@ -61,7 +62,12 @@ const faqs = [
 
 export default function PhotoStorePage() {
   return (
-    <div className="container mx-auto py-16 md:py-24 px-4">
+    <motion.div 
+      className="container mx-auto py-16 md:py-24 px-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <SectionTitle>{product.name}</SectionTitle>
       <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
         {product.description}
@@ -100,7 +106,13 @@ export default function PhotoStorePage() {
         </BackgroundGradient>
       </div>
       
-      <div className="max-w-3xl mx-auto mt-20">
+      <motion.div 
+        className="max-w-3xl mx-auto mt-20"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.5 }}
+      >
         <h3 className="font-headline text-3xl text-center mb-8">Frequently Asked Questions</h3>
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, index) => (
@@ -112,8 +124,8 @@ export default function PhotoStorePage() {
             </AccordionItem>
           ))}
         </Accordion>
-      </div>
+      </motion.div>
 
-    </div>
+    </motion.div>
   );
 }

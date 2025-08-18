@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ArrowDown } from 'lucide-react';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
+import { motion } from 'framer-motion';
 
 const freebies = [
   { id: 1, name: 'Free Sample LUT', description: 'A versatile LUT for a clean cinematic look.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'cinematic still' },
@@ -16,15 +17,25 @@ const freebies = [
 
 export default function FreebiesPage() {
   return (
-    <div className="container mx-auto py-16 md:py-24 px-4">
+    <motion.div 
+      className="container mx-auto py-16 md:py-24 px-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <SectionTitle>Free Resources</SectionTitle>
       <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
         Enjoy a selection of free tools to get a taste of the quality and style of my products.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {freebies.map((item) => (
-          <div key={item.id}>
+        {freebies.map((item, index) => (
+          <motion.div 
+            key={item.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+          >
             <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
               <div className="overflow-hidden rounded-md mb-4 aspect-[16/9]">
                 <Image
@@ -43,9 +54,9 @@ export default function FreebiesPage() {
                 <ArrowDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-1" />
               </Link>
             </BackgroundGradient>
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
