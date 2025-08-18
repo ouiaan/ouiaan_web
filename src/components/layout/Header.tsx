@@ -61,7 +61,12 @@ export function Header() {
     >
       <div className="container mx-auto flex h-24 items-center justify-between">
       <Link href="/" className="group flex items-center gap-2 relative h-24 w-48">
-          <div className="logo-main absolute inset-0">
+          <motion.div 
+            className="logo-main absolute inset-0"
+            initial={{ y: -4, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.3, ease: 'easeOut', delay: 0.4 }}
+          >
             <svg
               version="1.1"
               xmlns="http://www.w3.org/2000/svg"
@@ -74,8 +79,13 @@ export function Header() {
                 transform="translate(367.72314453125,181.794189453125)"
                 />
             </svg>
-          </div>
-          <div className="logo-shadow absolute inset-0">
+          </motion.div>
+          <motion.div 
+            className="logo-shadow absolute inset-0"
+            initial={{ y: 4, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.3, ease: 'easeOut', delay: 0.4 }}
+          >
             <svg
                 version="1.1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -88,48 +98,42 @@ export function Header() {
                 transform="translate(386.4375,501.6875)"
               />
             </svg>
-          </div>
+          </motion.div>
         </Link>
         {/* Desktop Navigation */}
         <motion.nav 
           className="hidden items-center gap-8 md:flex"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
         >
           <NavLink href="/" label="Home" />
           
-          <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
-            <DropdownMenuTrigger
-              asChild
-            >
-              <div
-                onMouseEnter={() => setStoreMenuOpen(true)}
-                onMouseLeave={() => setStoreMenuOpen(false)}
-                className={cn(
-                  'group flex items-center gap-1 font-headline uppercase tracking-wider text-xl transition-colors duration-300 outline-none cursor-pointer',
-                  pathname.startsWith('/store')
-                    ? 'text-accent'
-                    : 'text-foreground/70 hover:text-foreground'
-                )}
-              >
-                Store
-                <ChevronDown className={cn("h-5 w-5 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              onMouseEnter={() => setStoreMenuOpen(true)}
-              onMouseLeave={() => setStoreMenuOpen(false)}
-              sideOffset={0}
-            >
-              <DropdownMenuItem asChild>
-                <Link href="/store/photo">Photo</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/store/video">Video</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div onMouseEnter={() => setStoreMenuOpen(true)} onMouseLeave={() => setStoreMenuOpen(false)}>
+            <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
+              <DropdownMenuTrigger asChild>
+                <div
+                  className={cn(
+                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-xl transition-colors duration-300 outline-none cursor-pointer',
+                    pathname.startsWith('/store')
+                      ? 'text-accent'
+                      : 'text-foreground/70 hover:text-foreground'
+                  )}
+                >
+                  Store
+                  <ChevronDown className={cn("h-5 w-5 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent sideOffset={0}>
+                <DropdownMenuItem asChild>
+                  <Link href="/store/photo">Photo</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/store/video">Video</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           {desktopNavLinks.map((link) => (
             <NavLink key={link.href} href={link.href} label={link.label} />
