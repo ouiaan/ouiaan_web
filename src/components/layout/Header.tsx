@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -22,6 +23,8 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname();
   const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link href={href} passHref>
@@ -65,21 +68,29 @@ export function Header() {
           <NavLink href="/" label="Home" />
           
           <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
-            <DropdownMenuTrigger asChild>
-              <button
-                onMouseEnter={() => setStoreMenuOpen(true)}
-                className={cn(
-                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
-                    pathname.startsWith('/store')
-                    ? 'text-accent'
-                    : 'text-foreground/70 hover:text-foreground'
-                )}>
-                Store
-                <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
-              </button>
+            <DropdownMenuTrigger
+              ref={triggerRef}
+              onMouseEnter={() => setStoreMenuOpen(true)}
+              onMouseLeave={() => {
+                setTimeout(() => {
+                  if (menuRef.current && !menuRef.current.matches(':hover')) {
+                    setStoreMenuOpen(false);
+                  }
+                }, 100);
+              }}
+              className={cn(
+                  'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
+                  pathname.startsWith('/store')
+                  ? 'text-accent'
+                  : 'text-foreground/70 hover:text-foreground'
+              )}>
+              Store
+              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
             </DropdownMenuTrigger>
             <DropdownMenuContent 
+              ref={menuRef}
               onMouseLeave={() => setStoreMenuOpen(false)}
+              onMouseEnter={() => setStoreMenuOpen(true)}
               className="mt-2"
             >
                 <DropdownMenuItem asChild>
