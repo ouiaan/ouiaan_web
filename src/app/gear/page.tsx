@@ -109,10 +109,9 @@ export default function GearPage() {
                 <h3 className="font-headline text-2xl text-foreground">{item.name}</h3>
                 <p className="text-foreground/70 mt-2">{item.description}</p>
               </div>
-              <Link href={item.link} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider mt-6">
-                <span>View Product</span>
-                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-              </Link>
+              <div className="font-headline text-accent uppercase tracking-wider mt-6">
+                <span>{item.category}</span>
+              </div>
             </Card>
           </motion.div>
         ))}
