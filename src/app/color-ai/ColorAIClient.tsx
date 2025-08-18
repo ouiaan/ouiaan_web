@@ -2,7 +2,7 @@
 
 import { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Palette, Wand2, Loader2, AlertCircle } from 'lucide-react';
+import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Droplets } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,36 @@ import { useToast } from '@/hooks/use-toast';
 import { runGeneratePalette } from './actions';
 import type { GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
 import { Badge } from '@/components/ui/badge';
+
+const TonalColorSwatch = ({ color, label }: { color: string; label: string }) => {
+    const { toast } = useToast();
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast({
+          title: 'Copied to Clipboard!',
+          description: `Color ${text} copied.`,
+        });
+    }
+
+    return (
+        <div className="flex flex-col items-center gap-2">
+            <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                className="w-24 h-24 rounded-full cursor-pointer relative group border-4 border-border/50"
+                style={{ backgroundColor: color }}
+                onClick={() => copyToClipboard(color)}
+            >
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-full">
+                    <span className="text-white text-sm font-mono">{color}</span>
+                </div>
+            </motion.div>
+            <h5 className="font-headline text-lg text-foreground/80">{label}</h5>
+        </div>
+    );
+};
+
 
 export function ColorAIClient() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -144,8 +174,7 @@ export function ColorAIClient() {
 
         {results && (
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
+            <div>
                 <h4 className="font-headline text-2xl mb-4 flex items-center gap-2"><Palette/> Generated Palette</h4>
                 <div className="flex flex-wrap gap-4">
                   {results.colorPalette.map((color) => (
@@ -164,8 +193,18 @@ export function ColorAIClient() {
                     </motion.div>
                   ))}
                 </div>
-              </div>
-              <div>
+            </div>
+
+            <div className="mt-12">
+                <h4 className="font-headline text-2xl mb-6 flex items-center gap-2"><Droplets /> Tonal Range</h4>
+                <div className="flex flex-wrap justify-center md:justify-start gap-8">
+                    <TonalColorSwatch color={results.tonalColors.shadows} label="Shadows" />
+                    <TonalColorSwatch color={results.tonalColors.midtones} label="Midtones" />
+                    <TonalColorSwatch color={results.tonalColors.highlights} label="Highlights" />
+                </div>
+            </div>
+            
+            <div className="mt-12">
                 <h4 className="font-headline text-2xl mb-4 flex items-center gap-2"><Wand2 /> Suggested LUTs</h4>
                 <div className="flex flex-wrap gap-2">
                   {results.suggestedLuts.map((lut) => (
@@ -174,7 +213,6 @@ export function ColorAIClient() {
                     </Badge>
                   ))}
                 </div>
-              </div>
             </div>
           </motion.div>
         )}
