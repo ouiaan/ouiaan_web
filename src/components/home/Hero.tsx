@@ -1,4 +1,8 @@
+
+"use client";
+
 import { Spotlight } from "@/components/ui/Spotlight";
+import { motion } from "framer-motion";
 
 export function Hero() {
   return (
@@ -19,12 +23,22 @@ export function Hero() {
       
       {/* Content */}
       <div className="relative z-20 flex h-full flex-col items-center justify-center text-center text-white p-4">
-        <h1 className="font-headline text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="font-headline text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50"
+        >
           Ouiaan
-        </h1>
-        <p className="mt-4 font-normal text-base text-neutral-300 max-w-lg text-center mx-auto">
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+          className="mt-4 font-normal text-base text-neutral-300 max-w-lg text-center mx-auto"
+        >
           Digital assets for the modern creator.
-        </p>
+        </motion.p>
       </div>
     </section>
   );
