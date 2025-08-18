@@ -21,7 +21,7 @@ export function VideoSection() {
         <div className="aspect-video max-w-4xl mx-auto rounded-lg overflow-hidden shadow-2xl">
           <iframe
             className="w-full h-full"
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+            src="https://www.youtube.com/embed/NjDwRcBx_Dw"
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
