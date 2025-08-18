@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -23,27 +22,12 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname();
   const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
-  const menuTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-
-  const handleMenuEnter = () => {
-    if (menuTimeoutRef.current) {
-      clearTimeout(menuTimeoutRef.current);
-    }
-    setStoreMenuOpen(true);
-  };
-
-  const handleMenuLeave = () => {
-    menuTimeoutRef.current = setTimeout(() => {
-      setStoreMenuOpen(false);
-    }, 150);
-  };
-
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link href={href} passHref>
       <span
         className={cn(
-          'font-headline uppercase tracking-wider text-base transition-colors duration-300',
+          'font-headline uppercase tracking-wider text-lg transition-colors duration-300',
           pathname === href
             ? 'text-accent'
             : 'text-foreground/70 hover:text-foreground'
@@ -62,7 +46,7 @@ export function Header() {
             version="1.1"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 637 735"
-            className="h-12 w-auto text-foreground"
+            className="h-16 w-auto text-foreground"
             fill="currentColor"
           >
             <path
@@ -82,10 +66,10 @@ export function Header() {
           
           <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
             <DropdownMenuTrigger
-              onMouseEnter={handleMenuEnter}
-              onMouseLeave={handleMenuLeave}
+              onMouseEnter={() => setStoreMenuOpen(true)}
+              onMouseLeave={() => setStoreMenuOpen(false)}
               className={cn(
-                'group flex items-center gap-1 font-headline uppercase tracking-wider text-base transition-colors duration-300 outline-none',
+                'group flex items-center gap-1 font-headline uppercase tracking-wider text-lg transition-colors duration-300 outline-none',
                 pathname.startsWith('/store')
                   ? 'text-accent'
                   : 'text-foreground/70 hover:text-foreground'
@@ -95,8 +79,8 @@ export function Header() {
               <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
             </DropdownMenuTrigger>
             <DropdownMenuContent 
-              onMouseEnter={handleMenuEnter}
-              onMouseLeave={handleMenuLeave}
+              onMouseLeave={() => setStoreMenuOpen(false)}
+              onMouseEnter={() => setStoreMenuOpen(true)}
               className="mt-2"
             >
               <DropdownMenuItem asChild>
@@ -119,7 +103,7 @@ export function Header() {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                 <button className={cn(
-                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-base transition-colors duration-300 outline-none',
+                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-lg transition-colors duration-300 outline-none',
                     pathname.startsWith('/store')
                     ? 'text-accent'
                     : 'text-foreground/70 hover:text-foreground'
@@ -137,7 +121,9 @@ export function Header() {
                 </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-            <NavLink href="/contact" label="Contact" />
+            {navLinks.map((link) => (
+                <NavLink key={link.href} href={link.href} label={link.label} />
+            ))}
         </nav>
       </div>
     </header>
