@@ -78,4 +78,3 @@ const generateColorPaletteFlow = ai.defineFlow(
     return output!;
   }
 );
-
