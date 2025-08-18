@@ -47,6 +47,7 @@ export function ColorAIClient() {
 
     startTransition(async () => {
       setError(null);
+      setResults(null);
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = async () => {
@@ -128,21 +129,21 @@ export function ColorAIClient() {
       
       <AnimatePresence>
         {isPending && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="text-center py-10">
+          <motion.div key="loader" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="text-center py-10">
             <Loader2 className="h-12 w-12 text-accent animate-spin mx-auto" />
             <p className="mt-4 text-muted-foreground">Analyzing your image...</p>
           </motion.div>
         )}
 
         {error && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 bg-destructive/20 border border-destructive text-destructive-foreground p-4 rounded-lg flex items-center gap-4">
+          <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 bg-destructive/20 border border-destructive text-destructive-foreground p-4 rounded-lg flex items-center gap-4">
             <AlertCircle className="h-6 w-6" />
             <p>{error}</p>
           </motion.div>
         )}
 
         {results && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12">
+          <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12">
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <h4 className="font-headline text-2xl mb-4 flex items-center gap-2"><Palette/> Generated Palette</h4>
