@@ -4,6 +4,7 @@
 import * as React from 'react';
 import Image from "next/image";
 import Autoplay from "embla-carousel-autoplay";
+import { motion } from "framer-motion";
 
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import {
@@ -30,7 +31,13 @@ export function FeaturedWork() {
   );
 
   return (
-    <section className="py-20 md:py-32 bg-background">
+    <motion.section 
+      className="py-20 md:py-32 bg-background"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="container mx-auto px-4">
         <SectionTitle>Featured Work</SectionTitle>
         <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
@@ -71,6 +78,6 @@ export function FeaturedWork() {
           </Carousel>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

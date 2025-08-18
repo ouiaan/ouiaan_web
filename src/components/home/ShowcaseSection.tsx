@@ -1,13 +1,22 @@
 
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { BackgroundGradient } from '../ui/background-gradient';
+import { motion } from "framer-motion";
 
 export function ShowcaseSection() {
   return (
-    <section className="py-20 md:py-32 bg-card">
+    <motion.section 
+      className="py-20 md:py-32 bg-card"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="container mx-auto px-4">
         <SectionTitle>Digital Store</SectionTitle>
         <p className="text-center max-w-2xl mx-auto mb-16 text-foreground/70">
@@ -66,6 +75,6 @@ export function ShowcaseSection() {
           </BackgroundGradient>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

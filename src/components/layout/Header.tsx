@@ -1,9 +1,11 @@
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import * as React from 'react';
+import { motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
 import {
@@ -51,7 +53,12 @@ export function Header() {
   );
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm">
+    <motion.header 
+      className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm"
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
       <div className="container mx-auto flex h-24 items-center justify-between">
       <Link href="/" className="group flex items-center gap-2 relative h-24 w-48">
           <div className="logo-main absolute inset-0">
@@ -108,6 +115,7 @@ export function Header() {
             <DropdownMenuContent 
               onMouseEnter={() => setStoreMenuOpen(true)}
               onMouseLeave={() => setStoreMenuOpen(false)}
+              sideOffset={0}
             >
               <DropdownMenuItem asChild>
                 <Link href="/store/photo">Photo</Link>
@@ -139,6 +147,6 @@ export function Header() {
             ))}
         </div>
       )}
-    </header>
+    </motion.header>
   );
 }

@@ -1,8 +1,18 @@
+
+'use client';
+
 import { SectionTitle } from "@/components/ui/SectionTitle";
+import { motion } from "framer-motion";
 
 export function VideoSection() {
   return (
-    <section className="py-20 md:py-32 bg-background relative overflow-hidden">
+    <motion.section 
+      className="py-20 md:py-32 bg-background relative overflow-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="container mx-auto px-4 relative z-10">
         <SectionTitle>From the Channel</SectionTitle>
         <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
@@ -19,6 +29,6 @@ export function VideoSection() {
           ></iframe>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
