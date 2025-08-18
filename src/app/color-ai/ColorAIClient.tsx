@@ -12,6 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 import { runGeneratePalette } from './actions';
 import type { GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { description: string, color: string } }) => {
     const { toast } = useToast();
@@ -40,6 +42,20 @@ const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { des
     );
 }
 
+const ColorPicker = ({ label, value, onChange, disabled }: { label: string, value: string, onChange: (e: ChangeEvent<HTMLInputElement>) => void, disabled?: boolean }) => (
+    <div className="flex items-center gap-4">
+      <Label htmlFor={`${label}-color`} className="font-headline text-lg text-foreground/80 w-28">{label}</Label>
+      <Input
+        id={`${label}-color`}
+        type="color"
+        value={value}
+        onChange={onChange}
+        className="w-16 h-10 p-1 bg-card border-border/50 cursor-pointer disabled:cursor-not-allowed"
+        disabled={disabled}
+      />
+    </div>
+  );
+
 export function ColorAIClient() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -48,6 +64,10 @@ export function ColorAIClient() {
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const [shadows, setShadows] = useState('#2A342D');
+  const [midtones, setMidtones] = useState('#8A8375');
+  const [highlights, setHighlights] = useState('#F5E4C1');
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -80,7 +100,12 @@ export function ColorAIClient() {
       reader.readAsDataURL(file);
       reader.onload = async () => {
         const base64Image = reader.result as string;
-        const response = await runGeneratePalette({ photoDataUri: base64Image });
+        const response = await runGeneratePalette({ 
+          photoDataUri: base64Image,
+          userShadows: shadows,
+          userMidtones: midtones,
+          userHighlights: highlights
+        });
         if ('error' in response) {
           setError(response.error);
         } else {
@@ -106,35 +131,43 @@ export function ColorAIClient() {
       <Card className="bg-card border-dashed border-2">
         <CardContent className="p-6">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            {/* Uploader */}
-            <div 
-              className="relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg h-80 cursor-pointer hover:bg-secondary transition-colors"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                className="hidden"
-                accept="image/png, image/jpeg"
-              />
-              {imagePreview ? (
-                <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="contain" className="rounded-lg" />
-              ) : (
-                <>
-                  <UploadCloud className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-center text-muted-foreground">
-                    Click to browse or drag & drop an image
-                  </p>
-                </>
-              )}
+            <div className="space-y-4">
+              {/* Uploader */}
+              <div 
+                className="relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg h-80 cursor-pointer hover:bg-secondary transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  accept="image/png, image/jpeg"
+                />
+                {imagePreview ? (
+                  <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="contain" className="rounded-lg" />
+                ) : (
+                  <>
+                    <UploadCloud className="h-12 w-12 text-muted-foreground mb-4" />
+                    <p className="text-center text-muted-foreground">
+                      Click or drag & drop to upload
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Actions & Results */}
             <div className="flex flex-col justify-center space-y-6">
               <div>
-                <h3 className="font-headline text-2xl mb-2">Generate Palette</h3>
-                <p className="text-muted-foreground">Let AI find the perfect colors and analyze your image's tonal balance.</p>
+                <h3 className="font-headline text-2xl mb-4">Guide the AI</h3>
+                <p className="text-muted-foreground mb-6">Select the dominant tints from your image to get a more accurate analysis.</p>
+              </div>
+
+              <div className="space-y-4">
+                <ColorPicker label="Shadows" value={shadows} onChange={(e) => setShadows(e.target.value)} disabled={!file} />
+                <ColorPicker label="Midtones" value={midtones} onChange={(e) => setMidtones(e.target.value)} disabled={!file} />
+                <ColorPicker label="Highlights" value={highlights} onChange={(e) => setHighlights(e.target.value)} disabled={!file} />
               </div>
               
               <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
@@ -146,7 +179,7 @@ export function ColorAIClient() {
                 ) : (
                   <>
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Generate
+                    Analyze
                   </>
                 )}
               </Button>
