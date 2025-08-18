@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -66,18 +67,24 @@ export function Header() {
           
           <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
             <DropdownMenuTrigger asChild>
-                <button
-                    className={cn(
-                        'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
-                        pathname.startsWith('/store')
-                        ? 'text-accent'
-                        : 'text-foreground/70 hover:text-foreground'
-                    )}>
-                  Store
-                  <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
-                </button>
+              <button
+                onMouseEnter={() => setStoreMenuOpen(true)}
+                onMouseLeave={() => setStoreMenuOpen(false)}
+                className={cn(
+                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
+                    pathname.startsWith('/store')
+                    ? 'text-accent'
+                    : 'text-foreground/70 hover:text-foreground'
+                )}>
+                Store
+                <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
+              </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent 
+              onMouseEnter={() => setStoreMenuOpen(true)}
+              onMouseLeave={() => setStoreMenuOpen(false)}
+              className="mt-2"
+            >
                 <DropdownMenuItem asChild>
                   <Link href="/store/photo">Photo</Link>
                 </DropdownMenuItem>
