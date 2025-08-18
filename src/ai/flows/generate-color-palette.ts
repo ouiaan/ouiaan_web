@@ -20,13 +20,18 @@ const GenerateColorPaletteInputSchema = z.object({
 });
 export type GenerateColorPaletteInput = z.infer<typeof GenerateColorPaletteInputSchema>;
 
+const TonalCharacteristicSchema = z.object({
+  color: z.string().describe("A single representative hex color code for this tonal range."),
+  description: z.string().describe('A detailed description of the tonal characteristics. For example: "Slightly lifted with a cool, cyan tint to give a cinematic feel."'),
+});
+
 const GenerateColorPaletteOutputSchema = z.object({
-  colorPalette: z.array(z.string()).describe('An array of suggested color palette hex codes.'),
+  colorPalette: z.array(z.string()).describe('An array of 5 key color palette hex codes from the image.'),
   tonalAnalysis: z.object({
-    shadows: z.string().describe('A detailed description of the shadow characteristics, including any color tints, saturation levels, and brightness. For example: "Slightly lifted with a cool, cyan tint to give a cinematic feel."'),
-    midtones: z.string().describe('A detailed description of the midtone characteristics, focusing on skin tones if present, overall warmth, and contrast. For example: "Kept clean and natural, with a slight push towards magenta to contrast the shadows."'),
-    highlights: z.string().describe('A detailed description of the highlight characteristics, including any color casting and how they roll off. For example: "Soft roll-off to prevent clipping, with a subtle warm cast to enhance the sunset feel."'),
-  }).describe('A detailed analysis of the color grading characteristics for the shadows, midtones, and highlights.'),
+    shadows: TonalCharacteristicSchema,
+    midtones: TonalCharacteristicSchema,
+    highlights: TonalCharacteristicSchema,
+  }).describe('A detailed analysis of the color grading characteristics for the shadows, midtones, and highlights, including a representative hex color and a professional description for each.'),
   suggestedLuts: z.array(z.string()).describe('An array of suggested LUTs for purchase to help users implement the color palettes.'),
 });
 export type GenerateColorPaletteOutput = z.infer<typeof GenerateColorPaletteOutputSchema>;
@@ -45,7 +50,7 @@ You will analyze the provided image to create a full color grading analysis.
 
 Analyze the following image and provide:
 1. A general color palette of 5 key hex codes from the image.
-2. A detailed, professional analysis of the tonal characteristics for the shadows, midtones, and highlights. Provide actionable descriptions that a creator could use in software like Lightroom or DaVinci Resolve.
+2. A detailed, professional analysis of the tonal characteristics for the shadows, midtones, and highlights. For each tonal range, provide both a single representative hex color and a detailed description with actionable advice a creator could use in software like Lightroom or DaVinci Resolve.
 3. A list of suggested LUTs that are available for purchase to help users implement the color palettes.
 
 Image: {{media url=photoDataUri}}

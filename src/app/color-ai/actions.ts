@@ -6,7 +6,7 @@ import type { GenerateColorPaletteInput, GenerateColorPaletteOutput } from '@/ai
 export async function runGeneratePalette(input: GenerateColorPaletteInput): Promise<GenerateColorPaletteOutput | { error: string }> {
   try {
     const result = await generateColorPalette(input);
-    if (!result.colorPalette || !result.suggestedLuts || !result.tonalAnalysis) {
+    if (!result.colorPalette || !result.suggestedLuts || !result.tonalAnalysis?.shadows?.description) {
         throw new Error("AI failed to return expected data structure.");
     }
     return result;

@@ -11,18 +11,19 @@ import { useToast } from '@/hooks/use-toast';
 import { runGeneratePalette } from './actions';
 import type { GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
 import { Badge } from '@/components/ui/badge';
+import { BackgroundGradient } from '@/components/ui/background-gradient';
 
-const TonalAnalysisCard = ({ icon, title, description }: { icon: React.ReactNode, title: string; description: string }) => {
+
+const TonalAnalysisCard = ({ icon, title, color, description }: { icon: React.ReactNode, title: string; color: string; description: string }) => {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-card/50 rounded-lg p-4 border border-border/50 flex flex-col items-center text-center"
-        >
-            <div className="text-accent mb-2">{icon}</div>
-            <h5 className="font-headline text-lg text-foreground/90 mb-2">{title}</h5>
-            <p className="text-sm text-foreground/70">{description}</p>
-        </motion.div>
+        <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col items-center text-center">
+             <div className="flex items-center gap-4 mb-4">
+                <div className="text-accent">{icon}</div>
+                <h5 className="font-headline text-2xl text-foreground/90">{title}</h5>
+             </div>
+             <div className="w-16 h-16 rounded-md mb-4 border border-border" style={{ backgroundColor: color }} />
+             <p className="text-sm text-foreground/70 flex-grow">{description}</p>
+        </BackgroundGradient>
     );
 };
 
@@ -160,8 +161,8 @@ export function ColorAIClient() {
         {results && (
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12">
             <div>
-                <h4 className="font-headline text-2xl mb-4 flex items-center gap-2"><Palette/> Generated Palette</h4>
-                <div className="flex flex-wrap gap-4">
+                <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2"><Palette/> Generated Palette</h4>
+                <div className="flex flex-wrap gap-4 justify-center">
                   {results.colorPalette.map((color) => (
                     <motion.div 
                       key={color}
@@ -181,17 +182,17 @@ export function ColorAIClient() {
             </div>
 
             <div className="mt-12">
-                <h4 className="font-headline text-2xl mb-6 flex items-center gap-2"><Droplets /> Tonal Analysis</h4>
-                <div className="grid md:grid-cols-3 gap-4">
-                    <TonalAnalysisCard icon={<Moon size={24} />} title="Shadows" description={results.tonalAnalysis.shadows} />
-                    <TonalAnalysisCard icon={<Contrast size={24} />} title="Midtones" description={results.tonalAnalysis.midtones} />
-                    <TonalAnalysisCard icon={<Sun size={24} />} title="Highlights" description={results.tonalAnalysis.highlights} />
+                <h4 className="font-headline text-2xl text-center mb-6 flex items-center justify-center gap-2"><Droplets /> Tonal Analysis</h4>
+                <div className="grid md:grid-cols-3 gap-8">
+                    <TonalAnalysisCard icon={<Moon size={24} />} title="Shadows" color={results.tonalAnalysis.shadows.color} description={results.tonalAnalysis.shadows.description} />
+                    <TonalAnalysisCard icon={<Contrast size={24} />} title="Midtones" color={results.tonalAnalysis.midtones.color} description={results.tonalAnalysis.midtones.description} />
+                    <TonalAnalysisCard icon={<Sun size={24} />} title="Highlights" color={results.tonalAnalysis.highlights.color} description={results.tonalAnalysis.highlights.description} />
                 </div>
             </div>
             
             <div className="mt-12">
-                <h4 className="font-headline text-2xl mb-4 flex items-center gap-2"><Wand2 /> Suggested LUTs</h4>
-                <div className="flex flex-wrap gap-2">
+                <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2"><Wand2 /> Suggested LUTs</h4>
+                <div className="flex flex-wrap gap-2 justify-center">
                   {results.suggestedLuts.map((lut) => (
                     <Badge key={lut} variant="secondary" className="text-lg py-1 px-3 bg-secondary text-secondary-foreground border-border">
                       {lut}
