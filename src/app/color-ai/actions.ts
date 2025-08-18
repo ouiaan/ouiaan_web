@@ -2,9 +2,15 @@
 
 import { generateColorPalette } from '@/ai/flows/generate-color-palette';
 import type { GenerateColorPaletteInput, GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
+import { rateLimiter } from '@/lib/rate-limiter';
 
 export async function runGeneratePalette(input: GenerateColorPaletteInput): Promise<GenerateColorPaletteOutput | { error: string }> {
   try {
+    const { success } = await rateLimiter.limit("color-ai");
+    if (!success) {
+      return { error: 'Too many requests. Please try again in a minute.' };
+    }
+
     const result = await generateColorPalette(input);
     if (!result.colorPalette || !result.suggestedLuts || !result.tonalAnalysis?.shadows?.description) {
         throw new Error("AI failed to return expected data structure.");
