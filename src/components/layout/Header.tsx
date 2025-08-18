@@ -23,9 +23,7 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname();
   const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
-  const menuRef = React.useRef<HTMLDivElement>(null);
-  const triggerRef = React.useRef<HTMLButtonElement>(null);
-
+  
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link href={href} passHref>
       <span
@@ -69,15 +67,8 @@ export function Header() {
           
           <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
             <DropdownMenuTrigger
-              ref={triggerRef}
               onMouseEnter={() => setStoreMenuOpen(true)}
-              onMouseLeave={() => {
-                setTimeout(() => {
-                  if (menuRef.current && !menuRef.current.matches(':hover')) {
-                    setStoreMenuOpen(false);
-                  }
-                }, 100);
-              }}
+              onMouseLeave={() => setStoreMenuOpen(false)}
               className={cn(
                   'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
                   pathname.startsWith('/store')
@@ -88,9 +79,8 @@ export function Header() {
               <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", storeMenuOpen && "rotate-180")} />
             </DropdownMenuTrigger>
             <DropdownMenuContent 
-              ref={menuRef}
-              onMouseLeave={() => setStoreMenuOpen(false)}
               onMouseEnter={() => setStoreMenuOpen(true)}
+              onMouseLeave={() => setStoreMenuOpen(false)}
               className="mt-2"
             >
                 <DropdownMenuItem asChild>
