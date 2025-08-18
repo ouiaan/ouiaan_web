@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { runGeneratePalette } from './actions';
 import type { GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
+import { BackgroundGradient } from '@/components/ui/background-gradient';
 
 const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { description: string, color: string } }) => {
     const { toast } = useToast();
@@ -24,20 +25,18 @@ const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { des
       }
 
     return (
-        <Card className="bg-secondary/50">
-            <CardHeader>
-                <CardTitle className="text-xl font-headline flex items-center gap-2">{title}</CardTitle>
-            </CardHeader>
-            <CardContent>
+        <BackgroundGradient animate={true} containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
+            <div className="flex-grow">
+                <h4 className="font-headline text-xl text-foreground flex items-center gap-2">{title}</h4>
                  <div 
-                    className="w-full h-16 rounded-md cursor-pointer border border-border"
+                    className="w-full h-16 rounded-md cursor-pointer border border-border mt-4"
                     style={{ backgroundColor: analysis.color }}
                     onClick={() => copyToClipboard(analysis.color)}
                 />
                  <p className="font-mono text-sm mt-2 text-muted-foreground">{analysis.color}</p>
                  <p className="text-sm text-foreground/80 mt-2">{analysis.description}</p>
-            </CardContent>
-        </Card>
+            </div>
+        </BackgroundGradient>
     );
 }
 
