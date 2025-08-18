@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import * as React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
 import {
@@ -181,13 +181,20 @@ export function Header() {
       </div>
       
       {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="absolute top-24 left-0 w-full bg-background/95 backdrop-blur-sm md:hidden flex flex-col items-center gap-6 py-8 z-50">
-            {mobileNavLinks.map((link) => (
-                <NavLink key={link.href} href={link.href} label={link.label} className="text-2xl"/>
-            ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="absolute top-24 left-0 w-full bg-background/95 backdrop-blur-sm md:hidden flex flex-col items-center gap-6 py-8 z-50">
+              {mobileNavLinks.map((link) => (
+                  <NavLink key={link.href} href={link.href} label={link.label} className="text-2xl"/>
+              ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
