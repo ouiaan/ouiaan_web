@@ -94,13 +94,12 @@ export function ColorAIClient() {
   const [pickingColorFor, setPickingColorFor] = useState<string | null>(null);
 
   const drawImageToCanvas = () => {
-    if (!imageRef.current || !canvasRef.current) return;
+    if (!imageRef.current || !canvasRef.current || imageRef.current.naturalWidth === 0) return;
     const image = imageRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Determine the 'contain' dimensions
     const canvasWidth = canvas.offsetWidth;
     const canvasHeight = canvas.offsetHeight;
     const imgAspectRatio = image.naturalWidth / image.naturalHeight;
@@ -120,26 +119,18 @@ export function ColorAIClient() {
         xStart = (canvasWidth - renderWidth) / 2;
     }
 
-    // Set canvas logical dimensions to match its display dimensions
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
-    // Clear canvas and draw the image scaled and centered
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     ctx.drawImage(image, xStart, yStart, renderWidth, renderHeight);
   };
 
 
   useEffect(() => {
-    // Redraw when imagePreview changes
-    if (imageRef.current) {
-        // The onLoad event on the Image component will also trigger this
-        imageRef.current.onload = drawImageToCanvas;
-        // Also handle resize
-        window.addEventListener('resize', drawImageToCanvas);
-    }
+    window.addEventListener('resize', drawImageToCanvas);
     return () => window.removeEventListener('resize', drawImageToCanvas);
-  }, [imagePreview]);
+  }, []);
 
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -162,7 +153,6 @@ export function ColorAIClient() {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     
-    // Coordinates are relative to the canvas display size, which now matches its logical size
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
@@ -171,7 +161,6 @@ export function ColorAIClient() {
     
     const pixelData = ctx.getImageData(x, y, 1, 1).data;
 
-    // If pixel is transparent (alpha is 0), it's part of the letterboxing. Ignore click.
     if (pixelData[3] === 0) {
       setPickingColorFor(null);
       return;
