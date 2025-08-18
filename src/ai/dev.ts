@@ -3,4 +3,3 @@ config();
 
 import '@/ai/flows/recommend-luts.ts';
 import '@/ai/flows/generate-color-palette.ts';
-import '@/ai/flows/generate-rgb-curves.ts';
