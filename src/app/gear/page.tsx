@@ -11,56 +11,65 @@ import { motion } from 'framer-motion';
 const gear = [
   { 
     id: 1, 
-    name: 'Sony A7S III', 
+    name: 'Sony a6400', 
     category: 'Camera',
-    description: 'My primary workhorse for both video and photography. Incredible low-light performance and amazing video quality.',
+    description: 'Mi cámara principal para todo. Es compacta, potente y súper confiable para video y foto.',
     image: 'https://placehold.co/1600x900.png', 
     data_ai_hint: 'sony camera',
     link: '#' 
   },
   { 
     id: 2, 
-    name: 'Sigma 24-70mm f/2.8', 
+    name: 'Viltrox 24mm f/1.4', 
     category: 'Lens',
-    description: 'The most versatile lens in my bag. Perfect for almost any situation, from wide shots to portraits.',
+    description: 'Este lente es increíble para tomas amplias y con poca luz, dándole un look muy cinemático.',
     image: 'https://placehold.co/1600x900.png',
     data_ai_hint: 'camera lens', 
     link: '#'
   },
   { 
     id: 3, 
-    name: 'DJI Ronin-S', 
-    category: 'Stabilizer',
-    description: 'For those buttery smooth cinematic shots. It\'s reliable and easy to balance.',
+    name: '7Artisans 50mm f/1.8', 
+    category: 'Lens',
+    description: 'Perfecto para retratos y tomas con un bonito desenfoque de fondo (bokeh).',
     image: 'https://placehold.co/1600x900.png',
-    data_ai_hint: 'camera stabilizer', 
+    data_ai_hint: 'camera lens portrait', 
     link: '#'
   },
   { 
     id: 4, 
-    name: 'Aputure 120D II', 
-    category: 'Lighting',
-    description: 'A powerful and versatile key light that has been essential for my studio and interview setups.',
+    name: 'MacBook Air & Mac Mini M1', 
+    category: 'Editing',
+    description: 'La combinación que uso para editar. Potencia y portabilidad para manejar cualquier proyecto.',
     image: 'https://placehold.co/1600x900.png',
-    data_ai_hint: 'studio light', 
+    data_ai_hint: 'apple computer', 
     link: '#'
   },
   { 
     id: 5, 
-    name: 'Rode NTG4+', 
+    name: 'DJI Mic 2 & Mini', 
     category: 'Audio',
-    description: 'Crisp, clean audio is non-negotiable. This shotgun mic delivers broadcast-quality sound.',
+    description: 'Audio inalámbrico de alta calidad, súper fácil de usar y esencial para un sonido profesional.',
     image: 'https://placehold.co/1600x900.png',
-    data_ai_hint: 'shotgun microphone', 
+    data_ai_hint: 'wireless microphone', 
     link: '#'
   },
   { 
     id: 6, 
-    name: 'Apple MacBook Pro M1 Max', 
-    category: 'Editing',
-    description: 'The machine that powers it all. Handles 4K editing and color grading without breaking a sweat.',
+    name: 'Neewer SL60W & Softbox', 
+    category: 'Lighting',
+    description: 'Mi luz principal en el estudio. La softbox de 45cm crea una luz suave y difusa perfecta.',
     image: 'https://placehold.co/1600x900.png',
-    data_ai_hint: 'laptop computer', 
+    data_ai_hint: 'studio light softbox', 
+    link: '#'
+  },
+  { 
+    id: 7, 
+    name: 'Godox TT600 & X3', 
+    category: 'Flash',
+    description: 'Mi set de flash para fotografía. El TT600 es un caballo de batalla y el trigger X3 es súper moderno.',
+    image: 'https://placehold.co/1600x900.png',
+    data_ai_hint: 'camera flash', 
     link: '#'
   },
 ];
@@ -75,7 +84,7 @@ export default function GearPage() {
     >
       <SectionTitle>My Gear</SectionTitle>
       <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
-        The tools I use and trust to create my content. This is a curated list of the gear that helps me bring my vision to life.
+        Las herramientas que uso y en las que confío para crear mi contenido. Esta es una lista curada del equipo que me ayuda a darle vida a mi visión.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -111,5 +120,3 @@ export default function GearPage() {
     </motion.div>
   );
 }
-
-    
