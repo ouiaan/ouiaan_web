@@ -53,8 +53,8 @@ Your primary goal is to identify the specific color **tints** (color casting) ap
 1.  **Analyze RGB Channels:** For each tonal range (shadows, midtones, highlights), mentally analyze its RGB composition. Ask yourself: Is the Red, Green, or Blue channel disproportionately high or low? For example, shadows with a green tint will have a higher G value compared to R and B within the dark areas.
 2.  **Identify the Tint:** Based on the channel imbalance, name the resulting tint. (e.g., "The shadows have a green-cyan tint", "The highlights have a warm, yellow-orange tint").
 3.  **Select a Representative Hex Code:** Choose a hex code that **represents the identified tint**, not the overall brightness.
-    *   **BAD EXAMPLE:** For shadows with a green tint, the hex code `#3A3A35` is a bad choice because it's just a dark, slightly warm gray. It's an *average* color, not a representation of the *tint*.
-    *   **GOOD EXAMPLE:** For the same shadows, `#2E3A2C` is a good choice because it's a dark, desaturated green, which correctly represents the **green tint** itself.
+    *   **BAD EXAMPLE:** For shadows with a green tint, the hex code &#35;3A3A35 is a bad choice because it's just a dark, slightly warm gray. It's an *average* color, not a representation of the *tint*.
+    *   **GOOD EXAMPLE:** For the same shadows, &#35;2E3A2C is a good choice because it's a dark, desaturated green, which correctly represents the **green tint** itself.
 
 Analyze the following image and provide:
 1.  A general color palette of 5 key hex codes from the image.
