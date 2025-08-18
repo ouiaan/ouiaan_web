@@ -68,7 +68,6 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <button
                 onMouseEnter={() => setStoreMenuOpen(true)}
-                onMouseLeave={() => setStoreMenuOpen(false)}
                 className={cn(
                     'group flex items-center gap-1 font-headline uppercase tracking-wider text-sm transition-colors duration-300 outline-none',
                     pathname.startsWith('/store')
@@ -80,7 +79,6 @@ export function Header() {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
-              onMouseEnter={() => setStoreMenuOpen(true)}
               onMouseLeave={() => setStoreMenuOpen(false)}
               className="mt-2"
             >
