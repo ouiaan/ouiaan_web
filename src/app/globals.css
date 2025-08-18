@@ -6,6 +6,18 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+#logo-container #logo-path-1, #logo-container #logo-path-2 {
+  transition: transform 0.3s ease-in-out;
+}
+
+#logo-container:hover #logo-path-1 {
+  transform: translate(-15px, -15px);
+}
+
+#logo-container:hover #logo-path-2 {
+  transform: translate(15px, 15px);
+}
+
 @layer base {
   :root {
     --background: 220 11% 6%;
@@ -46,10 +58,6 @@ body {
 }
 
 @layer utilities {
-  .grain {
-    position: relative;
-  }
-
   .grain::after {
     animation: grain 8s steps(10) infinite;
     background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjYwMCI+PGZpbHRlciBpZD0iYSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1IiBkPSJNMCAwaDYwMHY2MDBIMHoiLz48L3N2Zz4=');
