@@ -80,4 +80,16 @@ body {
   .text-link-active {
       @apply text-accent;
   }
+
+  .logo-main, .logo-shadow {
+    transition: transform 0.3s ease-out;
+  }
+
+  .group:hover .logo-main {
+    transform: translateY(-4px);
+  }
+
+  .group:hover .logo-shadow {
+    transform: translateY(4px);
+  }
 }
