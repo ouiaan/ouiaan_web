@@ -86,10 +86,10 @@ body {
   }
 
   .logo-container:hover #logo-shadow {
-    transform: translate(-2px, -2px) rotate(-2deg);
+    transform: translate(365.72314453125px, 179.794189453125px);
   }
 
   .logo-container:hover #logo-main {
-    transform: translate(2px, 2px) rotate(2deg);
+    transform: translate(388.4375px, 503.6875px);
   }
 }
