@@ -12,6 +12,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 
 const navLinks = [
@@ -66,7 +67,7 @@ export function Header() {
           <NavLink href="/" label="Home" />
           
           <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
-            <div onMouseLeave={() => setStoreMenuOpen(false)}>
+            <DropdownMenuGroup onMouseLeave={() => setStoreMenuOpen(false)}>
               <DropdownMenuTrigger
                 onMouseEnter={() => setStoreMenuOpen(true)}
                 className={cn(
@@ -89,7 +90,7 @@ export function Header() {
                     <Link href="/store/video">Video</Link>
                   </DropdownMenuItem>
               </DropdownMenuContent>
-            </div>
+            </DropdownMenuGroup>
           </DropdownMenu>
 
           {navLinks.map((link) => (
