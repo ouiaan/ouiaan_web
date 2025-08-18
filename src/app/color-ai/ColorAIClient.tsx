@@ -1,8 +1,9 @@
+
 'use client';
 
 import { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Droplets, Contrast, Sun, Moon } from 'lucide-react';
+import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Droplets, Contrast, Sun, Moon, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -15,13 +16,32 @@ import { BackgroundGradient } from '@/components/ui/background-gradient';
 
 
 const TonalAnalysisCard = ({ icon, title, color, description }: { icon: React.ReactNode, title: string; color: string; description: string }) => {
+    const { toast } = useToast();
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast({
+          title: 'Copied to Clipboard!',
+          description: `Color ${text} copied.`,
+        });
+    }
+
     return (
         <BackgroundGradient animate={true} containerClassName="h-full rounded-2xl" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col items-center text-center">
              <div className="flex items-center gap-4 mb-4">
                 <div className="text-accent">{icon}</div>
                 <h5 className="font-headline text-2xl text-foreground/90">{title}</h5>
              </div>
-             <div className="w-16 h-16 rounded-md mb-4 border border-border" style={{ backgroundColor: color }} />
+             <div 
+                className="w-16 h-16 rounded-md mb-2 border border-border cursor-pointer group relative" 
+                style={{ backgroundColor: color }}
+                onClick={() => copyToClipboard(color)}
+             >
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <Copy className="h-6 w-6 text-white" />
+                </div>
+             </div>
+             <p className="font-mono text-xs text-muted-foreground mb-4">{color}</p>
              <p className="text-sm text-foreground/70 flex-grow">{description}</p>
         </BackgroundGradient>
     );
