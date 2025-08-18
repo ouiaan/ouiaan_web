@@ -3,7 +3,7 @@
 
 import { useState, useTransition, ChangeEvent, useRef, MouseEvent } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Copy, Pipette } from 'lucide-react';
+import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Pipette } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -109,25 +109,47 @@ export function ColorAIClient() {
   };
 
   const handleCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
-    if (!pickingColorFor || !canvasRef.current) return;
+    if (!pickingColorFor || !canvasRef.current || !imageRef.current) return;
 
     const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
+    const image = imageRef.current;
     const ctx = canvas.getContext('2d');
-    if (ctx) {
-        const pixel = ctx.getImageData(x, y, 1, 1).data;
-        const hex = `#${("000000" + ((pixel[0] << 16) | (pixel[1] << 8) | pixel[2]).toString(16)).slice(-6)}`;
-        
-        if (pickingColorFor === 'shadows') setShadows(hex);
-        else if (pickingColorFor === 'midtones') setMidtones(hex);
-        else if (pickingColorFor === 'highlights') setHighlights(hex);
-        
-        setPickingColorFor(null);
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    
+    const canvasAspectRatio = canvas.width / canvas.height;
+    const imageAspectRatio = image.naturalWidth / image.naturalHeight;
+
+    let scale: number;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (canvasAspectRatio > imageAspectRatio) {
+      scale = canvas.height / image.naturalHeight;
+      offsetX = (canvas.width - image.naturalWidth * scale) / 2;
+    } else {
+      scale = canvas.width / image.naturalWidth;
+      offsetY = (canvas.height - image.naturalHeight * scale) / 2;
     }
+
+    const x = (e.clientX - rect.left - offsetX) / scale;
+    const y = (e.clientY - rect.top - offsetY) / scale;
+
+    if (x < 0 || x > image.naturalWidth || y < 0 || y > image.naturalHeight) {
+      return; // Click was outside the actual image
+    }
+
+    const pixelData = ctx.getImageData(x, y, 1, 1).data;
+    const hex = `#${("000000" + ((pixelData[0] << 16) | (pixelData[1] << 8) | pixelData[2]).toString(16)).slice(-6)}`;
+    
+    if (pickingColorFor === 'shadows') setShadows(hex);
+    else if (pickingColorFor === 'midtones') setMidtones(hex);
+    else if (pickingColorFor === 'highlights') setHighlights(hex);
+    
+    setPickingColorFor(null);
   };
+
 
   const startPicking = (target: string) => {
     if (!imagePreview) {
@@ -207,7 +229,7 @@ export function ColorAIClient() {
                             ref={imageRef}
                             src={imagePreview} 
                             alt="Image preview" 
-                            layout="fill" 
+                            fill
                             objectFit="contain" 
                             className={cn("rounded-lg", pickingColorFor && "opacity-0")}
                             onLoad={() => {
@@ -218,12 +240,12 @@ export function ColorAIClient() {
                                     if(ctx) {
                                         canvas.width = image.naturalWidth;
                                         canvas.height = image.naturalHeight;
-                                        ctx.drawImage(image, 0, 0);
+                                        ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
                                     }
                                 }
                             }}
                         />
-                        <canvas 
+                         <canvas 
                             ref={canvasRef}
                             className="absolute inset-0 w-full h-full object-contain"
                             onClick={handleCanvasClick}
@@ -324,4 +346,5 @@ export function ColorAIClient() {
   );
 }
 
+    
     
