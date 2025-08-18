@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition, ChangeEvent, useRef, MouseEvent } from 'react';
+import { useState, useTransition, ChangeEvent, useRef, MouseEvent, useEffect } from 'react';
 import Image from 'next/image';
 import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Pipette } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -93,6 +93,50 @@ export function ColorAIClient() {
 
   const [pickingColorFor, setPickingColorFor] = useState<string | null>(null);
 
+  const drawImageToCanvas = () => {
+    if (!imageRef.current || !canvasRef.current) return;
+    const image = imageRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas dimensions to match the container
+    const container = canvas.parentElement;
+    if (!container) return;
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+
+    const canvasAspectRatio = canvas.width / canvas.height;
+    const imageAspectRatio = image.naturalWidth / image.naturalHeight;
+
+    let renderWidth, renderHeight, x, y;
+
+    if (canvasAspectRatio > imageAspectRatio) {
+      renderHeight = canvas.height;
+      renderWidth = image.naturalWidth * (renderHeight / image.naturalHeight);
+      x = (canvas.width - renderWidth) / 2;
+      y = 0;
+    } else {
+      renderWidth = canvas.width;
+      renderHeight = image.naturalHeight * (renderWidth / image.naturalWidth);
+      x = 0;
+      y = (canvas.height - renderHeight) / 2;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(image, x, y, renderWidth, renderHeight);
+  };
+
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (imageRef.current) {
+        drawImageToCanvas();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -109,38 +153,20 @@ export function ColorAIClient() {
   };
 
   const handleCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
-    if (!pickingColorFor || !canvasRef.current || !imageRef.current) return;
+    if (!pickingColorFor || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const image = imageRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    const rect = canvas.getBoundingClientRect();
     
-    const canvasAspectRatio = canvas.width / canvas.height;
-    const imageAspectRatio = image.naturalWidth / image.naturalHeight;
-
-    let scale: number;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    if (canvasAspectRatio > imageAspectRatio) {
-      scale = canvas.height / image.naturalHeight;
-      offsetX = (canvas.width - image.naturalWidth * scale) / 2;
-    } else {
-      scale = canvas.width / image.naturalWidth;
-      offsetY = (canvas.height - image.naturalHeight * scale) / 2;
-    }
-
-    const x = (e.clientX - rect.left - offsetX) / scale;
-    const y = (e.clientY - rect.top - offsetY) / scale;
-
-    if (x < 0 || x > image.naturalWidth || y < 0 || y > image.naturalHeight) {
-      return; // Click was outside the actual image
-    }
-
     const pixelData = ctx.getImageData(x, y, 1, 1).data;
+    // If alpha is 0, it's a transparent pixel, so do nothing.
+    if (pixelData[3] === 0) return;
+
     const hex = `#${("000000" + ((pixelData[0] << 16) | (pixelData[1] << 8) | pixelData[2]).toString(16)).slice(-6)}`;
     
     if (pickingColorFor === 'shadows') setShadows(hex);
@@ -230,24 +256,13 @@ export function ColorAIClient() {
                             src={imagePreview} 
                             alt="Image preview" 
                             fill
-                            objectFit="contain" 
+                            style={{ objectFit: 'contain' }}
                             className={cn("rounded-lg", pickingColorFor && "opacity-0")}
-                            onLoad={() => {
-                                if (imageRef.current && canvasRef.current) {
-                                    const canvas = canvasRef.current;
-                                    const image = imageRef.current;
-                                    const ctx = canvas.getContext('2d');
-                                    if(ctx) {
-                                        canvas.width = image.naturalWidth;
-                                        canvas.height = image.naturalHeight;
-                                        ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
-                                    }
-                                }
-                            }}
+                            onLoad={drawImageToCanvas}
                         />
                          <canvas 
                             ref={canvasRef}
-                            className="absolute inset-0 w-full h-full object-contain"
+                            className="absolute inset-0 w-full h-full"
                             onClick={handleCanvasClick}
                             style={{ display: pickingColorFor ? 'block' : 'none' }}
                         />
@@ -346,5 +361,4 @@ export function ColorAIClient() {
   );
 }
 
-    
     
