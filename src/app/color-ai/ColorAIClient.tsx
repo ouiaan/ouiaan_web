@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition, ChangeEvent, useRef } from 'react';
+import { useState, useTransition, ChangeEvent, useRef, MouseEvent } from 'react';
 import Image from 'next/image';
 import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Copy, Pipette } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +14,8 @@ import type { GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palet
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+
 
 const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { description: string, color: string } }) => {
     const { toast } = useToast();
@@ -42,7 +44,14 @@ const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { des
     );
 }
 
-const ColorPicker = ({ label, value, onChange, disabled }: { label: string, value: string, onChange: (e: ChangeEvent<HTMLInputElement>) => void, disabled?: boolean }) => (
+const ColorPicker = ({ label, value, onColorChange, onEyeDropperClick, disabled, isPicking }: { 
+    label: string, 
+    value: string, 
+    onColorChange: (e: ChangeEvent<HTMLInputElement>) => void, 
+    onEyeDropperClick: () => void,
+    disabled?: boolean,
+    isPicking?: boolean
+}) => (
     <div className="flex items-center gap-4">
       <Label htmlFor={`${label}-color`} className="font-headline text-lg text-foreground/80 w-28">{label}</Label>
       <div className="flex items-center gap-2">
@@ -50,10 +59,19 @@ const ColorPicker = ({ label, value, onChange, disabled }: { label: string, valu
           id={`${label}-color`}
           type="color"
           value={value}
-          onChange={onChange}
+          onChange={onColorChange}
           className="w-16 h-10 p-1 bg-card border-border/50 cursor-pointer disabled:cursor-not-allowed"
           disabled={disabled}
         />
+        <Button 
+            variant="outline" 
+            size="icon"
+            onClick={onEyeDropperClick}
+            disabled={disabled}
+            className={cn(isPicking && "ring-2 ring-accent")}
+        >
+            <Pipette className="h-5 w-5"/>
+        </Button>
       </div>
     </div>
   );
@@ -65,11 +83,16 @@ export function ColorAIClient() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
   const [shadows, setShadows] = useState('#2A342D');
   const [midtones, setMidtones] = useState('#8A8375');
   const [highlights, setHighlights] = useState('#F5E4C1');
+
+  const [pickingColorFor, setPickingColorFor] = useState<string | null>(null);
+
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -84,7 +107,37 @@ export function ColorAIClient() {
       reader.readAsDataURL(selectedFile);
     }
   };
-  
+
+  const handleCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
+    if (!pickingColorFor || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        const pixel = ctx.getImageData(x, y, 1, 1).data;
+        const hex = `#${("000000" + ((pixel[0] << 16) | (pixel[1] << 8) | pixel[2]).toString(16)).slice(-6)}`;
+        
+        if (pickingColorFor === 'shadows') setShadows(hex);
+        else if (pickingColorFor === 'midtones') setMidtones(hex);
+        else if (pickingColorFor === 'highlights') setHighlights(hex);
+        
+        setPickingColorFor(null);
+    }
+  };
+
+  const startPicking = (target: string) => {
+    if (!imagePreview) {
+        toast({ title: "Upload an image first!", variant: "destructive" });
+        return;
+    }
+    setPickingColorFor(current => current === target ? null : target);
+    toast({ title: "Color Picker Activated", description: "Click on the image to pick a color."});
+  }
+
   const handleGenerate = () => {
     if (!file) {
       toast({
@@ -134,10 +187,12 @@ export function ColorAIClient() {
         <CardContent className="p-6">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="space-y-4">
-              {/* Uploader */}
               <div 
-                className="relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg h-80 cursor-pointer hover:bg-secondary transition-colors"
-                onClick={() => fileInputRef.current?.click()}
+                className={cn(
+                    "relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg h-80",
+                    !imagePreview && "cursor-pointer hover:bg-secondary transition-colors"
+                )}
+                onClick={() => !imagePreview && fileInputRef.current?.click()}
               >
                 <input
                   type="file"
@@ -147,7 +202,34 @@ export function ColorAIClient() {
                   accept="image/png, image/jpeg"
                 />
                 {imagePreview ? (
-                  <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="contain" className="rounded-lg" />
+                   <div className={cn("relative w-full h-full", pickingColorFor ? "cursor-crosshair" : "cursor-default")}>
+                        <Image 
+                            ref={imageRef}
+                            src={imagePreview} 
+                            alt="Image preview" 
+                            layout="fill" 
+                            objectFit="contain" 
+                            className={cn("rounded-lg", pickingColorFor && "opacity-0")}
+                            onLoad={() => {
+                                if (imageRef.current && canvasRef.current) {
+                                    const canvas = canvasRef.current;
+                                    const image = imageRef.current;
+                                    const ctx = canvas.getContext('2d');
+                                    if(ctx) {
+                                        canvas.width = image.naturalWidth;
+                                        canvas.height = image.naturalHeight;
+                                        ctx.drawImage(image, 0, 0);
+                                    }
+                                }
+                            }}
+                        />
+                        <canvas 
+                            ref={canvasRef}
+                            className="absolute inset-0 w-full h-full object-contain"
+                            onClick={handleCanvasClick}
+                            style={{ display: pickingColorFor ? 'block' : 'none' }}
+                        />
+                   </div>
                 ) : (
                   <>
                     <UploadCloud className="h-12 w-12 text-muted-foreground mb-4" />
@@ -159,17 +241,16 @@ export function ColorAIClient() {
               </div>
             </div>
 
-            {/* Actions & Results */}
             <div className="flex flex-col justify-center space-y-6">
               <div>
                 <h3 className="font-headline text-2xl mb-4">Guide the AI</h3>
-                <p className="text-muted-foreground mb-6">Select the dominant tints from your image to get a more accurate analysis.</p>
+                <p className="text-muted-foreground mb-6">Use the eyedropper or color wheel to select tints from your image.</p>
               </div>
 
               <div className="space-y-4">
-                <ColorPicker label="Shadows" value={shadows} onChange={(e) => setShadows(e.target.value)} disabled={!file} />
-                <ColorPicker label="Midtones" value={midtones} onChange={(e) => setMidtones(e.target.value)} disabled={!file} />
-                <ColorPicker label="Highlights" value={highlights} onChange={(e) => setHighlights(e.target.value)} disabled={!file} />
+                <ColorPicker label="Shadows" value={shadows} onColorChange={(e) => setShadows(e.target.value)} onEyeDropperClick={() => startPicking('shadows')} disabled={!file} isPicking={pickingColorFor === 'shadows'} />
+                <ColorPicker label="Midtones" value={midtones} onColorChange={(e) => setMidtones(e.target.value)} onEyeDropperClick={() => startPicking('midtones')} disabled={!file} isPicking={pickingColorFor === 'midtones'} />
+                <ColorPicker label="Highlights" value={highlights} onColorChange={(e) => setHighlights(e.target.value)} onEyeDropperClick={() => startPicking('highlights')} disabled={!file} isPicking={pickingColorFor === 'highlights'}/>
               </div>
               
               <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
@@ -242,3 +323,5 @@ export function ColorAIClient() {
     </div>
   );
 }
+
+    
