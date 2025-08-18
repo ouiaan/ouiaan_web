@@ -99,44 +99,23 @@ export function ColorAIClient() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    
+    // Set canvas dimensions to match the image's natural dimensions
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
 
-    // Set canvas dimensions to match the container
-    const container = canvas.parentElement;
-    if (!container) return;
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
-
-    const canvasAspectRatio = canvas.width / canvas.height;
-    const imageAspectRatio = image.naturalWidth / image.naturalHeight;
-
-    let renderWidth, renderHeight, x, y;
-
-    if (canvasAspectRatio > imageAspectRatio) {
-      renderHeight = canvas.height;
-      renderWidth = image.naturalWidth * (renderHeight / image.naturalHeight);
-      x = (canvas.width - renderWidth) / 2;
-      y = 0;
-    } else {
-      renderWidth = canvas.width;
-      renderHeight = image.naturalHeight * (renderWidth / image.naturalWidth);
-      x = 0;
-      y = (canvas.height - renderHeight) / 2;
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(image, x, y, renderWidth, renderHeight);
+    // Draw the image to the canvas
+    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
   };
 
 
   useEffect(() => {
-    const handleResize = () => {
-      if (imageRef.current) {
+    // Redraw when imagePreview changes
+    if (imageRef.current) {
         drawImageToCanvas();
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    }
+  }, [imagePreview]);
+
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -153,19 +132,23 @@ export function ColorAIClient() {
   };
 
   const handleCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
-    if (!pickingColorFor || !canvasRef.current) return;
+    if (!pickingColorFor || !canvasRef.current || !imageRef.current) return;
 
     const canvas = canvasRef.current;
+    const image = imageRef.current;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
     const pixelData = ctx.getImageData(x, y, 1, 1).data;
-    // If alpha is 0, it's a transparent pixel, so do nothing.
-    if (pixelData[3] === 0) return;
+    if (pixelData[3] === 0) return; // Ignore transparent pixels
 
     const hex = `#${("000000" + ((pixelData[0] << 16) | (pixelData[1] << 8) | pixelData[2]).toString(16)).slice(-6)}`;
     
@@ -174,7 +157,7 @@ export function ColorAIClient() {
     else if (pickingColorFor === 'highlights') setHighlights(hex);
     
     setPickingColorFor(null);
-  };
+};
 
 
   const startPicking = (target: string) => {
@@ -257,14 +240,14 @@ export function ColorAIClient() {
                             alt="Image preview" 
                             fill
                             style={{ objectFit: 'contain' }}
-                            className={cn("rounded-lg", pickingColorFor && "opacity-0")}
+                            className="rounded-lg"
                             onLoad={drawImageToCanvas}
                         />
                          <canvas 
                             ref={canvasRef}
                             className="absolute inset-0 w-full h-full"
                             onClick={handleCanvasClick}
-                            style={{ display: pickingColorFor ? 'block' : 'none' }}
+                            style={{ display: imagePreview ? 'block' : 'none', opacity: 0, pointerEvents: pickingColorFor ? 'auto' : 'none' }}
                         />
                    </div>
                 ) : (
@@ -299,7 +282,7 @@ export function ColorAIClient() {
                 ) : (
                   <>
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Analyze
+                    Get Your Grade
                   </>
                 )}
               </Button>
