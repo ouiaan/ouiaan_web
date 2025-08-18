@@ -9,7 +9,7 @@ export async function runGeneratePalette(input: GenerateColorPaletteInput): Prom
   try {
     const { success } = await rateLimiter.limit("color-ai");
     if (!success) {
-      return { error: "Wow, you're all inspired today, Try again in 60 seconds Picasso!" };
+      return { error: "Wow, you're all inspired today. Try again in 60 seconds, Picasso!" };
     }
 
     const result = await generateColorPalette(input);

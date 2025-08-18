@@ -100,12 +100,33 @@ export function ColorAIClient() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas dimensions to match the image's natural dimensions for accurate color picking
-    canvas.width = image.naturalWidth;
-    canvas.height = image.naturalHeight;
+    // Determine the 'contain' dimensions
+    const canvasWidth = canvas.offsetWidth;
+    const canvasHeight = canvas.offsetHeight;
+    const imgAspectRatio = image.naturalWidth / image.naturalHeight;
+    const canvasAspectRatio = canvasWidth / canvasHeight;
 
-    // Draw the image to the canvas
-    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
+    let renderWidth, renderHeight, xStart, yStart;
+
+    if (imgAspectRatio > canvasAspectRatio) {
+        renderWidth = canvasWidth;
+        renderHeight = canvasWidth / imgAspectRatio;
+        xStart = 0;
+        yStart = (canvasHeight - renderHeight) / 2;
+    } else {
+        renderHeight = canvasHeight;
+        renderWidth = canvasHeight * imgAspectRatio;
+        yStart = 0;
+        xStart = (canvasWidth - renderWidth) / 2;
+    }
+
+    // Set canvas logical dimensions to match its display dimensions
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    // Clear canvas and draw the image scaled and centered
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.drawImage(image, xStart, yStart, renderWidth, renderHeight);
   };
 
 
@@ -114,7 +135,10 @@ export function ColorAIClient() {
     if (imageRef.current) {
         // The onLoad event on the Image component will also trigger this
         imageRef.current.onload = drawImageToCanvas;
+        // Also handle resize
+        window.addEventListener('resize', drawImageToCanvas);
     }
+    return () => window.removeEventListener('resize', drawImageToCanvas);
   }, [imagePreview]);
 
 
@@ -133,28 +157,25 @@ export function ColorAIClient() {
   };
 
   const handleCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
-    if (!pickingColorFor || !canvasRef.current || !imageRef.current) return;
+    if (!pickingColorFor || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const image = imageRef.current;
     const rect = canvas.getBoundingClientRect();
     
-    // Calculate scale
-    const scaleX = canvas.width / image.naturalWidth;
-    const scaleY = canvas.height / image.naturalHeight;
-    const actualScale = Math.min(rect.width / canvas.width, rect.height / canvas.height);
-
-    const offsetX = (rect.width - canvas.width * actualScale) / 2;
-    const offsetY = (rect.height - canvas.height * actualScale) / 2;
-    
-    const x = Math.floor((e.clientX - rect.left - offsetX) / actualScale);
-    const y = Math.floor((e.clientY - rect.top - offsetY) / actualScale);
+    // Coordinates are relative to the canvas display size, which now matches its logical size
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
     const pixelData = ctx.getImageData(x, y, 1, 1).data;
-    if (pixelData[3] === 0) return; // Ignore transparent pixels
+
+    // If pixel is transparent (alpha is 0), it's part of the letterboxing. Ignore click.
+    if (pixelData[3] === 0) {
+      setPickingColorFor(null);
+      return;
+    }
 
     const hex = `#${("000000" + ((pixelData[0] << 16) | (pixelData[1] << 8) | pixelData[2]).toString(16)).slice(-6)}`;
     
@@ -238,36 +259,32 @@ export function ColorAIClient() {
                   className="hidden"
                   accept="image/png, image/jpeg"
                 />
-                {imagePreview ? (
-                   <div className={cn("relative w-full h-full", pickingColorFor ? "cursor-crosshair" : "cursor-default")}>
-                        <Image 
-                            ref={imageRef}
-                            src={imagePreview} 
-                            alt="Image preview" 
-                            fill
-                            style={{ objectFit: 'contain' }}
-                            className="rounded-lg"
-                            onLoad={drawImageToCanvas}
-                        />
-                         <canvas 
-                            ref={canvasRef}
-                            className="absolute inset-0 w-full h-full"
-                            onClick={handleCanvasClick}
-                            style={{ 
-                                display: imagePreview ? 'block' : 'none', 
-                                opacity: pickingColorFor ? 1 : 0, 
-                                pointerEvents: pickingColorFor ? 'auto' : 'none',
-                                objectFit: 'contain'
-                            }}
-                        />
-                   </div>
-                ) : (
-                  <>
+                <div className={cn("relative w-full h-full", pickingColorFor ? "cursor-crosshair" : "cursor-default")}>
+                    <Image 
+                        ref={imageRef}
+                        src={imagePreview || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='} 
+                        alt="Image preview" 
+                        fill
+                        style={{ objectFit: 'contain', opacity: imagePreview ? 1 : 0 }}
+                        className="rounded-lg"
+                        onLoad={drawImageToCanvas}
+                    />
+                     <canvas 
+                        ref={canvasRef}
+                        className="absolute inset-0 w-full h-full"
+                        onClick={handleCanvasClick}
+                        style={{ 
+                            display: imagePreview ? 'block' : 'none'
+                        }}
+                    />
+                </div>
+                {!imagePreview && (
+                  <div className="absolute flex flex-col items-center justify-center text-center">
                     <UploadCloud className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-center text-muted-foreground">
+                    <p className="text-muted-foreground">
                       Click or drag & drop to upload
                     </p>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
@@ -306,7 +323,7 @@ export function ColorAIClient() {
         {isPending && (
           <motion.div key="loader" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="text-center py-10">
             <Loader2 className="h-12 w-12 text-accent animate-spin mx-auto" />
-            <p className="mt-4 text-muted-foreground">Analyzing your image...</p>
+            <p className="mt-4 text-muted-foreground">Almost there, Picasso...</p>
           </motion.div>
         )}
 
@@ -354,7 +371,3 @@ export function ColorAIClient() {
     </div>
   );
 }
-
-    
-
-    
