@@ -30,7 +30,7 @@ const GenerateColorPaletteOutputSchema = z.object({
   colorPalette: z.array(z.string()).describe('An array of 5 key color palette hex codes from the image.'),
   tonalAnalysis: z.object({
       shadows: TonalCharacteristicSchema.describe("Analysis of the shadows (darkest areas)."),
-      midtones: Tonal_characteristic_schema.describe("Analysis of the midtones (middle grey areas)."),
+      midtones: TonalCharacteristicSchema.describe("Analysis of the midtones (middle grey areas)."),
       highlights: TonalCharacteristicSchema.describe("Analysis of the highlights (brightest areas)."),
     }).describe("An analysis of the image's primary color tints across shadows, midtones, and highlights."),
 });
