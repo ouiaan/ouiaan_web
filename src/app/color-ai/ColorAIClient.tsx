@@ -33,12 +33,15 @@ const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { des
             <div className="flex-grow">
                 <h4 className="font-headline text-xl text-foreground flex items-center gap-2">{title}</h4>
                  <div 
-                    className="w-full h-16 rounded-md cursor-pointer border border-border mt-4"
+                    className="w-full h-24 rounded-md cursor-pointer border border-border mt-4 relative group"
                     style={{ backgroundColor: analysis.color }}
                     onClick={() => copyToClipboard(analysis.color)}
-                />
-                 <p className="font-mono text-sm mt-2 text-muted-foreground">{analysis.color}</p>
-                 <p className="text-sm text-foreground/80 mt-2">{analysis.description}</p>
+                >
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <span className="text-white text-sm font-mono">{analysis.color}</span>
+                    </div>
+                </div>
+                 <p className="text-sm text-foreground/80 mt-4">{analysis.description}</p>
             </div>
         </BackgroundGradient>
     );
@@ -102,6 +105,9 @@ export function ColorAIClient() {
 
     const canvasWidth = canvas.offsetWidth;
     const canvasHeight = canvas.offsetHeight;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
     const imgAspectRatio = image.naturalWidth / image.naturalHeight;
     const canvasAspectRatio = canvasWidth / canvasHeight;
 
@@ -119,18 +125,9 @@ export function ColorAIClient() {
         xStart = (canvasWidth - renderWidth) / 2;
     }
 
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     ctx.drawImage(image, xStart, yStart, renderWidth, renderHeight);
   };
-
-
-  useEffect(() => {
-    window.addEventListener('resize', drawImageToCanvas);
-    return () => window.removeEventListener('resize', drawImageToCanvas);
-  }, []);
 
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
