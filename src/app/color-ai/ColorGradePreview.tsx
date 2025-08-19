@@ -90,8 +90,7 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
         if (totalWeight > 0) {
             h = (h + totalHueShift / totalWeight + 360) % 360;
             s = Math.max(0, Math.min(100, s + totalSatShift / totalWeight));
-            // For now, we ignore luminance shift from HSL to prevent artifacts
-            // l = Math.max(0, Math.min(100, l + totalLumShift / totalWeight));
+            l = Math.max(0, Math.min(100, l + totalLumShift / totalWeight));
         }
 
         [r, g, b] = convert.hsl.rgb(h, s, l);
