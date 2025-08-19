@@ -215,4 +215,5 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
             </div>
         </div>
     );
-}
+
+    

@@ -95,7 +95,7 @@ export function ColorAIClient() {
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  const [isPicking, setIsPicking] = useState<keyof TonalPalette | null>(null);
+  const [isPicking, setIsPicking] = useState<keyof Omit<TonalPalette, 'midtones' | 'highlights' | 'shadows'> | null>(null);
   
   const [tonalPalette, setTonalPalette] = useState<TonalPalette>({
       shadows: { color: '#2C3E50', description: '' },
@@ -325,20 +325,15 @@ export function ColorAIClient() {
                         </motion.div>
                     ))}
                     </div>
-
-                    <div className="mt-12">
-                        <h4 className="font-headline text-2xl mb-8 flex items-center justify-center gap-2"><Pipette /> Tonal Analysis</h4>
-                        <div className="grid gap-6">
-                            {results.tonalPalette.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalPalette.shadows} />}
-                            {results.tonalPalette.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalPalette.midtones} />}
-                            {results.tonalPalette.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalPalette.highlights} />}
-                        </div>
-                    </div>
                 </div>
-
+                
                 <div>
-                    <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2"><Rss /> Color Curves</h4>
-                    <ColorCurves tonalPalette={tonalPalette} />
+                    <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2"><Pipette /> Tonal Analysis</h4>
+                    <div className="grid gap-6">
+                        {results.tonalPalette.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalPalette.shadows} />}
+                        {results.tonalPalette.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalPalette.midtones} />}
+                        {results.tonalPalette.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalPalette.highlights} />}
+                    </div>
                 </div>
             </div>
           </motion.div>
@@ -348,3 +343,5 @@ export function ColorAIClient() {
     </div>
   );
 }
+
+    
