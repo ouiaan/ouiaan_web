@@ -17,11 +17,13 @@ const parseAdjustment = (adjustment: string): number => {
 
 // Helper function to convert hex to an [r, g, b] array
 const hexToRgb = (hex: string): [number, number, number] => {
+  if (!hex || !/^[#a-fA-F0-9]{6,7}$/.test(hex)) return [128, 128, 128]; // Return neutral gray for invalid hex
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
-    : [0, 0, 0];
+    : [128, 128, 128];
 };
+
 
 export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -39,6 +41,8 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
       canvas.width = image.naturalWidth;
       canvas.height = image.naturalHeight;
       context.drawImage(image, 0, 0);
+
+      if (!canvas.width || !canvas.height) return;
 
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
@@ -66,41 +70,67 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
         
         let [h, s, l] = convert.rgb.hsl(r, g, b);
 
-        // 1. Apply HSL Adjustments
+        // 1. Apply HSL Adjustments with smooth falloff
+        let totalHueShift = 0;
+        let totalSatShift = 0;
+        let totalLumShift = 0;
+        let totalWeight = 0;
+
         for (const shift of hslShifts) {
-          // Check if the pixel's hue is close to the target hue
           const hueDistance = Math.min(Math.abs(h - shift.targetHsl[0]), 360 - Math.abs(h - shift.targetHsl[0]));
-          if (hueDistance < 30) { // Apply if hue is within a 30-degree range
-            h = (h + shift.hueShift + 360) % 360;
-            s = Math.max(0, Math.min(100, s + shift.saturationShift));
-            l = Math.max(0, Math.min(100, l + shift.luminanceShift));
+          const hueInfluenceRange = 30; // degrees
+
+          if (hueDistance < hueInfluenceRange) {
+            // Use a cosine-based weight for smooth falloff
+            const weight = (1 + Math.cos(Math.PI * hueDistance / hueInfluenceRange)) / 2;
+            totalHueShift += shift.hueShift * weight;
+            totalSatShift += shift.saturationShift * weight;
+            totalLumShift += shift.luminanceShift * weight;
+            totalWeight += weight;
           }
+        }
+
+        if (totalWeight > 0) {
+          h = (h + totalHueShift / totalWeight + 360) % 360;
+          s = Math.max(0, Math.min(100, s + totalSatShift / totalWeight));
+          l = Math.max(0, Math.min(100, l + totalLumShift / totalWeight));
         }
         
         [r, g, b] = convert.hsl.rgb(h, s, l);
 
-        // 2. Apply Tonal Tints
-        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255; // Luminance
-        let tint: [number, number, number] | null = null;
-        let blendFactor = 0.2; // How strong the tint is
+        // 2. Apply Tonal Tints with smooth blending
+        const luminance = l / 100; // Use HSL's luminance (0-1) for consistency
+        const blendFactor = 0.18; // How strong the tint is
+
+        let finalTint = [0, 0, 0];
 
         if (luminance < 0.33) {
-          tint = shadowTint;
+            finalTint = shadowTint;
         } else if (luminance < 0.66) {
-          tint = midtoneTint;
+            // Blend between shadows and midtones
+            const midtoneWeight = (luminance - 0.33) / (0.66 - 0.33);
+            finalTint = [
+                shadowTint[0] * (1 - midtoneWeight) + midtoneTint[0] * midtoneWeight,
+                shadowTint[1] * (1 - midtoneWeight) + midtoneTint[1] * midtoneWeight,
+                shadowTint[2] * (1 - midtoneWeight) + midtoneTint[2] * midtoneWeight,
+            ];
         } else {
-          tint = highlightTint;
+            // Blend between midtones and highlights
+            const highlightWeight = (luminance - 0.66) / (1.0 - 0.66);
+            finalTint = [
+                midtoneTint[0] * (1 - highlightWeight) + highlightTint[0] * highlightWeight,
+                midtoneTint[1] * (1 - highlightWeight) + highlightTint[1] * highlightWeight,
+                midtoneTint[2] * (1 - highlightWeight) + highlightTint[2] * highlightWeight,
+            ];
         }
         
-        if (tint) {
-            r = Math.round(r * (1 - blendFactor) + tint[0] * blendFactor);
-            g = Math.round(g * (1 - blendFactor) + tint[1] * blendFactor);
-            b = Math.round(b * (1 - blendFactor) + tint[2] * blendFactor);
-        }
+        r = Math.round(r * (1 - blendFactor) + finalTint[0] * blendFactor);
+        g = Math.round(g * (1 - blendFactor) + finalTint[1] * blendFactor);
+        b = Math.round(b * (1 - blendFactor) + finalTint[2] * blendFactor);
 
-        data[i] = r;
-        data[i + 1] = g;
-        data[i + 2] = b;
+        data[i] = Math.max(0, Math.min(255, r));
+        data[i + 1] = Math.max(0, Math.min(255, g));
+        data[i + 2] = Math.max(0, Math.min(255, b));
       }
 
       context.putImageData(imageData, 0, 0);
