@@ -65,15 +65,17 @@ const ColorPicker = ({ label, color, onColorPick }: { label: string, color: stri
     }
 
     return (
-        <div className="flex items-center gap-4">
-            <div 
-                className="w-12 h-12 rounded-md border border-border cursor-pointer" 
-                style={{ backgroundColor: color }}
-                onClick={() => copyToClipboard(color)}
-            />
-            <div className="flex-grow">
-                <Label className="font-headline text-lg text-foreground/80">{label}</Label>
-                <p className="font-mono text-muted-foreground">{color}</p>
+        <div className="flex items-center justify-between gap-4 w-full">
+            <div className="flex items-center gap-4">
+                <div 
+                    className="w-12 h-12 rounded-md border border-border cursor-pointer shrink-0" 
+                    style={{ backgroundColor: color }}
+                    onClick={() => copyToClipboard(color)}
+                />
+                <div>
+                    <Label className="font-headline text-lg text-foreground/80">{label}</Label>
+                    <p className="font-mono text-muted-foreground">{color}</p>
+                </div>
             </div>
             <Button variant="ghost" size="icon" onClick={onColorPick} aria-label={`Pick ${label} color`}>
                 <Pipette className="h-6 w-6" />
@@ -256,31 +258,31 @@ export function ColorAIClient() {
               </div>
             </div>
 
-            <div className="flex flex-col justify-center space-y-6 pt-8">
-              <div>
-                <h3 className="font-headline text-2xl mb-4 text-center">Tonal Selection</h3>
-                <p className="text-muted-foreground mb-6 text-center">Use the eyedropper to select the tones from your image, or let the AI suggest them for you.</p>
-              </div>
+            <div className="flex flex-col h-full justify-center items-center space-y-6">
+                <div className="text-center">
+                    <h3 className="font-headline text-2xl mb-2">Tonal Selection</h3>
+                    <p className="text-muted-foreground mb-6">Use the eyedropper to select the tones from your image, or let the AI suggest them for you.</p>
+                </div>
 
-              <div className="space-y-4">
-                <ColorPicker label="Shadows" color={tonalPalette.shadows.color} onColorPick={() => setIsPicking('shadows')} />
-                <ColorPicker label="Midtones" color={tonalPalette.midtones.color} onColorPick={() => setIsPicking('midtones')} />
-                <ColorPicker label="Highlights" color={tonalPalette.highlights.color} onColorPick={() => setIsPicking('highlights')} />
-              </div>
+                <div className="space-y-4 w-full max-w-xs">
+                    <ColorPicker label="Shadows" color={tonalPalette.shadows.color} onColorPick={() => setIsPicking('shadows')} />
+                    <ColorPicker label="Midtones" color={tonalPalette.midtones.color} onColorPick={() => setIsPicking('midtones')} />
+                    <ColorPicker label="Highlights" color={tonalPalette.highlights.color} onColorPick={() => setIsPicking('highlights')} />
+                </div>
               
-              <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs mx-auto">
-                {isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="mr-2 h-4 w-4" />
-                    Get your grade
-                  </>
-                )}
-              </Button>
+                <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
+                    {isPending ? (
+                    <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Generating...
+                    </>
+                    ) : (
+                    <>
+                        <Wand2 className="mr-2 h-4 w-4" />
+                        Get your grade
+                    </>
+                    )}
+                </Button>
             </div>
           </div>
         </CardContent>
