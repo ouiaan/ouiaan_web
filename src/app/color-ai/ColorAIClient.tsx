@@ -10,17 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { runGeneratePalette } from './actions';
-import type { GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
+import type { GenerateColorPaletteOutput, GenerateColorPaletteInput } from '@/ai/flows/generate-color-palette';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 
-type TonalPalette = {
-    shadows: { color: string, description: string };
-    midtones: { color: string, description: string };
-    highlights: { color: string, description: string };
-}
+type TonalPaletteInput = NonNullable<GenerateColorPaletteInput['tonalPalette']>;
 
 const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { description: string, color: string } }) => {
     const { toast } = useToast();
@@ -93,12 +89,12 @@ export function ColorAIClient() {
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  const [isPicking, setIsPicking] = useState<keyof TonalPalette | null>(null);
+  const [isPicking, setIsPicking] = useState<keyof TonalPaletteInput | null>(null);
   
-  const [tonalPalette, setTonalPalette] = useState<TonalPalette>({
-      shadows: { color: '#2C3E50', description: '' },
-      midtones: { color: '#808080', description: '' },
-      highlights: { color: '#ECF0F1', description: '' },
+  const [tonalPalette, setTonalPalette] = useState<TonalPaletteInput>({
+      shadows: { color: '#2C3E50' },
+      midtones: { color: '#808080' },
+      highlights: { color: '#ECF0F1' },
   });
 
 
@@ -137,13 +133,18 @@ export function ColorAIClient() {
         const base64Image = reader.result as string;
         const response = await runGeneratePalette({ 
           photoDataUri: base64Image,
-          tonalPalette: tonalPalette,
+          tonalPalette: {
+            shadows: { color: tonalPalette.shadows.color },
+            midtones: { color: tonalPalette.midtones.color },
+            highlights: { color: tonalPalette.highlights.color },
+          }
         });
         if ('error' in response) {
           setError(response.error);
         } else {
           setResults(response);
-          setTonalPalette(response.tonalPalette);
+          // Optionally update the picker colors to reflect the AI's analysis, or keep user's selection
+          // For now, we keep the user's selection, and the results show the AI's analysis.
         }
       };
       reader.onerror = () => {
@@ -156,40 +157,43 @@ export function ColorAIClient() {
     if (!isPicking || !imageRef.current || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     const image = imageRef.current;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return;
     
-    // Ensure canvas is the same size as the natural image size for accurate color picking
-    if (canvas.width !== image.naturalWidth || canvas.height !== image.naturalHeight) {
-        canvas.width = image.naturalWidth;
-        canvas.height = image.naturalHeight;
-        ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
-    }
-
+    // Set canvas dimensions to the image's natural dimensions for accurate color picking
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
+    
+    // Get the bounding rectangle of the image element on the screen
     const rect = e.currentTarget.getBoundingClientRect();
     
     // Calculate click coordinates relative to the image element
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    // Calculate the ratio of the click position to the displayed image size
+    // Calculate the ratio of the click position to the displayed image's dimensions
     const xRatio = x / rect.width;
     const yRatio = y / rect.height;
 
-    // Apply the ratio to the natural image size to get the correct pixel
+    // Apply the ratio to the natural image dimensions to get the correct pixel on the canvas
     const pixelX = Math.floor(xRatio * image.naturalWidth);
     const pixelY = Math.floor(yRatio * image.naturalHeight);
 
+    // Get the color data for that pixel
     const [r, g, b] = ctx.getImageData(pixelX, pixelY, 1, 1).data;
     const hexColor = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
 
+    // Update the state
     setTonalPalette(prev => {
         if (!isPicking) return prev;
         const newPalette = { ...prev };
-        newPalette[isPicking] = { ...newPalette[isPicking], color: hexColor };
+        newPalette[isPicking] = { color: hexColor };
         return newPalette;
     });
+
+    // Reset picking mode
     setIsPicking(null);
   };
 
@@ -257,7 +261,6 @@ export function ColorAIClient() {
                     </motion.div>
                   )}
                  </AnimatePresence>
-
               </div>
             </div>
 
