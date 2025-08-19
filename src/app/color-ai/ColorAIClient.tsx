@@ -31,7 +31,7 @@ const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { des
     return (
         <BackgroundGradient animate={true} containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
             <div className="flex-grow">
-                <h4 className="font-headline text-xl text-foreground flex items-center gap-2">{title}</h4>
+                <h4 className="font-headline text-xl text-foreground flex items-center gap-2">{title} <Pipette className="h-5 w-5" /></h4>
                  <div 
                     className="w-full h-24 rounded-md cursor-pointer border border-border mt-4 relative group"
                     style={{ backgroundColor: analysis.color }}
