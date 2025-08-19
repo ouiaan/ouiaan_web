@@ -26,8 +26,9 @@ export default function Test2Page() {
         return;
     }
 
-    // Adjustment function to soften the curve points
-    function adjustToDiagonal(original: {r: number, g: number, b: number}, factor = 0.15) {
+    // Adjustment function to soften the curve points.
+    // A higher factor means a more subtle effect (closer to the neutral diagonal).
+    function adjustToDiagonal(original: {r: number, g: number, b: number}, factor = 0.60) {
         return {
             r: Math.round(original.r + (128 - original.r) * factor),
             g: Math.round(original.g + (128 - original.g) * factor),
@@ -42,14 +43,26 @@ export default function Test2Page() {
     };
 
     function createCurvePath(shadowVal: number, midtoneVal: number, highlightVal: number) {
-        // Using Catmull-Rom spline for a smoother curve
+        // Using a Catmull-Rom-like spline for a smoother, more natural curve.
+        // Control points are calculated to ensure the curve passes through the key points.
         const p0 = { x: 0, y: 255 };
         const p1 = { x: 64, y: 255 - shadowVal };
         const p2 = { x: 128, y: 255 - midtoneVal };
         const p3 = { x: 192, y: 255 - highlightVal };
         const p4 = { x: 255, y: 0 };
-        
-        return `M ${p0.x} ${p0.y} C ${p1.x},${p1.y} ${p2.x},${p2.y} ${p2.x},${p2.y} S ${p3.x},${p3.y} ${p4.x},${p4.y}`;
+
+        // Calculate control points for smooth transitions
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        const cp3x = p2.x + (p3.x - p1.x) / 6;
+        const cp3y = p2.y + (p3.y - p1.y) / 6;
+        const cp4x = p3.x - (p4.x - p2.x) / 6;
+        const cp4y = p3.y - (p4.y - p2.y) / 6;
+
+        return `M ${p0.x} ${p0.y} C ${p0.x},${p0.y} ${cp1x},${cp1y} ${p1.x},${p1.y} C ${cp2x},${cp2y} ${cp3x},${cp3y} ${p2.x},${p2.y} C ${p2.x},${p2.y} ${cp4x},${cp4y} ${p3.x},${p3.y} C ${p3.x},${p3.y} ${p4.x},${p4.y} ${p4.x},${p4.y}`;
     }
 
     function addPoints(graphId: string, shadowVal: number, midtoneVal: number, highlightVal: number, color: string) {
