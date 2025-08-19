@@ -15,7 +15,7 @@ export async function runGenerateGrade(input: GenerateColorGradeRecipeInput): Pr
 
     // The flow being called is now the new comparative analysis flow.
     const result = await generateColorGradeRecipe(input);
-    if (!result.colorPalette || !result.tonalPalette || !result.hslAdjustments || !result.toneCurveAdjustments) {
+    if (!result || !result.colorPalette || !result.tonalPalette || !result.hslAdjustments || !result.toneCurveAdjustments) {
         throw new Error("AI failed to return the expected data structure for the grade recipe.");
     }
     return result;
@@ -31,3 +31,5 @@ export async function runGenerateGrade(input: GenerateColorGradeRecipeInput): Pr
     return { error: `Failed to generate color grade recipe: ${message}` };
   }
 }
+
+    

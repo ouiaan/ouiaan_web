@@ -1,26 +1,27 @@
 
 'use client';
 
-import { useState, useTransition, ChangeEvent, useRef, MouseEvent } from 'react';
+import { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Pipette, SlidersHorizontal } from 'lucide-react';
+import { UploadCloud, Wand2, Loader2, AlertCircle, FileImage, Replace } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { runGeneratePalette } from './actions';
-import type { GenerateColorPaletteOutput, GenerateColorPaletteInput } from '@/ai/flows/generate-color-palette';
+import { runGenerateGrade } from './actions';
+import type { GenerateColorGradeRecipeOutput } from '@/ai/flows/generate-color-palette';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
-import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 
-type TonalPaletteInput = NonNullable<GenerateColorPaletteInput['tonalPalette']>;
-type HSLAdjustment = GenerateColorPaletteOutput['hslAdjustments'][0];
+type HSLAdjustment = GenerateColorGradeRecipeOutput['hslAdjustments'][0];
+type TonalPaletteAnalysis = GenerateColorGradeRecipeOutput['tonalPalette'];
 
-const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { description: string, color: string } }) => {
+const TonalAnalysisCard = ({ title, analysis }: { title: keyof TonalPaletteAnalysis, analysis: TonalPaletteAnalysis[keyof TonalPaletteAnalysis] }) => {
     const { toast } = useToast();
+
+    if (!analysis) return null;
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
@@ -33,7 +34,7 @@ const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { des
     return (
         <BackgroundGradient animate={true} containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
             <div className="flex-grow">
-                <h4 className="font-headline text-xl text-foreground flex items-center gap-2">{title}</h4>
+                <h4 className="font-headline text-xl text-foreground flex items-center gap-2 capitalize">{title}</h4>
                  <div 
                     className="w-full h-24 rounded-md cursor-pointer border border-border mt-4 relative group"
                     style={{ backgroundColor: analysis.color }}
@@ -76,77 +77,100 @@ const HSLAdjustmentCard = ({ adjustment }: { adjustment: HSLAdjustment }) => {
 };
 
 
-const ColorPicker = ({ label, color, onColorPick }: { label: string, color: string, onColorPick: () => void }) => {
-    const { toast } = useToast();
-    const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text);
-        toast({
-          title: 'Copied to Clipboard!',
-          description: `Color ${text} copied.`,
-        });
-    }
+const ImageUploader = ({ title, imagePreview, onFileChange, icon: Icon }: { title: string, imagePreview: string | null, onFileChange: (e: ChangeEvent<HTMLInputElement>) => void, icon: React.ElementType }) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     return (
-        <div className="flex items-center justify-between gap-4 w-full">
-            <div className="flex items-center gap-4">
-                <div 
-                    className="w-12 h-12 rounded-md border border-border cursor-pointer shrink-0" 
-                    style={{ backgroundColor: color }}
-                    onClick={() => copyToClipboard(color)}
+        <div className="flex flex-col items-center gap-4 w-full">
+            <h3 className="font-headline text-2xl flex items-center gap-2 text-foreground/80"><Icon className="h-6 w-6"/> {title}</h3>
+            <div 
+                className={cn(
+                    "relative flex flex-col items-center justify-center p-4 border-2 border-dashed border-border rounded-lg h-[250px] w-full cursor-pointer hover:bg-secondary transition-colors"
+                )}
+                onClick={() => fileInputRef.current?.click()}
+            >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={onFileChange}
+                  className="hidden"
+                  accept="image/png, image/jpeg"
                 />
-                <div>
-                    <Label className="font-headline text-lg text-foreground/80">{label}</Label>
-                    <p className="font-mono text-muted-foreground">{color}</p>
-                </div>
+                 <AnimatePresence>
+                  {imagePreview ? (
+                     <motion.div
+                       key="image"
+                       initial={{ opacity: 0, scale: 0.8 }}
+                       animate={{ opacity: 1, scale: 1 }}
+                       exit={{ opacity: 0, scale: 0.8 }}
+                       className="absolute inset-0 p-2"
+                     >
+                       <Image
+                         src={imagePreview}
+                         alt={`${title} preview`}
+                         fill
+                         style={{ objectFit: 'contain' }}
+                         className="rounded-lg"
+                       />
+                     </motion.div>
+                  ) : (
+                    <motion.div
+                      key="placeholder"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="absolute flex flex-col items-center justify-center text-center text-muted-foreground"
+                    >
+                      <UploadCloud className="h-10 w-10 mb-2" />
+                      <p>Click to upload</p>
+                    </motion.div>
+                  )}
+                 </AnimatePresence>
             </div>
-            <Button variant="ghost" size="icon" onClick={onColorPick} aria-label={`Pick ${label} color`}>
-                <Pipette className="h-6 w-6" />
-            </Button>
         </div>
     );
 };
 
 
 export function ColorAIClient() {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [results, setResults] = useState<GenerateColorPaletteOutput | null>(null);
+  const [sourceImageFile, setSourceImageFile] = useState<File | null>(null);
+  const [referenceImageFile, setReferenceImageFile] = useState<File | null>(null);
+  const [sourceImagePreview, setSourceImagePreview] = useState<string | null>(null);
+  const [referenceImagePreview, setReferenceImagePreview] = useState<string | null>(null);
+  
+  const [results, setResults] = useState<GenerateColorGradeRecipeOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  const [isPicking, setIsPicking] = useState<keyof TonalPaletteInput | null>(null);
-  
-  const [tonalPalette, setTonalPalette] = useState<TonalPaletteInput>({
-      shadows: { color: '#2C3E50' },
-      midtones: { color: '#808080' },
-      highlights: { color: '#ECF0F1' },
-  });
-
-
   const { toast } = useToast();
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (setter: (file: File | null) => void, previewSetter: (url: string | null) => void) => (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      setFile(selectedFile);
+      setter(selectedFile);
       setResults(null);
       setError(null);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        previewSetter(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
     }
   };
+  
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = error => reject(error);
+    });
+  }
 
   const handleGenerate = () => {
-    if (!file) {
+    if (!sourceImageFile || !referenceImageFile) {
       toast({
-        title: 'No file selected',
-        description: 'Please upload an image first.',
+        title: 'Missing Images',
+        description: 'Please upload both a source and a reference image.',
         variant: 'destructive',
       });
       return;
@@ -155,76 +179,31 @@ export function ColorAIClient() {
     startTransition(async () => {
       setError(null);
       setResults(null);
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = async () => {
-        const base64Image = reader.result as string;
-        const response = await runGeneratePalette({ 
-          photoDataUri: base64Image,
-          tonalPalette: {
-            shadows: { color: tonalPalette.shadows.color },
-            midtones: { color: tonalPalette.midtones.color },
-            highlights: { color: tonalPalette.highlights.color },
-          }
+      try {
+        const [sourceBase64, referenceBase64] = await Promise.all([
+            fileToBase64(sourceImageFile),
+            fileToBase64(referenceImageFile)
+        ]);
+        
+        const response = await runGenerateGrade({ 
+          sourcePhotoDataUri: sourceBase64,
+          referencePhotoDataUri: referenceBase64,
         });
-        if ('error' in response) {
+
+        if (response && 'error' in response) {
           setError(response.error);
-        } else {
+        } else if (response) {
           setResults(response);
-          // Set the tonal palette from the AI response, but only if the user didn't provide one
-          if (!response.error) {
-              setTonalPalette({
-                  shadows: { color: response.tonalPalette.shadows.color },
-                  midtones: { color: response.tonalPalette.midtones.color },
-                  highlights: { color: response.tonalPalette.highlights.color },
-              });
-          }
+        } else {
+            setError("Received an unexpected null response from the server.");
         }
-      };
-      reader.onerror = () => {
-        setError('Failed to read the file.');
-      };
+      } catch (e) {
+          const message = e instanceof Error ? e.message : "An unknown error occurred during file processing.";
+          setError(message);
+          console.error(e);
+      }
     });
   };
-
-  const handleImageClick = (e: MouseEvent<HTMLDivElement>) => {
-    if (!isPicking || !imageRef.current || !canvasRef.current) return;
-
-    const canvas = canvasRef.current;
-    const image = imageRef.current;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    if (!ctx) return;
-    
-    canvas.width = image.naturalWidth;
-    canvas.height = image.naturalHeight;
-    ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
-    
-    const rect = e.currentTarget.getBoundingClientRect();
-    // Calculate click position relative to the image element
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    // Calculate ratio of click position to image element's dimensions
-    const xRatio = x / rect.width;
-    const yRatio = y / rect.height;
-
-    // Apply ratio to the original image dimensions to get the correct pixel
-    const pixelX = Math.floor(xRatio * image.naturalWidth);
-    const pixelY = Math.floor(yRatio * image.naturalHeight);
-
-    const [r, g, b] = ctx.getImageData(pixelX, pixelY, 1, 1).data;
-    const hexColor = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
-
-    setTonalPalette(prev => {
-        if (!isPicking) return prev;
-        const newPalette = { ...prev };
-        newPalette[isPicking] = { color: hexColor };
-        return newPalette;
-    });
-
-    setIsPicking(null);
-  };
-
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -238,86 +217,34 @@ export function ColorAIClient() {
     <div className="max-w-6xl mx-auto">
       <Card className="bg-card border-dashed border-2">
         <CardContent className="p-6">
-          <div className="grid md:grid-cols-2 gap-8 items-start">
-            <div className="space-y-4">
-              <div 
-                className={cn(
-                    "relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg h-[400px]",
-                    {"cursor-crosshair": isPicking},
-                    {"cursor-pointer hover:bg-secondary transition-colors": !isPicking && !imagePreview}
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <ImageUploader 
+                title="Source Image" 
+                imagePreview={sourceImagePreview}
+                onFileChange={handleFileChange(setSourceImageFile, setSourceImagePreview)}
+                icon={FileImage}
+            />
+            <ImageUploader 
+                title="Reference Image" 
+                imagePreview={referenceImagePreview}
+                onFileChange={handleFileChange(setReferenceImageFile, setReferenceImagePreview)}
+                icon={Replace}
+            />
+          </div>
+          <div className="mt-8 flex justify-center">
+            <Button onClick={handleGenerate} disabled={isPending || !sourceImageFile || !referenceImageFile} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
+                {isPending ? (
+                <span className="flex items-center font-bold text-lg">
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Generating...
+                </span>
+                ) : (
+                <span className="flex items-center font-bold text-lg">
+                    <Wand2 className="mr-2 h-5 w-5" />
+                    Get Your Grade!
+                </span>
                 )}
-                onClick={!isPicking ? () => fileInputRef.current?.click() : undefined}
-              >
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                  accept="image/png, image/jpeg"
-                />
-                 <AnimatePresence>
-                  {imagePreview ? (
-                     <motion.div
-                       key="image"
-                       initial={{ opacity: 0, scale: 0.8 }}
-                       animate={{ opacity: 1, scale: 1 }}
-                       exit={{ opacity: 0, scale: 0.8 }}
-                       className="absolute inset-0 p-2"
-                       onClick={handleImageClick}
-                     >
-                       <Image
-                         ref={imageRef}
-                         src={imagePreview}
-                         alt="Image preview"
-                         fill
-                         style={{ objectFit: 'contain' }}
-                         className="rounded-lg"
-                         crossOrigin='anonymous'
-                       />
-                     </motion.div>
-                  ) : (
-                    <motion.div
-                      key="placeholder"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="absolute flex flex-col items-center justify-center text-center"
-                    >
-                      <UploadCloud className="h-12 w-12 text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">
-                        Click or drag & drop to upload
-                      </p>
-                    </motion.div>
-                  )}
-                 </AnimatePresence>
-              </div>
-            </div>
-
-            <div className="flex flex-col h-full justify-center items-center space-y-6">
-                <div className="text-center">
-                    <h3 className="font-headline text-2xl mb-2">Tonal Selection</h3>
-                    <p className="text-muted-foreground mb-6">Use the eyedropper to select the tones from your image, or let the AI suggest them for you.</p>
-                </div>
-
-                <div className="space-y-4 w-full max-w-xs">
-                    <ColorPicker label="Shadows" color={tonalPalette.shadows.color} onColorPick={() => setIsPicking('shadows')} />
-                    <ColorPicker label="Midtones" color={tonalPalette.midtones.color} onColorPick={() => setIsPicking('midtones')} />
-                    <ColorPicker label="Highlights" color={tonalPalette.highlights.color} onColorPick={() => setIsPicking('highlights')} />
-                </div>
-              
-                <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
-                    {isPending ? (
-                    <span className="flex items-center font-bold text-lg">
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Generating...
-                    </span>
-                    ) : (
-                    <span className="flex items-center font-bold text-lg">
-                        <Wand2 className="mr-2 h-5 w-5" />
-                        Get Your Grade!
-                    </span>
-                    )}
-                </Button>
-            </div>
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -341,9 +268,7 @@ export function ColorAIClient() {
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 flex flex-col items-center gap-12">
             
             <div className="w-full flex flex-col items-center">
-              <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
-                <Palette /> Generated Palette
-              </h4>
+              <h3 className="font-headline text-2xl mb-4">Generated Palette</h3>
               <div className="flex flex-wrap gap-4 justify-center">
                 {results.colorPalette.map((color) => (
                   <motion.div
@@ -364,21 +289,17 @@ export function ColorAIClient() {
             </div>
 
             <div className="w-full flex flex-col items-center">
-                <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
-                    <Pipette /> Tonal Analysis
-                </h4>
+                <h3 className="font-headline text-2xl mb-4">Tonal Analysis</h3>
                 <div className="grid md:grid-cols-3 gap-6 w-full max-w-4xl">
-                    {results.tonalPalette.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalPalette.shadows} />}
-                    {results.tonalPalette.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalPalette.midtones} />}
-                    {results.tonalPalette.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalPalette.highlights} />}
+                    <TonalAnalysisCard title="shadows" analysis={results.tonalPalette.shadows} />
+                    <TonalAnalysisCard title="midtones" analysis={results.tonalPalette.midtones} />
+                    <TonalAnalysisCard title="highlights" analysis={results.tonalPalette.highlights} />
                 </div>
             </div>
             
             {results.hslAdjustments && (
               <div className="w-full flex flex-col items-center">
-                <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
-                  <SlidersHorizontal /> HSL Primary Color Analysis
-                </h4>
+                <h3 className="font-headline text-2xl mb-4">HSL Primary Color Analysis</h3>
                 <div className="grid md:grid-cols-3 gap-6 w-full max-w-4xl">
                   {results.hslAdjustments.map((adj) => (
                     <HSLAdjustmentCard key={adj.colorName} adjustment={adj} />
@@ -390,7 +311,6 @@ export function ColorAIClient() {
           </motion.div>
         )}
       </AnimatePresence>
-      <canvas ref={canvasRef} className="hidden" />
     </div>
   );
 }
