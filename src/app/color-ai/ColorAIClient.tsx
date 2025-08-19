@@ -3,7 +3,7 @@
 
 import { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Wand2, Loader2, AlertCircle, FileImage, Replace } from 'lucide-react';
+import { UploadCloud, Wand2, Loader2, AlertCircle, FileImage, Replace, SlidersHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { runGenerateGrade } from './actions';
 import type { GenerateColorGradeRecipeOutput } from '@/ai/flows/generate-color-palette';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { cn } from '@/lib/utils';
+import { ColorGradePreview } from './ColorGradePreview';
 
 
 type HSLAdjustment = GenerateColorGradeRecipeOutput['hslAdjustments'][0];
@@ -214,7 +215,7 @@ export function ColorAIClient() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       <Card className="bg-card border-dashed border-2">
         <CardContent className="p-6">
           <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -234,12 +235,12 @@ export function ColorAIClient() {
           <div className="mt-8 flex justify-center">
             <Button onClick={handleGenerate} disabled={isPending || !sourceImageFile || !referenceImageFile} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
                 {isPending ? (
-                <span className="flex items-center font-bold text-lg">
+                <span className="flex items-center justify-center font-bold text-lg">
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Generating...
                 </span>
                 ) : (
-                <span className="flex items-center font-bold text-lg">
+                <span className="flex items-center justify-center font-bold text-lg">
                     <Wand2 className="mr-2 h-5 w-5" />
                     Get Your Grade!
                 </span>
@@ -264,49 +265,68 @@ export function ColorAIClient() {
           </motion.div>
         )}
 
-        {results && (
-          <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 flex flex-col items-center gap-12">
+        {results && sourceImagePreview && (
+          <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 flex flex-col gap-12">
             
             <div className="w-full flex flex-col items-center">
-              <h3 className="font-headline text-2xl mb-4">Generated Palette</h3>
-              <div className="flex flex-wrap gap-4 justify-center">
-                {results.colorPalette.map((color) => (
-                  <motion.div
-                    key={color}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                    className="w-20 h-20 rounded-md cursor-pointer relative group"
-                    style={{ backgroundColor: color }}
-                    onClick={() => copyToClipboard(color)}
-                  >
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                      <span className="text-white text-xs font-mono">{color}</span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                <h3 className="font-headline text-3xl mb-6">Your Color Grade Recipe</h3>
             </div>
 
-            <div className="w-full flex flex-col items-center">
-                <h3 className="font-headline text-2xl mb-4">Tonal Analysis</h3>
-                <div className="grid md:grid-cols-3 gap-6 w-full max-w-4xl">
-                    <TonalAnalysisCard title="shadows" analysis={results.tonalPalette.shadows} />
-                    <TonalAnalysisCard title="midtones" analysis={results.tonalPalette.midtones} />
-                    <TonalAnalysisCard title="highlights" analysis={results.tonalPalette.highlights} />
+            <div className="grid lg:grid-cols-2 gap-12">
+                <div className="flex flex-col gap-8">
+                    
+                    <div className="w-full flex flex-col items-center">
+                      <h3 className="font-headline text-2xl mb-4">Generated Palette</h3>
+                      <div className="flex flex-wrap gap-4 justify-center">
+                        {results.colorPalette.map((color) => (
+                          <motion.div
+                            key={color}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                            className="w-20 h-20 rounded-md cursor-pointer relative group"
+                            style={{ backgroundColor: color }}
+                            onClick={() => copyToClipboard(color)}
+                          >
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                              <span className="text-white text-xs font-mono">{color}</span>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="w-full flex flex-col items-center">
+                        <h3 className="font-headline text-2xl mb-4">Tonal Analysis</h3>
+                        <div className="grid md:grid-cols-3 gap-6 w-full max-w-4xl">
+                            <TonalAnalysisCard title="shadows" analysis={results.tonalPalette.shadows} />
+                            <TonalAnalysisCard title="midtones" analysis={results.tonalPalette.midtones} />
+                            <TonalAnalysisCard title="highlights" analysis={results.tonalPalette.highlights} />
+                        </div>
+                    </div>
+                    
+                    {results.hslAdjustments && (
+                      <div className="w-full flex flex-col items-center">
+                        <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> HSL Primary Color Analysis</h3>
+                        <div className="grid md:grid-cols-3 gap-6 w-full max-w-4xl">
+                          {results.hslAdjustments.map((adj) => (
+                            <HSLAdjustmentCard key={adj.colorName} adjustment={adj} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                </div>
+
+                 <div className="w-full flex flex-col items-center">
+                    <h3 className="font-headline text-2xl mb-4">Preview</h3>
+                    <div className="w-full max-w-2xl">
+                       <ColorGradePreview
+                         sourceImage={sourceImagePreview}
+                         recipe={results}
+                       />
+                    </div>
                 </div>
             </div>
-            
-            {results.hslAdjustments && (
-              <div className="w-full flex flex-col items-center">
-                <h3 className="font-headline text-2xl mb-4">HSL Primary Color Analysis</h3>
-                <div className="grid md:grid-cols-3 gap-6 w-full max-w-4xl">
-                  {results.hslAdjustments.map((adj) => (
-                    <HSLAdjustmentCard key={adj.colorName} adjustment={adj} />
-                  ))}
-                </div>
-              </div>
-            )}
 
           </motion.div>
         )}
@@ -314,5 +334,3 @@ export function ColorAIClient() {
     </div>
   );
 }
-
-    
