@@ -155,21 +155,28 @@ export function ColorAIClient() {
     if (!isPicking || !imageRef.current || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     const image = imageRef.current;
     if (!ctx) return;
     
-    // Draw image on canvas if not already there
-    canvas.width = image.naturalWidth;
-    canvas.height = image.naturalHeight;
-    ctx.drawImage(image, 0, 0);
+    // Draw image on canvas if not already there, using its natural dimensions
+    if (canvas.width !== image.naturalWidth || canvas.height !== image.naturalHeight) {
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        ctx.drawImage(image, 0, 0);
+    }
 
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    const pixelX = Math.round((x / rect.width) * canvas.width);
-    const pixelY = Math.round((y / rect.height) * canvas.height);
+    // Calculate the click position as a ratio of the displayed image's dimensions
+    const xRatio = x / rect.width;
+    const yRatio = y / rect.height;
+
+    // Apply the ratio to the canvas's natural dimensions to get the correct pixel
+    const pixelX = Math.floor(xRatio * canvas.width);
+    const pixelY = Math.floor(yRatio * canvas.height);
 
     const [r, g, b] = ctx.getImageData(pixelX, pixelY, 1, 1).data;
     const hexColor = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
