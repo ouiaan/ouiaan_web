@@ -1,9 +1,9 @@
 
 'use client';
 
-import { useState, useTransition, ChangeEvent, useRef, MouseEvent } from 'react';
+import { useState, useTransition, ChangeEvent, useRef, MouseEvent, useEffect } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Pipette } from 'lucide-react';
+import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Pipette, Rss } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,14 @@ import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { ColorCurves } from './ColorCurves';
 
+
+type TonalPalette = {
+    shadows: { color: string, description: string };
+    midtones: { color: string, description: string };
+    highlights: { color: string, description: string };
+}
 
 const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { description: string, color: string } }) => {
     const { toast } = useToast();
@@ -47,6 +54,35 @@ const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { des
     );
 }
 
+const ColorPicker = ({ label, color, onColorPick }: { label: string, color: string, onColorPick: () => void }) => {
+    const { toast } = useToast();
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast({
+          title: 'Copied to Clipboard!',
+          description: `Color ${text} copied.`,
+        });
+    }
+
+    return (
+        <div className="flex items-center gap-4">
+            <div 
+                className="w-12 h-12 rounded-md border border-border cursor-pointer" 
+                style={{ backgroundColor: color }}
+                onClick={() => copyToClipboard(color)}
+            />
+            <div className="flex-grow">
+                <Label className="font-headline text-lg text-foreground/80">{label}</Label>
+                <p className="font-mono text-muted-foreground">{color}</p>
+            </div>
+            <Button variant="ghost" size="icon" onClick={onColorPick} aria-label={`Pick ${label} color`}>
+                <Pipette className="h-6 w-6" />
+            </Button>
+        </div>
+    );
+};
+
+
 export function ColorAIClient() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -54,7 +90,18 @@ export function ColorAIClient() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   
+  const [isPicking, setIsPicking] = useState<keyof TonalPalette | null>(null);
+  
+  const [tonalPalette, setTonalPalette] = useState<TonalPalette>({
+      shadows: { color: '#2C3E50', description: '' },
+      midtones: { color: '#808080', description: '' },
+      highlights: { color: '#ECF0F1', description: '' },
+  });
+
+
   const { toast } = useToast();
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -95,6 +142,7 @@ export function ColorAIClient() {
           setError(response.error);
         } else {
           setResults(response);
+          setTonalPalette(response.tonalPalette);
         }
       };
       reader.onerror = () => {
@@ -102,6 +150,37 @@ export function ColorAIClient() {
       };
     });
   };
+
+  const handleImageClick = (e: MouseEvent<HTMLDivElement>) => {
+    if (!isPicking || !imageRef.current || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const image = imageRef.current;
+    if (!ctx) return;
+    
+    // Draw image on canvas if not already there
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    ctx.drawImage(image, 0, 0);
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const pixelX = Math.round((x / rect.width) * canvas.width);
+    const pixelY = Math.round((y / rect.height) * canvas.height);
+
+    const [r, g, b] = ctx.getImageData(pixelX, pixelY, 1, 1).data;
+    const hexColor = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+
+    setTonalPalette(prev => ({
+        ...prev,
+        [isPicking]: { ...prev[isPicking], color: hexColor }
+    }));
+    setIsPicking(null);
+  };
+
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -112,17 +191,18 @@ export function ColorAIClient() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <Card className="bg-card border-dashed border-2">
         <CardContent className="p-6">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="grid md:grid-cols-2 gap-8 items-start">
             <div className="space-y-4">
               <div 
                 className={cn(
-                    "relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg h-80",
-                    "cursor-pointer hover:bg-secondary transition-colors"
+                    "relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg h-[400px]",
+                    {"cursor-crosshair": isPicking},
+                    {"cursor-pointer hover:bg-secondary transition-colors": !isPicking && !imagePreview}
                 )}
-                onClick={() => fileInputRef.current?.click()}
+                onClick={!isPicking ? () => fileInputRef.current?.click() : undefined}
               >
                 <input
                   type="file"
@@ -131,23 +211,26 @@ export function ColorAIClient() {
                   className="hidden"
                   accept="image/png, image/jpeg"
                 />
-                <AnimatePresence>
+                 <AnimatePresence>
                   {imagePreview ? (
-                    <motion.div
-                      key="image"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className="absolute inset-0 p-2"
-                    >
-                      <Image 
-                          src={imagePreview} 
-                          alt="Image preview" 
-                          fill
-                          style={{ objectFit: 'contain' }}
-                          className="rounded-lg"
-                      />
-                    </motion.div>
+                     <motion.div
+                       key="image"
+                       initial={{ opacity: 0, scale: 0.8 }}
+                       animate={{ opacity: 1, scale: 1 }}
+                       exit={{ opacity: 0, scale: 0.8 }}
+                       className="absolute inset-0 p-2"
+                       onClick={handleImageClick}
+                     >
+                       <Image
+                         ref={imageRef}
+                         src={imagePreview}
+                         alt="Image preview"
+                         fill
+                         style={{ objectFit: 'contain' }}
+                         className="rounded-lg"
+                         crossOrigin='anonymous'
+                       />
+                     </motion.div>
                   ) : (
                     <motion.div
                       key="placeholder"
@@ -161,17 +244,24 @@ export function ColorAIClient() {
                       </p>
                     </motion.div>
                   )}
-                </AnimatePresence>
+                 </AnimatePresence>
+
               </div>
             </div>
 
-            <div className="flex flex-col justify-center items-center space-y-6">
+            <div className="flex flex-col justify-center space-y-6 pt-8">
               <div>
-                <h3 className="font-headline text-2xl mb-4 text-center">Ready to Grade?</h3>
-                <p className="text-muted-foreground mb-6 text-center">Upload your image and let our AI create a professional color palette and tonal grade just for you.</p>
+                <h3 className="font-headline text-2xl mb-4 text-center">Tonal Selection</h3>
+                <p className="text-muted-foreground mb-6 text-center">Use the eyedropper to select the tones from your image, or let the AI suggest them for you.</p>
+              </div>
+
+              <div className="space-y-4">
+                <ColorPicker label="Shadows" color={tonalPalette.shadows.color} onColorPick={() => setIsPicking('shadows')} />
+                <ColorPicker label="Midtones" color={tonalPalette.midtones.color} onColorPick={() => setIsPicking('midtones')} />
+                <ColorPicker label="Highlights" color={tonalPalette.highlights.color} onColorPick={() => setIsPicking('highlights')} />
               </div>
               
-              <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
+              <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs mx-auto">
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -180,7 +270,7 @@ export function ColorAIClient() {
                 ) : (
                   <>
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Get Your Grade
+                    Let AI Suggest
                   </>
                 )}
               </Button>
@@ -193,7 +283,7 @@ export function ColorAIClient() {
         {isPending && (
           <motion.div key="loader" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="text-center py-10">
             <Loader2 className="h-12 w-12 text-accent animate-spin mx-auto" />
-            <p className="mt-4 text-muted-foreground">Almost there, Picasso...</p>
+            <p className="mt-4 text-muted-foreground">Analyzing your image...</p>
           </motion.div>
         )}
 
@@ -206,38 +296,46 @@ export function ColorAIClient() {
 
         {results && (
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12">
-            <div>
-                <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2"><Palette/> Generated Palette</h4>
-                <div className="flex flex-wrap gap-4 justify-center">
-                  {results.colorPalette.map((color) => (
-                    <motion.div 
-                      key={color}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                      className="w-20 h-20 rounded-md cursor-pointer relative group"
-                      style={{ backgroundColor: color }}
-                      onClick={() => copyToClipboard(color)}
-                    >
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                        <span className="text-white text-xs font-mono">{color}</span>
-                      </div>
-                    </motion.div>
-                  ))}
+            <div className="grid md:grid-cols-2 gap-12 items-start">
+                <div>
+                    <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2"><Palette/> Generated Palette</h4>
+                    <div className="flex flex-wrap gap-4 justify-center">
+                    {results.colorPalette.map((color) => (
+                        <motion.div 
+                        key={color}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                        className="w-20 h-20 rounded-md cursor-pointer relative group"
+                        style={{ backgroundColor: color }}
+                        onClick={() => copyToClipboard(color)}
+                        >
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <span className="text-white text-xs font-mono">{color}</span>
+                        </div>
+                        </motion.div>
+                    ))}
+                    </div>
+
+                    <div className="mt-12">
+                        <h4 className="font-headline text-2xl mb-8 flex items-center justify-center gap-2"><Pipette /> Tonal Analysis</h4>
+                        <div className="grid gap-6">
+                            {results.tonalPalette.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalPalette.shadows} />}
+                            {results.tonalPalette.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalPalette.midtones} />}
+                            {results.tonalPalette.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalPalette.highlights} />}
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div className="mt-12">
-                <h4 className="font-headline text-2xl mb-8 flex items-center justify-center gap-2"><Pipette /> Tonal Palette</h4>
-                <div className="grid md:grid-cols-3 gap-6">
-                    {results.tonalPalette.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalPalette.shadows} />}
-                    {results.tonalPalette.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalPalette.midtones} />}
-                    {results.tonalPalette.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalPalette.highlights} />}
+
+                <div>
+                    <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2"><Rss /> Color Curves</h4>
+                    <ColorCurves tonalPalette={tonalPalette} />
                 </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+      <canvas ref={canvasRef} className="hidden" />
     </div>
   );
 }
