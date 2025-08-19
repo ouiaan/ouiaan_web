@@ -270,7 +270,7 @@ export function ColorAIClient() {
                 ) : (
                   <>
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Let AI Suggest
+                    Ready to Grade?
                   </>
                 )}
               </Button>
