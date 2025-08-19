@@ -42,28 +42,33 @@ export default function Test2Page() {
         highlights: adjustToDiagonal(colors.highlights)
     };
 
+    // Generates a smooth Cubic Bezier curve path through the points
     function createCurvePath(shadowVal: number, midtoneVal: number, highlightVal: number) {
-        // Using a Catmull-Rom-like spline for a smoother, more natural curve.
-        // Control points are calculated to ensure the curve passes through the key points.
         const p0 = { x: 0, y: 255 };
         const p1 = { x: 64, y: 255 - shadowVal };
         const p2 = { x: 128, y: 255 - midtoneVal };
         const p3 = { x: 192, y: 255 - highlightVal };
         const p4 = { x: 255, y: 0 };
-
-        // Calculate control points for smooth transitions
-        const cp1x = p1.x + (p2.x - p0.x) / 6;
-        const cp1y = p1.y + (p2.y - p0.y) / 6;
-        const cp2x = p2.x - (p3.x - p1.x) / 6;
-        const cp2y = p2.y - (p3.y - p1.y) / 6;
-
-        const cp3x = p2.x + (p3.x - p1.x) / 6;
-        const cp3y = p2.y + (p3.y - p1.y) / 6;
-        const cp4x = p3.x - (p4.x - p2.x) / 6;
-        const cp4y = p3.y - (p4.y - p2.y) / 6;
-
-        return `M ${p0.x} ${p0.y} C ${p0.x},${p0.y} ${cp1x},${cp1y} ${p1.x},${p1.y} C ${cp2x},${cp2y} ${cp3x},${cp3y} ${p2.x},${p2.y} C ${p2.x},${p2.y} ${cp4x},${cp4y} ${p3.x},${p3.y} C ${p3.x},${p3.y} ${p4.x},${p4.y} ${p4.x},${p4.y}`;
+    
+        // A common tension value for smooth splines
+        const tension = 0.4;
+    
+        // Calculate control points for a smooth path through p1, p2, p3
+        // Control points for segment p1 -> p2
+        const cp1_x = p1.x + tension * (p2.x - p0.x);
+        const cp1_y = p1.y + tension * (p2.y - p0.y);
+        const cp2_x = p2.x - tension * (p3.x - p1.x);
+        const cp2_y = p2.y - tension * (p3.y - p1.y);
+    
+        // Control points for segment p2 -> p3
+        const cp3_x = p2.x + tension * (p3.x - p1.x);
+        const cp3_y = p2.y + tension * (p3.y - p1.y);
+        const cp4_x = p3.x - tension * (p4.x - p2.x);
+        const cp4_y = p3.y - tension * (p4.y - p2.y);
+    
+        return `M ${p0.x} ${p0.y} C ${p0.x} ${p0.y}, ${p1.x} ${p1.y}, ${p1.x} ${p1.y} S ${cp2_x} ${cp2_y}, ${p2.x} ${p2.y} S ${cp4_x} ${cp4_y}, ${p3.x} ${p3.y} C ${p3.x} ${p3.y}, ${p4.x} ${p4.y}, ${p4.x} ${p4.y}`;
     }
+    
 
     function addPoints(graphId: string, shadowVal: number, midtoneVal: number, highlightVal: number, color: string) {
         const graph = document.getElementById(graphId);
@@ -94,19 +99,19 @@ export default function Test2Page() {
         const redCurve = document.getElementById('red-curve');
         if (redCurve) {
             redCurve.setAttribute('d', createCurvePath(adjustedColors.shadows.r, adjustedColors.midtones.r, adjustedColors.highlights.r));
-            addPoints('red-graph', colors.shadows.r, colors.midtones.r, colors.highlights.r, '#ff4d4d');
+            addPoints('red-graph', adjustedColors.shadows.r, adjustedColors.midtones.r, adjustedColors.highlights.r, '#ff4d4d');
         }
 
         const greenCurve = document.getElementById('green-curve');
         if (greenCurve) {
             greenCurve.setAttribute('d', createCurvePath(adjustedColors.shadows.g, adjustedColors.midtones.g, adjustedColors.highlights.g));
-            addPoints('green-graph', colors.shadows.g, colors.midtones.g, colors.highlights.g, '#4dff4d');
+            addPoints('green-graph', adjustedColors.shadows.g, adjustedColors.midtones.g, adjustedColors.highlights.g, '#4dff4d');
         }
 
         const blueCurve = document.getElementById('blue-curve');
         if (blueCurve) {
             blueCurve.setAttribute('d', createCurvePath(adjustedColors.shadows.b, adjustedColors.midtones.b, adjustedColors.highlights.b));
-            addPoints('blue-graph', colors.shadows.b, colors.midtones.b, colors.highlights.b, '#4d9dff');
+            addPoints('blue-graph', adjustedColors.shadows.b, adjustedColors.midtones.b, adjustedColors.highlights.b, '#4d9dff');
         }
     }
 
@@ -218,3 +223,5 @@ export default function Test2Page() {
     </>
   );
 }
+
+    
