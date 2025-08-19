@@ -3,7 +3,7 @@
 
 import { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Wand2, Loader2, AlertCircle, FileImage, Replace, SlidersHorizontal, Palette } from 'lucide-react';
+import { UploadCloud, Wand2, Loader2, AlertCircle, FileImage, Replace, SlidersHorizontal, Palette, Thermometer, Contrast } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import { ColorCurves } from './ColorCurves';
 
 type HSLAdjustment = GenerateColorGradeRecipeOutput['hslAdjustments'][0];
 type TonalPaletteAnalysis = GenerateColorGradeRecipeOutput['tonalPalette'];
+type WhiteBalanceAnalysis = GenerateColorGradeRecipeOutput['whiteBalanceAnalysis'];
 
 const TonalAnalysisCard = ({ title, analysis }: { title: keyof TonalPaletteAnalysis, analysis: TonalPaletteAnalysis[keyof TonalPaletteAnalysis] }) => {
     const { toast } = useToast();
@@ -37,7 +38,7 @@ const TonalAnalysisCard = ({ title, analysis }: { title: keyof TonalPaletteAnaly
         <BackgroundGradient animate={true} containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
             <div className="flex-grow">
                 <h4 className="font-headline text-xl text-foreground flex items-center gap-2 capitalize">{title}</h4>
-                 <div 
+                 <div
                     className="w-full h-24 rounded-md cursor-pointer border border-border mt-4 relative group"
                     style={{ backgroundColor: analysis.color }}
                     onClick={() => copyToClipboard(analysis.color)}
@@ -78,6 +79,36 @@ const HSLAdjustmentCard = ({ adjustment }: { adjustment: HSLAdjustment }) => {
     );
 };
 
+const WhiteBalanceCard = ({ analysis }: { analysis: WhiteBalanceAnalysis }) => {
+  return (
+    <BackgroundGradient animate={true} containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground p-6">
+      <h3 className="font-headline text-2xl mb-4 text-center">General Analysis</h3>
+      <div className="space-y-4">
+        <div className="flex items-start gap-4">
+          <Thermometer className="h-6 w-6 text-accent mt-1" />
+          <div>
+            <h4 className="font-semibold text-foreground">Temperature</h4>
+            <p className="text-foreground/80 text-sm">{analysis.temperature}</p>
+          </div>
+        </div>
+        <div className="flex items-start gap-4">
+          <Palette className="h-6 w-6 text-accent mt-1" />
+          <div>
+            <h4 className="font-semibold text-foreground">Tint</h4>
+            <p className="text-foreground/80 text-sm">{analysis.tint}</p>
+          </div>
+        </div>
+        <div className="flex items-start gap-4">
+          <Contrast className="h-6 w-6 text-accent mt-1" />
+          <div>
+            <h4 className="font-semibold text-foreground">Contrast</h4>
+            <p className="text-foreground/80 text-sm">{analysis.contrast}</p>
+          </div>
+        </div>
+      </div>
+    </BackgroundGradient>
+  );
+};
 
 const ImageUploader = ({ title, imagePreview, onFileChange, icon: Icon }: { title: string, imagePreview: string | null, onFileChange: (e: ChangeEvent<HTMLInputElement>) => void, icon: React.ElementType }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,7 +116,7 @@ const ImageUploader = ({ title, imagePreview, onFileChange, icon: Icon }: { titl
     return (
         <div className="flex flex-col items-center gap-4 w-full">
             <h3 className="font-headline text-2xl flex items-center gap-2 text-foreground/80"><Icon className="h-6 w-6"/> {title}</h3>
-            <div 
+            <div
                 className={cn(
                     "relative flex flex-col items-center justify-center p-4 border-2 border-dashed border-border rounded-lg h-[250px] w-full cursor-pointer hover:bg-secondary transition-colors"
                 )}
@@ -138,11 +169,11 @@ export function ColorAIClient() {
   const [referenceImageFile, setReferenceImageFile] = useState<File | null>(null);
   const [sourceImagePreview, setSourceImagePreview] = useState<string | null>(null);
   const [referenceImagePreview, setReferenceImagePreview] = useState<string | null>(null);
-  
+
   const [results, setResults] = useState<GenerateColorGradeRecipeOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  
+
   const { toast } = useToast();
 
   const handleFileChange = (setter: (file: File | null) => void, previewSetter: (url: string | null) => void) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -158,7 +189,7 @@ export function ColorAIClient() {
       reader.readAsDataURL(selectedFile);
     }
   };
-  
+
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -186,8 +217,8 @@ export function ColorAIClient() {
             fileToBase64(sourceImageFile),
             fileToBase64(referenceImageFile)
         ]);
-        
-        const response = await runGenerateGrade({ 
+
+        const response = await runGenerateGrade({
           sourcePhotoDataUri: sourceBase64,
           referencePhotoDataUri: referenceBase64,
         });
@@ -220,14 +251,14 @@ export function ColorAIClient() {
       <Card className="bg-card border-dashed border-2">
         <CardContent className="p-6">
           <div className="grid md:grid-cols-2 gap-8 items-start">
-            <ImageUploader 
-                title="Source Image" 
+            <ImageUploader
+                title="Source Image"
                 imagePreview={sourceImagePreview}
                 onFileChange={handleFileChange(setSourceImageFile, setSourceImagePreview)}
                 icon={FileImage}
             />
-            <ImageUploader 
-                title="Reference Image" 
+            <ImageUploader
+                title="Reference Image"
                 imagePreview={referenceImagePreview}
                 onFileChange={handleFileChange(setReferenceImageFile, setReferenceImagePreview)}
                 icon={Replace}
@@ -250,12 +281,12 @@ export function ColorAIClient() {
           </div>
         </CardContent>
       </Card>
-      
+
       <AnimatePresence>
         {isPending && (
           <motion.div key="loader" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="text-center py-10">
             <Loader2 className="h-12 w-12 text-accent animate-spin mx-auto" />
-            <p className="mt-4 text-muted-foreground text-lg font-semibold">Almost there Picasso!</p>
+            <p className="mt-4 text-muted-foreground text-lg font-semibold">Analyzing, please wait...</p>
           </motion.div>
         )}
 
@@ -268,11 +299,11 @@ export function ColorAIClient() {
 
         {results && sourceImagePreview && (
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 flex flex-col gap-12">
-            
+
             <div className="w-full flex flex-col items-center">
                 <h3 className="font-headline text-3xl mb-6">Your Color Grade Recipe</h3>
             </div>
-            
+
             <div className="grid lg:grid-cols-2 gap-12 items-start">
               <div className="flex flex-col gap-12">
                 <div className="w-full flex flex-col items-center">
@@ -325,6 +356,12 @@ export function ColorAIClient() {
                       recipe={results}
                     />
                   </div>
+
+                  {results.whiteBalanceAnalysis && (
+                     <div className="w-full max-w-2xl">
+                        <WhiteBalanceCard analysis={results.whiteBalanceAnalysis} />
+                     </div>
+                  )}
 
                   <div className="w-full max-w-2xl">
                     <h3 className="font-headline text-2xl mb-4 text-center">Tone Curve Analysis</h3>

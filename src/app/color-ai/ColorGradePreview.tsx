@@ -33,9 +33,9 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
     if (!canvas || !context) return;
 
     const image = new Image();
-    image.crossOrigin = 'anonymous'; 
+    image.crossOrigin = 'anonymous';
     image.src = sourceImage;
-    
+
     image.onload = () => {
       canvas.width = image.naturalWidth;
       canvas.height = image.naturalHeight;
@@ -64,9 +64,9 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
         let r = data[i];
         let g = data[i + 1];
         let b = data[i + 2];
-        
+
         const originalLuminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        
+
         // --- 1. Apply HSL Adjustments ---
         let [h, s, l] = convert.rgb.hsl(r, g, b);
 
@@ -87,7 +87,7 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
             totalWeight += weight;
           }
         }
-        
+
         if (totalWeight > 0) {
             h = (h + totalHueShift / totalWeight + 360) % 360;
             s = Math.max(0, Math.min(100, s + totalSatShift / totalWeight));
@@ -96,8 +96,8 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
 
         [r, g, b] = convert.hsl.rgb(h, s, l);
 
-        // --- 2. Apply Tonal Tints ---
-        const blendFactor = 0.35; 
+        // --- 2. Apply Tonal Tints using linear interpolation ---
+        const blendFactor = 0.25; // Softer blend
 
         let tintRgb: [number, number, number];
 
@@ -118,11 +118,11 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
                 midtoneTintRgb[2] * (1 - mixRatio) + highlightTintRgb[2] * mixRatio,
             ];
         }
-        
+
         r = r * (1 - blendFactor) + tintRgb[0] * blendFactor;
         g = g * (1 - blendFactor) + tintRgb[1] * blendFactor;
         b = b * (1 - blendFactor) + tintRgb[2] * blendFactor;
-        
+
         data[i] = Math.max(0, Math.min(255, r));
         data[i + 1] = Math.max(0, Math.min(255, g));
         data[i + 2] = Math.max(0, Math.min(255, b));

@@ -54,11 +54,15 @@ const GenerateColorGradeRecipeOutputSchema = z.object({
     }).describe("A 3-color palette representing the color tint in the shadows, midtones, and highlights of the reference image."),
   hslAdjustments: z.array(HSLAdjustmentSchema).length(3).describe("An array of actionable HSL (Hue, Saturation, Luminance) adjustment recommendations for the 3 most important colors to transform the source image to the reference look."),
   toneCurveAdjustments: z.array(ToneCurveAdjustmentSchema).length(5).describe("An analysis of the tone curve adjustments required to match the contrast and exposure of the source image to the reference image."),
+  whiteBalanceAnalysis: z.object({
+      temperature: z.string().describe("Describes the white balance temperature shift needed (e.g., 'Warmer', 'Cooler', 'Neutral')."),
+      tint: z.string().describe("Describes the white balance tint shift needed (e.g., 'Shift towards magenta', 'Shift towards green', 'Neutral')."),
+      contrast: z.string().describe("A brief analysis of the overall contrast difference."),
+  }).describe("A general analysis of the white balance and contrast adjustments needed."),
 });
 export type GenerateColorGradeRecipeOutput = z.infer<typeof GenerateColorGradeRecipeOutputSchema>;
 
 export async function generateColorGradeRecipe(input: GenerateColorGradeRecipeInput): Promise<GenerateColorGradeRecipeOutput> {
-  // Rename for clarity.
   return generateColorPaletteFlow(input);
 }
 
@@ -66,29 +70,36 @@ const prompt = ai.definePrompt({
   name: 'generateColorGradeRecipePrompt',
   input: {schema: GenerateColorGradeRecipeInputSchema},
   output: {schema: GenerateColorGradeRecipeOutputSchema},
-  prompt: `You are a world-class colorist and digital image technician. Your task is to analyze two images: a "Source" image (original footage) and a "Reference" image (the desired look). You will generate a detailed, actionable color grading recipe to make the Source image look like the Reference image.
+  prompt: `You are a world-class colorist and digital image technician (DIT). Your task is to analyze two images: a "Source" image (original footage) and a "Reference" image (the desired look). You will generate a detailed, actionable color grading recipe to make the Source image look like the Reference image.
+
+You have a deep understanding of professional color grading principles, including the characteristics of digital cinema cameras (like ARRI, RED) and classic film stocks (like Kodak and Fuji).
+
+**Core Color Grading Principles to follow:**
+- **Anchor Points:** Professionally graded images maintain clean anchor points. This means deep blacks should be truly black (or near-black) and peak whites should be white, without color contamination.
+- **Cinematic Tinting:** The mood and "look" are primarily created by introducing specific, subtle color tints into the **shadows** and **midtones**. Highlights are generally kept clean or have a very slight, motivated tint to avoid an amateurish look.
+- **White Balance:** Before detailed adjustments, the overall white balance must be matched.
 
 **Your Task:**
 
 1.  **Extract a General Palette from the Reference:** Analyze the **Reference image** and extract an array of 5 key color palette hex codes. This provides a general overview of the target aesthetic.
 
-2.  **Analyze the Color Grading (Tonal Palette):** Analyze the **Reference image** to determine the color tint applied to its shadows, midtones, and highlights.
-    *   **Principle:** The goal is to identify the subtle tint used for cinematic mood. The colors should be close to neutral gray but with a specific hue.
-    *   **For each (Shadows, Midtones, Highlights), provide:**
-        *   color: The hex code of the tint you identified in the Reference image.
-        *   description: A professional analysis of how this tint contributes to the reference image's mood.
+2.  **Analyze the Color Grading (Tonal Palette):** Following the core principles, analyze the **Reference image** to determine the color tint applied to its shadows, midtones, and highlights.
+    *   For each (Shadows, Midtones, Highlights), provide:
+        *   \`color\`: The hex code of the tint you identified in the Reference image.
+        *   \`description\`: A professional analysis of how this tint contributes to the reference image's mood, considering the principle of keeping highlights cleaner.
 
 3.  **Perform a Comparative HSL Analysis:** This is the most critical task. Compare the Source and Reference images to provide actionable HSL advice.
-    *   Identify the **3 most photographically important colors** that differ between the images.
+    *   Identify the **3 most photographically important colors** that differ between the images (e.g., skin tones, foliage, sky).
     *   For each of these three colors, provide specific HSL (Hue, Saturation, Luminance) adjustment recommendations to apply to the **Source image** to make it match the **Reference image**.
-    *   **For each HSL adjustment, you must populate:**
-        *   colorName: A simple, descriptive name (e.g., "Foliage Green").
-        *   hex: A representative hex code for that color *from the reference image*.
-        *   hueShift, saturation, luminance: Recommended numerical shifts (e.g., "+8", "-15") to apply to the source.
-        *   reasoning: A professional justification explaining *why* these adjustments are needed (e.g., "The greens in the source are too vibrant. Reducing saturation and shifting the hue towards yellow will match the muted, earthy tones of the reference.").
+    *   For each HSL adjustment, you must populate:
+        *   \`colorName\`: A simple, descriptive name (e.g., "Foliage Green", "Actor's Skin Tone").
+        *   \`hex\`: A representative hex code for that color *from the reference image*.
+        *   \`hueShift\`, \`saturation\`, \`luminance\`: Recommended numerical shifts (e.g., "+8", "-15") to apply to the source.
+        *   \`reasoning\`: A professional justification explaining *why* these adjustments are needed (e.g., "The greens in the source are too vibrant. Reducing saturation and shifting the hue towards yellow will match the muted, earthy tones characteristic of the Fuji Eterna film stock emulated in the reference.").
 
-4.  **Analyze the Tone Curve:** Compare the contrast and exposure of the Source and Reference images. Describe the adjustments needed on a 5-point tone curve (Blacks, Shadows, Midtones, Highlights, Whites) to make the source match the reference.
-    *   For each of the 5 points, describe the adjustment (e.g., "Blacks: Crushed significantly to increase contrast", "Highlights: Rolled off to create a softer, filmic look").
+4.  **Analyze White Balance and Tone Curve:**
+    *   **White Balance & Contrast:** Compare the overall color temperature, tint, and contrast. Describe the necessary adjustments.
+    *   **Tone Curve:** Compare the contrast and exposure of the Source and Reference images. Describe the adjustments needed on a 5-point tone curve (Blacks, Shadows, Midtones, Highlights, Whites) to make the source match the reference, paying attention to the cinematic principles. For each of the 5 points, describe the adjustment (e.g., "Blacks: Crushed significantly to create a deep, rich black point and increase contrast", "Highlights: Rolled off gently to create a softer, filmic look and prevent digital clipping").
 
 **Inputs:**
 *   **Source Image:** {{media url=sourcePhotoDataUri}}
@@ -97,7 +108,6 @@ const prompt = ai.definePrompt({
 Respond in JSON format.`,
 });
 
-// The function name is kept for now to avoid breaking the client, but the logic is updated.
 const generateColorPaletteFlow = ai.defineFlow(
   {
     name: 'generateColorPaletteFlow',
