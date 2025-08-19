@@ -37,7 +37,7 @@ const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { des
     return (
         <BackgroundGradient animate={true} containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
             <div className="flex-grow">
-                <h4 className="font-headline text-xl text-foreground flex items-center gap-2">{title} <Pipette className="h-5 w-5" /></h4>
+                <h4 className="font-headline text-xl text-foreground flex items-center gap-2">{title}</h4>
                  <div 
                     className="w-full h-24 rounded-md cursor-pointer border border-border mt-4 relative group"
                     style={{ backgroundColor: analysis.color }}
@@ -160,6 +160,7 @@ export function ColorAIClient() {
     const image = imageRef.current;
     if (!ctx) return;
     
+    // Ensure canvas is the same size as the natural image size for accurate color picking
     if (canvas.width !== image.naturalWidth || canvas.height !== image.naturalHeight) {
         canvas.width = image.naturalWidth;
         canvas.height = image.naturalHeight;
@@ -167,14 +168,18 @@ export function ColorAIClient() {
     }
 
     const rect = e.currentTarget.getBoundingClientRect();
+    
+    // Calculate click coordinates relative to the image element
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
+    // Calculate the ratio of the click position to the displayed image size
     const xRatio = x / rect.width;
     const yRatio = y / rect.height;
 
-    const pixelX = Math.floor(xRatio * canvas.width);
-    const pixelY = Math.floor(yRatio * canvas.height);
+    // Apply the ratio to the natural image size to get the correct pixel
+    const pixelX = Math.floor(xRatio * image.naturalWidth);
+    const pixelY = Math.floor(yRatio * image.naturalHeight);
 
     const [r, g, b] = ctx.getImageData(pixelX, pixelY, 1, 1).data;
     const hexColor = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
@@ -288,7 +293,7 @@ export function ColorAIClient() {
         {isPending && (
           <motion.div key="loader" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="text-center py-10">
             <Loader2 className="h-12 w-12 text-accent animate-spin mx-auto" />
-            <p className="mt-4 text-muted-foreground">Analyzing your image...</p>
+            <p className="mt-4 text-muted-foreground">Almost there Picasso!</p>
           </motion.div>
         )}
 
@@ -301,7 +306,7 @@ export function ColorAIClient() {
 
         {results && (
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 flex flex-col items-center gap-12">
-            <div className="w-full max-w-lg">
+            <div className="w-full">
               <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
                 <Palette /> Generated Palette
               </h4>
@@ -323,11 +328,11 @@ export function ColorAIClient() {
                 ))}
               </div>
             </div>
-            <div className="w-full max-w-lg">
+            <div className="w-full">
               <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
                 <Pipette /> Tonal Analysis
               </h4>
-              <div className="grid gap-6">
+              <div className="grid md:grid-cols-3 gap-6">
                 {results.tonalPalette.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalPalette.shadows} />}
                 {results.tonalPalette.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalPalette.midtones} />}
                 {results.tonalPalette.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalPalette.highlights} />}
@@ -340,4 +345,3 @@ export function ColorAIClient() {
     </div>
   );
 }
-
