@@ -59,9 +59,9 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
             ];
     
             let path = `M ${points[0].x} ${points[0].y}`;
-            const tension = 0.5;
+            const tension = 0.5; // Catmull-Rom tension
             for (let i = 0; i < points.length - 1; i++) {
-                const p0 = points[i > 0 ? i - 1 : i];
+                const p0 = points[i > 0 ? i - 1 : 0];
                 const p1 = points[i];
                 const p2 = points[i + 1];
                 const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
@@ -72,7 +72,7 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
                 const cp2x = p2.x - (p3.x - p1.x) / 6 * tension;
                 const cp2y = p2.y - (p3.y - p1.y) / 6 * tension;
                 
-                path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
+                path += ` C ${cp1x.toFixed(2)},${cp1y.toFixed(2)} ${cp2x.toFixed(2)},${cp2y.toFixed(2)} ${p2.x},${p2.y}`;
             }
             
             return path;
@@ -84,19 +84,26 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
             
             graph.querySelectorAll('.point').forEach(p => p.remove());
 
-            const points = [
+            const pointsData = [
                 { x: 64, y: shadowVal },
                 { x: 128, y: midtoneVal },
                 { x: 192, y: highlightVal }
             ];
 
-            points.forEach(point => {
-                const dot = document.createElement('div');
-                dot.className = 'point';
-                dot.style.left = `${(point.x / 255) * 100}%`;
-                dot.style.bottom = `${(point.y / 255) * 100}%`;
-                dot.style.color = color;
-                graph.appendChild(dot);
+            pointsData.forEach(point => {
+                const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                dot.setAttribute("class", "point");
+                dot.setAttribute("cx", String((point.x / 255) * 100) + "%");
+                dot.setAttribute("cy", String(100 - (point.y / 255) * 100) + "%");
+                dot.setAttribute("r", "3");
+                dot.setAttribute("fill", "#222");
+                dot.setAttribute("stroke", color);
+                dot.setAttribute("stroke-width", "1.5");
+                
+                const svg = graph.querySelector('svg.curve');
+                if (svg) {
+                    svg.appendChild(dot);
+                }
             });
         }
 
@@ -125,66 +132,33 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
         drawGraphs();
     }, [tonalPalette, uniqueId]);
 
+    const Graph = ({ id, curveColor }: { id: string, curveColor: string }) => (
+        <div className="bg-card border border-border/50 rounded-lg p-4 shadow-inner">
+            <div id={id} className="relative w-full aspect-square">
+                <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    {/* Grid Lines */}
+                    <path d="M 0 25 H 100 M 0 50 H 100 M 0 75 H 100 M 25 0 V 100 M 50 0 V 100 M 75 0 V 100" stroke="hsl(var(--border))" strokeWidth="0.2" />
+                    {/* Diagonal Line */}
+                    <line x1="0" y1="100" x2="100" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.3" strokeDasharray="2,2"/>
+                    {/* Curve */}
+                    <path id={`curve-${id}`} d="" fill="none" stroke={curveColor} strokeWidth="1" strokeLinecap="round"/>
+                </svg>
+            </div>
+        </div>
+    );
+
     return (
-        <div className="flex flex-col items-center gap-4">
-            <style jsx global>{`
-                .graph-container {
-                    background: #222;
-                    border-radius: 4px;
-                    padding: 15px;
-                    width: 100%;
-                    max-width: 320px;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-                }
-                .graph {
-                    width: 100%;
-                    height: 200px;
-                    position: relative;
-                    background: #222;
-                }
-                .grid {
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    background-image: 
-                        linear-gradient(to right, #333 1px, transparent 1px),
-                        linear-gradient(to bottom, #333 1px, transparent 1px);
-                    background-size: 25% 33.33%;
-                    background-position: 0 0, 0 0;
-                }
-                .curve {
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                }
-                .point {
-                    position: absolute;
-                    width: 8px;
-                    height: 8px;
-                    border-radius: 50%;
-                    transform: translate(-50%, 50%);
-                    background: #222;
-                    border: 2px solid currentColor;
-                    box-shadow: 0 0 0 1px rgba(0,0,0,0.5);
-                    z-index: 2;
-                }
-                .diagonal-line {
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    top: 0;
-                    left: 0;
-                    pointer-events: none;
-                }
-            `}</style>
-            
-            <div className="graph-container">
+        <div className="grid grid-cols-3 gap-4">
+             <div className="graph-container">
                 <div className="graph" id={`red-graph-${uniqueId}`}>
-                    <div className="grid"></div>
-                    <svg className="diagonal-line" viewBox="0 0 255 255" preserveAspectRatio="none">
-                        <line x1="0" y1="255" x2="255" y2="0" stroke="#444" strokeWidth="1"/>
-                    </svg>
-                    <svg className="curve" viewBox="0 0 255 255" preserveAspectRatio="none">
+                    <svg className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
+                        <defs>
+                            <pattern id={`grid-${uniqueId}`} width="63.75" height="63.75" patternUnits="userSpaceOnUse">
+                                <path d="M 63.75 0 L 0 0 0 63.75" fill="none" stroke="hsl(var(--border))" strokeWidth="0.5"/>
+                            </pattern>
+                        </defs>
+                        <rect width="255" height="255" fill={`url(#grid-${uniqueId})`} />
+                        <line x1="0" y1="255" x2="255" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" strokeDasharray="3,3"/>
                         <path id={`red-curve-${uniqueId}`} d="" fill="none" stroke="#ff4d4d" strokeWidth="1.8" strokeLinecap="round"/>
                     </svg>
                 </div>
@@ -192,11 +166,9 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
 
             <div className="graph-container">
                 <div className="graph" id={`green-graph-${uniqueId}`}>
-                    <div className="grid"></div>
-                    <svg className="diagonal-line" viewBox="0 0 255 255" preserveAspectRatio="none">
-                        <line x1="0" y1="255" x2="255" y2="0" stroke="#444" strokeWidth="1"/>
-                    </svg>
-                    <svg className="curve" viewBox="0 0 255 255" preserveAspectRatio="none">
+                     <svg className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
+                        <rect width="255" height="255" fill={`url(#grid-${uniqueId})`} />
+                        <line x1="0" y1="255" x2="255" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" strokeDasharray="3,3"/>
                         <path id={`green-curve-${uniqueId}`} d="" fill="none" stroke="#4dff4d" strokeWidth="1.8" strokeLinecap="round"/>
                     </svg>
                 </div>
@@ -204,16 +176,38 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
 
             <div className="graph-container">
                 <div className="graph" id={`blue-graph-${uniqueId}`}>
-                    <div className="grid"></div>
-                    <svg className="diagonal-line" viewBox="0 0 255 255" preserveAspectRatio="none">
-                        <line x1="0" y1="255" x2="255" y2="0" stroke="#444" strokeWidth="1"/>
-                    </svg>
-                    <svg className="curve" viewBox="0 0 255 255" preserveAspectRatio="none">
+                     <svg className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
+                        <rect width="255" height="255" fill={`url(#grid-${uniqueId})`} />
+                        <line x1="0" y1="255" x2="255" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" strokeDasharray="3,3"/>
                         <path id={`blue-curve-${uniqueId}`} d="" fill="none" stroke="#4d9dff" strokeWidth="1.8" strokeLinecap="round"/>
                     </svg>
                 </div>
             </div>
+
+            <style jsx>{`
+                .graph-container {
+                    background: hsl(var(--card));
+                    border-radius: 0.5rem;
+                    padding: 1rem;
+                    width: 100%;
+                    box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.05);
+                }
+                .graph {
+                    width: 100%;
+                    aspect-ratio: 1 / 1;
+                    position: relative;
+                }
+                .point {
+                    position: absolute;
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    background: #222;
+                    border: 2px solid currentColor;
+                    z-index: 2;
+                }
+            `}</style>
         </div>
     );
-
-    
+}
