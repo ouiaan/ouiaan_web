@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition, ChangeEvent, useRef, MouseEvent, useEffect } from 'react';
+import { useState, useTransition, ChangeEvent, useRef, MouseEvent } from 'react';
 import Image from 'next/image';
 import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Pipette } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -47,38 +47,6 @@ const TonalAnalysisCard = ({ title, analysis }: { title: string, analysis: { des
     );
 }
 
-const ColorPicker = ({ label, value, onColorChange, onEyeDropperClick, disabled, isPicking }: { 
-    label: string, 
-    value: string, 
-    onColorChange: (e: ChangeEvent<HTMLInputElement>) => void, 
-    onEyeDropperClick: () => void,
-    disabled?: boolean,
-    isPicking?: boolean
-}) => (
-    <div className="flex items-center gap-4">
-      <Label htmlFor={`${label}-color`} className="font-headline text-lg text-foreground/80 w-28">{label}</Label>
-      <div className="flex items-center gap-2">
-        <Input
-          id={`${label}-color`}
-          type="color"
-          value={value}
-          onChange={onColorChange}
-          className="w-16 h-10 p-1 bg-card border-border/50 cursor-pointer disabled:cursor-not-allowed"
-          disabled={disabled}
-        />
-        <Button 
-            variant="outline" 
-            size="icon"
-            onClick={onEyeDropperClick}
-            disabled={disabled}
-            className={cn(isPicking && "ring-2 ring-accent")}
-        >
-            <Pipette className="h-5 w-5"/>
-        </Button>
-      </div>
-    </div>
-  );
-
 export function ColorAIClient() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -86,49 +54,8 @@ export function ColorAIClient() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
   const { toast } = useToast();
-
-  const [shadows, setShadows] = useState('#2A342D');
-  const [midtones, setMidtones] = useState('#8A8375');
-  const [highlights, setHighlights] = useState('#F5E4C1');
-
-  const [pickingColorFor, setPickingColorFor] = useState<string | null>(null);
-
-  const drawImageToCanvas = () => {
-    if (!imageRef.current || !canvasRef.current || imageRef.current.naturalWidth === 0) return;
-    const image = imageRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const canvasWidth = canvas.offsetWidth;
-    const canvasHeight = canvas.offsetHeight;
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-
-    const imgAspectRatio = image.naturalWidth / image.naturalHeight;
-    const canvasAspectRatio = canvasWidth / canvasHeight;
-
-    let renderWidth, renderHeight, xStart, yStart;
-
-    if (imgAspectRatio > canvasAspectRatio) {
-        renderWidth = canvasWidth;
-        renderHeight = canvasWidth / imgAspectRatio;
-        xStart = 0;
-        yStart = (canvasHeight - renderHeight) / 2;
-    } else {
-        renderHeight = canvasHeight;
-        renderWidth = canvasHeight * imgAspectRatio;
-        yStart = 0;
-        xStart = (canvasWidth - renderWidth) / 2;
-    }
-
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    ctx.drawImage(image, xStart, yStart, renderWidth, renderHeight);
-  };
-
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -143,44 +70,6 @@ export function ColorAIClient() {
       reader.readAsDataURL(selectedFile);
     }
   };
-
-  const handleCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
-    if (!pickingColorFor || !canvasRef.current) return;
-
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    const pixelData = ctx.getImageData(x, y, 1, 1).data;
-
-    if (pixelData[3] === 0) {
-      setPickingColorFor(null);
-      return;
-    }
-
-    const hex = `#${("000000" + ((pixelData[0] << 16) | (pixelData[1] << 8) | pixelData[2]).toString(16)).slice(-6)}`;
-    
-    if (pickingColorFor === 'shadows') setShadows(hex);
-    else if (pickingColorFor === 'midtones') setMidtones(hex);
-    else if (pickingColorFor === 'highlights') setHighlights(hex);
-    
-    setPickingColorFor(null);
-};
-
-
-  const startPicking = (target: string) => {
-    if (!imagePreview) {
-        toast({ title: "Upload an image first!", variant: "destructive" });
-        return;
-    }
-    setPickingColorFor(current => current === target ? null : target);
-    toast({ title: "Color Picker Activated", description: "Click on the image to pick a color."});
-  }
 
   const handleGenerate = () => {
     if (!file) {
@@ -201,9 +90,6 @@ export function ColorAIClient() {
         const base64Image = reader.result as string;
         const response = await runGeneratePalette({ 
           photoDataUri: base64Image,
-          userShadows: shadows,
-          userMidtones: midtones,
-          userHighlights: highlights
         });
         if ('error' in response) {
           setError(response.error);
@@ -234,9 +120,9 @@ export function ColorAIClient() {
               <div 
                 className={cn(
                     "relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg h-80",
-                    !imagePreview && "cursor-pointer hover:bg-secondary transition-colors"
+                    "cursor-pointer hover:bg-secondary transition-colors"
                 )}
-                onClick={() => !imagePreview && fileInputRef.current?.click()}
+                onClick={() => fileInputRef.current?.click()}
               >
                 <input
                   type="file"
@@ -245,49 +131,47 @@ export function ColorAIClient() {
                   className="hidden"
                   accept="image/png, image/jpeg"
                 />
-                <div className={cn("relative w-full h-full", pickingColorFor ? "cursor-crosshair" : "cursor-default")}>
-                    <Image 
-                        ref={imageRef}
-                        src={imagePreview || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='} 
-                        alt="Image preview" 
-                        fill
-                        style={{ objectFit: 'contain', opacity: imagePreview ? 1 : 0 }}
-                        className="rounded-lg"
-                        onLoad={drawImageToCanvas}
-                    />
-                     <canvas 
-                        ref={canvasRef}
-                        className="absolute inset-0 w-full h-full"
-                        onClick={handleCanvasClick}
-                        style={{ 
-                            display: imagePreview ? 'block' : 'none'
-                        }}
-                    />
-                </div>
-                {!imagePreview && (
-                  <div className="absolute flex flex-col items-center justify-center text-center">
-                    <UploadCloud className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">
-                      Click or drag & drop to upload
-                    </p>
-                  </div>
-                )}
+                <AnimatePresence>
+                  {imagePreview ? (
+                    <motion.div
+                      key="image"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="absolute inset-0 p-2"
+                    >
+                      <Image 
+                          src={imagePreview} 
+                          alt="Image preview" 
+                          fill
+                          style={{ objectFit: 'contain' }}
+                          className="rounded-lg"
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="placeholder"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="absolute flex flex-col items-center justify-center text-center"
+                    >
+                      <UploadCloud className="h-12 w-12 text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">
+                        Click or drag & drop to upload
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
-            <div className="flex flex-col justify-center space-y-6">
+            <div className="flex flex-col justify-center items-center space-y-6">
               <div>
-                <h3 className="font-headline text-2xl mb-4">Guide the AI</h3>
-                <p className="text-muted-foreground mb-6">Use the eyedropper or color wheel to select tints from your image.</p>
-              </div>
-
-              <div className="space-y-4">
-                <ColorPicker label="Shadows" value={shadows} onColorChange={(e) => setShadows(e.target.value)} onEyeDropperClick={() => startPicking('shadows')} disabled={!file} isPicking={pickingColorFor === 'shadows'} />
-                <ColorPicker label="Midtones" value={midtones} onColorChange={(e) => setMidtones(e.target.value)} onEyeDropperClick={() => startPicking('midtones')} disabled={!file} isPicking={pickingColorFor === 'midtones'} />
-                <ColorPicker label="Highlights" value={highlights} onColorChange={(e) => setHighlights(e.target.value)} onEyeDropperClick={() => startPicking('highlights')} disabled={!file} isPicking={pickingColorFor === 'highlights'}/>
+                <h3 className="font-headline text-2xl mb-4 text-center">Ready to Grade?</h3>
+                <p className="text-muted-foreground mb-6 text-center">Upload your image and let our AI create a professional color palette and tonal grade just for you.</p>
               </div>
               
-              <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -344,11 +228,11 @@ export function ColorAIClient() {
             </div>
             
             <div className="mt-12">
-                <h4 className="font-headline text-2xl mb-8 flex items-center justify-center gap-2"><Pipette /> Tonal Analysis</h4>
+                <h4 className="font-headline text-2xl mb-8 flex items-center justify-center gap-2"><Pipette /> Tonal Palette</h4>
                 <div className="grid md:grid-cols-3 gap-6">
-                    {results.tonalAnalysis.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalAnalysis.shadows} />}
-                    {results.tonalAnalysis.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalAnalysis.midtones} />}
-                    {results.tonalAnalysis.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalAnalysis.highlights} />}
+                    {results.tonalPalette.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalPalette.shadows} />}
+                    {results.tonalPalette.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalPalette.midtones} />}
+                    {results.tonalPalette.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalPalette.highlights} />}
                 </div>
             </div>
           </motion.div>
