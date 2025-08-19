@@ -184,10 +184,12 @@ export function ColorAIClient() {
     const [r, g, b] = ctx.getImageData(pixelX, pixelY, 1, 1).data;
     const hexColor = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
 
-    setTonalPalette(prev => ({
-        ...prev,
-        [isPicking]: { ...prev[isPicking], color: hexColor }
-    }));
+    setTonalPalette(prev => {
+        if (!isPicking) return prev;
+        const newPalette = { ...prev };
+        newPalette[isPicking] = { ...newPalette[isPicking], color: hexColor };
+        return newPalette;
+    });
     setIsPicking(null);
   };
 
@@ -345,3 +347,5 @@ export function ColorAIClient() {
     </div>
   );
 }
+
+    
