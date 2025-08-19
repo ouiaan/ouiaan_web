@@ -75,17 +75,17 @@ const prompt = ai.definePrompt({
 2.  **Analyze the Color Grading (Tonal Palette):** Analyze the **Reference image** to determine the color tint applied to its shadows, midtones, and highlights.
     *   **Principle:** The goal is to identify the subtle tint used for cinematic mood. The colors should be close to neutral gray but with a specific hue.
     *   **For each (Shadows, Midtones, Highlights), provide:**
-        *   `color`: The hex code of the tint you identified in the Reference image.
-        *   `description`: A professional analysis of how this tint contributes to the reference image's mood.
+        *   color: The hex code of the tint you identified in the Reference image.
+        *   description: A professional analysis of how this tint contributes to the reference image's mood.
 
 3.  **Perform a Comparative HSL Analysis:** This is the most critical task. Compare the Source and Reference images to provide actionable HSL advice.
     *   Identify the **3 most photographically important colors** that differ between the images.
     *   For each of these three colors, provide specific HSL (Hue, Saturation, Luminance) adjustment recommendations to apply to the **Source image** to make it match the **Reference image**.
     *   **For each HSL adjustment, you must populate:**
-        *   `colorName`: A simple, descriptive name (e.g., "Foliage Green").
-        *   `hex`: A representative hex code for that color *from the reference image*.
-        *   `hueShift`, `saturation`, `luminance`: Recommended numerical shifts (e.g., "+8", "-15") to apply to the source.
-        *   `reasoning`: A professional justification explaining *why* these adjustments are needed (e.g., "The greens in the source are too vibrant. Reducing saturation and shifting the hue towards yellow will match the muted, earthy tones of the reference.").
+        *   colorName: A simple, descriptive name (e.g., "Foliage Green").
+        *   hex: A representative hex code for that color *from the reference image*.
+        *   hueShift, saturation, luminance: Recommended numerical shifts (e.g., "+8", "-15") to apply to the source.
+        *   reasoning: A professional justification explaining *why* these adjustments are needed (e.g., "The greens in the source are too vibrant. Reducing saturation and shifting the hue towards yellow will match the muted, earthy tones of the reference.").
 
 4.  **Analyze the Tone Curve:** Compare the contrast and exposure of the Source and Reference images. Describe the adjustments needed on a 5-point tone curve (Blacks, Shadows, Midtones, Highlights, Whites) to make the source match the reference.
     *   For each of the 5 points, describe the adjustment (e.g., "Blacks: Crushed significantly to increase contrast", "Highlights: Rolled off to create a softer, filmic look").
