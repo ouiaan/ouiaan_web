@@ -13,7 +13,7 @@ export async function runGeneratePalette(input: GenerateColorPaletteInput): Prom
     }
 
     const result = await generateColorPalette(input);
-    if (!result.colorPalette || !result.tonalPalette) {
+    if (!result.colorPalette || !result.tonalPalette || !result.hslAdjustments) {
         throw new Error("AI failed to return expected data structure.");
     }
     return result;
@@ -28,3 +28,5 @@ export async function runGeneratePalette(input: GenerateColorPaletteInput): Prom
     return { error: `Failed to generate palette: ${message}` };
   }
 }
+
+    
