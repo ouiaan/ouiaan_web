@@ -20,6 +20,11 @@ export async function runGeneratePalette(input: GenerateColorPaletteInput): Prom
   } catch (e: unknown) {
     console.error(e);
     const message = e instanceof Error ? e.message : 'An unknown error occurred.';
+
+    if (message.includes('503') || message.toLowerCase().includes('overloaded')) {
+      return { error: "The AI is currently busy. Please wait a moment and try again." };
+    }
+
     return { error: `Failed to generate palette: ${message}` };
   }
 }
