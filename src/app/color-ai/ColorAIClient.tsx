@@ -143,8 +143,6 @@ export function ColorAIClient() {
           setError(response.error);
         } else {
           setResults(response);
-          // Optionally update the picker colors to reflect the AI's analysis, or keep user's selection
-          // For now, we keep the user's selection, and the results show the AI's analysis.
         }
       };
       reader.onerror = () => {
@@ -161,31 +159,23 @@ export function ColorAIClient() {
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return;
     
-    // Set canvas dimensions to the image's natural dimensions for accurate color picking
     canvas.width = image.naturalWidth;
     canvas.height = image.naturalHeight;
     ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
     
-    // Get the bounding rectangle of the image element on the screen
     const rect = e.currentTarget.getBoundingClientRect();
-    
-    // Calculate click coordinates relative to the image element
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    // Calculate the ratio of the click position to the displayed image's dimensions
     const xRatio = x / rect.width;
     const yRatio = y / rect.height;
 
-    // Apply the ratio to the natural image dimensions to get the correct pixel on the canvas
     const pixelX = Math.floor(xRatio * image.naturalWidth);
     const pixelY = Math.floor(yRatio * image.naturalHeight);
 
-    // Get the color data for that pixel
     const [r, g, b] = ctx.getImageData(pixelX, pixelY, 1, 1).data;
     const hexColor = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
 
-    // Update the state
     setTonalPalette(prev => {
         if (!isPicking) return prev;
         const newPalette = { ...prev };
@@ -193,7 +183,6 @@ export function ColorAIClient() {
         return newPalette;
     });
 
-    // Reset picking mode
     setIsPicking(null);
   };
 
@@ -276,17 +265,17 @@ export function ColorAIClient() {
                     <ColorPicker label="Highlights" color={tonalPalette.highlights.color} onColorPick={() => setIsPicking('highlights')} />
                 </div>
               
-                <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
+                <Button onClick={handleGenerate} disabled={isPending || !file} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs font-bold text-lg">
                     {isPending ? (
-                    <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <span className="flex items-center">
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         Generating...
-                    </>
+                    </span>
                     ) : (
-                    <>
-                        <Wand2 className="mr-2 h-4 w-4" />
-                        Get your grade
-                    </>
+                    <span className="flex items-center">
+                        <Wand2 className="mr-2 h-5 w-5" />
+                        Get Your Grade!
+                    </span>
                     )}
                 </Button>
             </div>
@@ -298,7 +287,7 @@ export function ColorAIClient() {
         {isPending && (
           <motion.div key="loader" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="text-center py-10">
             <Loader2 className="h-12 w-12 text-accent animate-spin mx-auto" />
-            <p className="mt-4 text-muted-foreground">Almost there Picasso!</p>
+            <p className="mt-4 text-muted-foreground text-lg font-semibold">Almost there Picasso!</p>
           </motion.div>
         )}
 
