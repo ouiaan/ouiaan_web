@@ -65,8 +65,6 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
         let g = data[i + 1];
         let b = data[i + 2];
 
-        const originalLuminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
         // --- 1. Apply HSL Adjustments ---
         let [h, s, l] = convert.rgb.hsl(r, g, b);
 
@@ -93,8 +91,11 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
             s = Math.max(0, Math.min(100, s + totalSatShift / totalWeight));
             l = Math.max(0, Math.min(100, l + totalLumShift / totalWeight));
         }
-
+        
         [r, g, b] = convert.hsl.rgb(h, s, l);
+        
+        const originalLuminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
 
         // --- 2. Apply Tonal Tints using linear interpolation ---
         const blendFactor = 0.25; // Softer blend
