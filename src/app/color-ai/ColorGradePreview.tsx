@@ -24,7 +24,6 @@ const hexToRgb = (hex: string): [number, number, number] => {
     : [128, 128, 128];
 };
 
-
 export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -49,29 +48,29 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
 
       const { tonalPalette, hslAdjustments } = recipe;
 
-      // Prepare HSL representations of tint colors
-      const shadowTintHsl = convert.rgb.hsl(hexToRgb(tonalPalette.shadows.color));
-      const midtoneTintHsl = convert.rgb.hsl(hexToRgb(tonalPalette.midtones.color));
-      const highlightTintHsl = convert.rgb.hsl(hexToRgb(tonalPalette.highlights.color));
+      const shadowTintRgb = hexToRgb(tonalPalette.shadows.color);
+      const midtoneTintRgb = hexToRgb(tonalPalette.midtones.color);
+      const highlightTintRgb = hexToRgb(tonalPalette.highlights.color);
 
       // Prepare HSL adjustments
       const hslShifts = hslAdjustments.map(adj => ({
         targetHsl: convert.hex.hsl(adj.hex),
         hueShift: parseAdjustment(adj.hueShift),
         saturationShift: parseAdjustment(adj.saturation),
+        luminanceShift: parseAdjustment(adj.luminance),
       }));
 
-      // Process each pixel
       for (let i = 0; i < data.length; i += 4) {
         let r = data[i];
         let g = data[i + 1];
         let b = data[i + 2];
         
+        // --- 1. Apply HSL Adjustments ---
         let [h, s, l] = convert.rgb.hsl(r, g, b);
 
-        // 1. Apply HSL Adjustments 
         let totalHueShift = 0;
         let totalSatShift = 0;
+        let totalLumShift = 0;
         let totalWeight = 0;
 
         for (const shift of hslShifts) {
@@ -79,59 +78,42 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
           const hueInfluenceRange = 30; // degrees
 
           if (hueDistance < hueInfluenceRange) {
+            // Use a cosine-based falloff for smooth transitions
             const weight = (1 + Math.cos(Math.PI * hueDistance / hueInfluenceRange)) / 2;
             totalHueShift += shift.hueShift * weight;
             totalSatShift += shift.saturationShift * weight;
+            totalLumShift += shift.luminanceShift * weight;
             totalWeight += weight;
           }
         }
-
-        if (totalWeight > 0) {
-          h = (h + totalHueShift / totalWeight + 360) % 360;
-          s = Math.max(0, Math.min(100, s + totalSatShift / totalWeight));
-        }
         
-        // Convert back to RGB to apply tonal tinting
+        if (totalWeight > 0) {
+            h = (h + totalHueShift / totalWeight + 360) % 360;
+            s = Math.max(0, Math.min(100, s + totalSatShift / totalWeight));
+            l = Math.max(0, Math.min(100, l + totalLumShift / totalWeight));
+        }
+
         [r, g, b] = convert.hsl.rgb(h, s, l);
 
-        // 2. Apply Tonal Tints
-        const originalLuminance = l;
-        const originalSaturation = s;
-        const blendFactor = 0.35; // How strong the tint is
+        // --- 2. Apply Tonal Tints using a simple RGB blend ---
+        const originalLuminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255; // Perceived luminance
+        const blendFactor = 0.30; // How strong the tint is
 
-        let finalTintHsl: [number, number, number];
+        let tintRgb: [number, number, number];
 
-        // Determine which tint to use based on original luminance and blend between them
-        if (originalLuminance < 33.3) {
-            finalTintHsl = shadowTintHsl;
-        } else if (originalLuminance < 66.6) {
-            const midtoneWeight = (originalLuminance - 33.3) / (66.6 - 33.3);
-            finalTintHsl = [
-                shadowTintHsl[0] * (1 - midtoneWeight) + midtoneTintHsl[0] * midtoneWeight,
-                shadowTintHsl[1] * (1 - midtoneWeight) + midtoneTintHsl[1] * midtoneWeight,
-                shadowTintHsl[2] * (1 - midtoneWeight) + midtoneTintHsl[2] * midtoneWeight,
-            ];
+        // Determine which tint to use based on luminance
+        if (originalLuminance < 0.33) {
+            tintRgb = shadowTintRgb;
+        } else if (originalLuminance < 0.66) {
+            tintRgb = midtoneTintRgb;
         } else {
-            const highlightWeight = (originalLuminance - 66.6) / (100.0 - 66.6);
-            finalTintHsl = [
-                midtoneTintHsl[0] * (1 - highlightWeight) + highlightTintHsl[0] * highlightWeight,
-                midtoneTintHsl[1] * (1 - highlightWeight) + highlightTintHsl[1] * highlightWeight,
-                midtoneTintHsl[2] * (1 - highlightWeight) + highlightTintHsl[2] * highlightWeight,
-            ];
+            tintRgb = highlightTintRgb;
         }
-        
-        // Create the new color by taking the HUE from the tint, but keeping the original saturation and luminance
-        const gradedHsl: [number, number, number] = [
-            finalTintHsl[0],      // Hue from tint
-            originalSaturation,   // ** Preserve original saturation **
-            originalLuminance,    // ** Preserve original luminance **
-        ];
-        const [tinted_r, tinted_g, tinted_b] = convert.hsl.rgb(gradedHsl);
 
-        // Blend the original color (after HSL adjustments) with the new tinted color
-        r = Math.round(r * (1 - blendFactor) + tinted_r * blendFactor);
-        g = Math.round(g * (1 - blendFactor) + tinted_g * blendFactor);
-        b = Math.round(b * (1 - blendFactor) + tinted_b * blendFactor);
+        // Linear interpolation between original color and tint color
+        r = Math.round(r * (1 - blendFactor) + tintRgb[0] * blendFactor);
+        g = Math.round(g * (1 - blendFactor) + tintRgb[1] * blendFactor);
+        b = Math.round(b * (1 - blendFactor) + tintRgb[2] * blendFactor);
 
         data[i] = Math.max(0, Math.min(255, r));
         data[i + 1] = Math.max(0, Math.min(255, g));
@@ -151,3 +133,5 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
       <canvas ref={canvasRef} className="w-full h-auto rounded-lg border border-border" />
   );
 }
+
+    
