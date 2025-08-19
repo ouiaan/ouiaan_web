@@ -60,7 +60,7 @@ export default function Test2Page() {
             const p0 = points[i > 0 ? i - 1 : 0];
             const p1 = points[i];
             const p2 = points[i + 1];
-            const p3 = points[i + 2 < points.length ? i + 2 : p2];
+            const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
 
             const cp1x = p1.x + (p2.x - p0.x) / 6 * tension;
             const cp1y = p1.y + (p2.y - p0.y) / 6 * tension;
@@ -228,3 +228,5 @@ export default function Test2Page() {
     </>
   );
 }
+
+    
