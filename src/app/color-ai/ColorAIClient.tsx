@@ -1,9 +1,9 @@
 
 'use client';
 
-import { useState, useTransition, ChangeEvent, useRef, MouseEvent, useEffect } from 'react';
+import { useState, useTransition, ChangeEvent, useRef, MouseEvent } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Pipette, Rss } from 'lucide-react';
+import { UploadCloud, Palette, Wand2, Loader2, AlertCircle, Pipette } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,6 @@ import { runGeneratePalette } from './actions';
 import type { GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 
@@ -138,6 +137,7 @@ export function ColorAIClient() {
         const base64Image = reader.result as string;
         const response = await runGeneratePalette({ 
           photoDataUri: base64Image,
+          tonalPalette: tonalPalette,
         });
         if ('error' in response) {
           setError(response.error);
@@ -308,7 +308,7 @@ export function ColorAIClient() {
 
         {results && (
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 flex flex-col items-center gap-12">
-            <div className="w-full">
+            <div className="w-full flex flex-col items-center">
               <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
                 <Palette /> Generated Palette
               </h4>
@@ -330,11 +330,11 @@ export function ColorAIClient() {
                 ))}
               </div>
             </div>
-            <div className="w-full">
+            <div className="w-full flex flex-col items-center">
               <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
                 <Pipette /> Tonal Analysis
               </h4>
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-3 gap-6 w-full max-w-4xl">
                 {results.tonalPalette.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalPalette.shadows} />}
                 {results.tonalPalette.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalPalette.midtones} />}
                 {results.tonalPalette.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalPalette.highlights} />}
@@ -347,5 +347,3 @@ export function ColorAIClient() {
     </div>
   );
 }
-
-    

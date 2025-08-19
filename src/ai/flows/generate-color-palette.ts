@@ -12,12 +12,24 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+const TonalPaletteColorInputSchema = z.object({
+  color: z.string().describe("The hex code for this tonal range."),
+  description: z.string().optional().describe("An optional description."),
+});
+
+const TonalPaletteInputSchema = z.object({
+  shadows: TonalPaletteColorInputSchema,
+  midtones: TonalPaletteColorInputSchema,
+  highlights: TonalPaletteColorInputSchema,
+});
+
 const GenerateColorPaletteInputSchema = z.object({
   photoDataUri: z
     .string()
     .describe(
       "A photo to generate a color palette from, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+   tonalPalette: TonalPaletteInputSchema.optional().describe("An optional user-provided tonal palette to guide the analysis."),
 });
 export type GenerateColorPaletteInput = z.infer<typeof GenerateColorPaletteInputSchema>;
 
@@ -50,15 +62,27 @@ const prompt = ai.definePrompt({
 
 1.  **Extract a General Palette:** Analyze the provided image and extract an array of 5 key color palette hex codes. This is a general overview of the image's most prominent colors.
 
-2.  **Generate a Tonal Palette for Grading:** This is the most critical task. Create a 3-color palette specifically for a subtle, professional color grade (like one you would create using RGB curves). This palette should define the tint for the shadows, midtones, and highlights.
+2.  **Generate a Tonal Palette for Grading:** 
+    {{#if tonalPalette}}
+    A tonal palette has been provided by the user. Your primary task is to use these exact colors. For each provided color (shadows, midtones, highlights), you MUST:
+    - Use the provided hex code as the 'color' in your output. DO NOT change it.
+    - Write a brief, professional analysis for the 'description' field, explaining the effect this user-chosen color will have on the image's mood and feel. Justify why it's a good choice for its respective tonal range (shadows, midtones, or highlights).
+
+    **User-Provided Tonal Palette:**
+    - Shadows: {{tonalPalette.shadows.color}}
+    - Midtones: {{tonalPalette.midtones.color}}
+    - Highlights: {{tonalPalette.highlights.color}}
+    {{else}}
+    This is the most critical task. Create a 3-color palette specifically for a subtle, professional color grade (like one you would create using RGB curves). This palette should define the tint for the shadows, midtones, and highlights.
     *   **Guiding Principle:** The goal is a **subtle tint**, not an overpowering color cast. The generated colors should represent a gentle push in a certain direction, suitable for creating a cinematic mood. They should be close to neutral gray but with a specific hue. Avoid overly saturated or intense colors.
     *   **For Shadows:** Propose a hex color that will tint the darkest parts of the image. Think about adding mood (e.g., cool, cinematic blues, or warm, earthy tones).
     *   **For Midtones:** Propose a hex color for the mid-range. **Crucially, this should reflect the *overall tonality* you want to apply, not a specific color from the image (like a skin tone).** Often, this will be a near-neutral gray with a very subtle warm or cool shift.
     *   **For Highlights:** Propose a hex color for the brightest parts. This often complements the shadow tint (e.g., warm highlights with cool shadows). It should be a very light, near-white color with a subtle tint.
-
-**For each color in the Tonal Palette, provide:**
-*   **color:** The hex code you generated.
-*   **description:** A brief, professional analysis of *why* you chose this color and the effect it will have on the image's mood and feel.
+    
+    **For each color in the Tonal Palette, provide:**
+    *   **color:** The hex code you generated.
+    *   **description:** A brief, professional analysis of *why* you chose this color and the effect it will have on the image's mood and feel.
+    {{/if}}
 
 **Input Image:** {{media url=photoDataUri}}
 
@@ -73,6 +97,12 @@ const generateColorPaletteFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
+    // Ensure the output respects the user's input colors if they were provided.
+    if (input.tonalPalette && output) {
+        output.tonalPalette.shadows.color = input.tonalPalette.shadows.color;
+        output.tonalPalette.midtones.color = input.tonalPalette.midtones.color;
+        output.tonalPalette.highlights.color = input.tonalPalette.highlights.color;
+    }
     return output!;
   }
 );
