@@ -41,34 +41,39 @@ export default function Test2Page() {
         midtones: adjustToDiagonal(colors.midtones),
         highlights: adjustToDiagonal(colors.highlights)
     };
-
-    // Generates a smooth Cubic Bezier curve path through the points
+    
+    // Generates a smooth Cubic Bezier spline through all points.
     function createCurvePath(shadowVal: number, midtoneVal: number, highlightVal: number) {
-        const p0 = { x: 0, y: 255 };
-        const p1 = { x: 64, y: 255 - shadowVal };
-        const p2 = { x: 128, y: 255 - midtoneVal };
-        const p3 = { x: 192, y: 255 - highlightVal };
-        const p4 = { x: 255, y: 0 };
-    
-        // A common tension value for smooth splines
-        const tension = 0.4;
-    
-        // Calculate control points for a smooth path through p1, p2, p3
-        // Control points for segment p1 -> p2
-        const cp1_x = p1.x + tension * (p2.x - p0.x);
-        const cp1_y = p1.y + tension * (p2.y - p0.y);
-        const cp2_x = p2.x - tension * (p3.x - p1.x);
-        const cp2_y = p2.y - tension * (p3.y - p1.y);
-    
-        // Control points for segment p2 -> p3
-        const cp3_x = p2.x + tension * (p3.x - p1.x);
-        const cp3_y = p2.y + tension * (p3.y - p1.y);
-        const cp4_x = p3.x - tension * (p4.x - p2.x);
-        const cp4_y = p3.y - tension * (p4.y - p2.y);
-    
-        return `M ${p0.x} ${p0.y} C ${p0.x} ${p0.y}, ${p1.x} ${p1.y}, ${p1.x} ${p1.y} S ${cp2_x} ${cp2_y}, ${p2.x} ${p2.y} S ${cp4_x} ${cp4_y}, ${p3.x} ${p3.y} C ${p3.x} ${p3.y}, ${p4.x} ${p4.y}, ${p4.x} ${p4.y}`;
+        const points = [
+            { x: 0, y: 255 },
+            { x: 64, y: 255 - shadowVal },
+            { x: 128, y: 255 - midtoneVal },
+            { x: 192, y: 255 - highlightVal },
+            { x: 255, y: 0 }
+        ];
+
+        let path = `M ${points[0].x} ${points[0].y}`;
+
+        for (let i = 0; i < points.length - 1; i++) {
+            const p0 = points[i - 1] || points[i];
+            const p1 = points[i];
+            const p2 = points[i + 1];
+            const p3 = points[i + 2] || p2;
+            
+            const tension = 0.4;
+            
+            const cp1x = p1.x + (p2.x - p0.x) / 6 * tension;
+            const cp1y = p1.y + (p2.y - p0.y) / 6 * tension;
+
+            const cp2x = p2.x - (p3.x - p1.x) / 6 * tension;
+            const cp2y = p2.y - (p3.y - p1.y) / 6 * tension;
+            
+            path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
+        }
+        
+        return path;
     }
-    
+
 
     function addPoints(graphId: string, shadowVal: number, midtoneVal: number, highlightVal: number, color: string) {
         const graph = document.getElementById(graphId);
@@ -223,5 +228,3 @@ export default function Test2Page() {
     </>
   );
 }
-
-    
