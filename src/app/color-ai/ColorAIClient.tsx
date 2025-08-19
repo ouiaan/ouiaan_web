@@ -15,7 +15,6 @@ import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { ColorCurves } from './ColorCurves';
 
 
 type TonalPalette = {
@@ -95,7 +94,7 @@ export function ColorAIClient() {
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  const [isPicking, setIsPicking] = useState<keyof Omit<TonalPalette, 'midtones' | 'highlights' | 'shadows'> | null>(null);
+  const [isPicking, setIsPicking] = useState<keyof TonalPalette | null>(null);
   
   const [tonalPalette, setTonalPalette] = useState<TonalPalette>({
       shadows: { color: '#2C3E50', description: '' },
@@ -161,22 +160,19 @@ export function ColorAIClient() {
     const image = imageRef.current;
     if (!ctx) return;
     
-    // Draw image on canvas if not already there, using its natural dimensions
     if (canvas.width !== image.naturalWidth || canvas.height !== image.naturalHeight) {
         canvas.width = image.naturalWidth;
         canvas.height = image.naturalHeight;
-        ctx.drawImage(image, 0, 0);
+        ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
     }
 
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    // Calculate the click position as a ratio of the displayed image's dimensions
     const xRatio = x / rect.width;
     const yRatio = y / rect.height;
 
-    // Apply the ratio to the canvas's natural dimensions to get the correct pixel
     const pixelX = Math.floor(xRatio * canvas.width);
     const pixelY = Math.floor(yRatio * canvas.height);
 
@@ -304,39 +300,37 @@ export function ColorAIClient() {
         )}
 
         {results && (
-          <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12">
-            <div className="grid md:grid-cols-2 gap-12 items-start">
-              <div>
-                <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
-                  <Palette /> Generated Palette
-                </h4>
-                <div className="flex flex-wrap gap-4 justify-center">
-                  {results.colorPalette.map((color) => (
-                    <motion.div
-                      key={color}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                      className="w-20 h-20 rounded-md cursor-pointer relative group"
-                      style={{ backgroundColor: color }}
-                      onClick={() => copyToClipboard(color)}
-                    >
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                        <span className="text-white text-xs font-mono">{color}</span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+          <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 flex flex-col items-center gap-12">
+            <div className="w-full max-w-lg">
+              <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
+                <Palette /> Generated Palette
+              </h4>
+              <div className="flex flex-wrap gap-4 justify-center">
+                {results.colorPalette.map((color) => (
+                  <motion.div
+                    key={color}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                    className="w-20 h-20 rounded-md cursor-pointer relative group"
+                    style={{ backgroundColor: color }}
+                    onClick={() => copyToClipboard(color)}
+                  >
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                      <span className="text-white text-xs font-mono">{color}</span>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-              <div>
-                <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
-                  <Pipette /> Tonal Analysis
-                </h4>
-                <div className="grid gap-6">
-                  {results.tonalPalette.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalPalette.shadows} />}
-                  {results.tonalPalette.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalPalette.midtones} />}
-                  {results.tonalPalette.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalPalette.highlights} />}
-                </div>
+            </div>
+            <div className="w-full max-w-lg">
+              <h4 className="font-headline text-2xl mb-4 flex items-center justify-center gap-2">
+                <Pipette /> Tonal Analysis
+              </h4>
+              <div className="grid gap-6">
+                {results.tonalPalette.shadows && <TonalAnalysisCard title="Shadows" analysis={results.tonalPalette.shadows} />}
+                {results.tonalPalette.midtones && <TonalAnalysisCard title="Midtones" analysis={results.tonalPalette.midtones} />}
+                {results.tonalPalette.highlights && <TonalAnalysisCard title="Highlights" analysis={results.tonalPalette.highlights} />}
               </div>
             </div>
           </motion.div>
@@ -346,3 +340,4 @@ export function ColorAIClient() {
     </div>
   );
 }
+
