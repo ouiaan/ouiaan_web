@@ -219,7 +219,7 @@ export function ColorAIClient() {
     <div className="max-w-7xl mx-auto">
       <Card className="bg-card border-dashed border-2">
         <CardContent className="p-6">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="grid md:grid-cols-2 gap-8 items-start">
             <ImageUploader 
                 title="Source Image" 
                 imagePreview={sourceImagePreview}
@@ -340,5 +340,3 @@ export function ColorAIClient() {
     </div>
   );
 }
-
-    

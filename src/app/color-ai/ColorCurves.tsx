@@ -100,7 +100,7 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
                 dot.setAttribute("stroke", color);
                 dot.setAttribute("stroke-width", "1.5");
                 
-                const svg = graph.querySelector('svg.curve');
+                const svg = graph.querySelector('svg');
                 if (svg) {
                     svg.appendChild(dot);
                 }
@@ -132,58 +132,28 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
         drawGraphs();
     }, [tonalPalette, uniqueId]);
 
-    const Graph = ({ id, curveColor }: { id: string, curveColor: string }) => (
-        <div className="bg-card border border-border/50 rounded-lg p-4 shadow-inner">
-            <div id={id} className="relative w-full aspect-square">
-                <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    {/* Grid Lines */}
-                    <path d="M 0 25 H 100 M 0 50 H 100 M 0 75 H 100 M 25 0 V 100 M 50 0 V 100 M 75 0 V 100" stroke="hsl(var(--border))" strokeWidth="0.2" />
-                    {/* Diagonal Line */}
-                    <line x1="0" y1="100" x2="100" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.3" strokeDasharray="2,2"/>
-                    {/* Curve */}
-                    <path id={`curve-${id}`} d="" fill="none" stroke={curveColor} strokeWidth="1" strokeLinecap="round"/>
-                </svg>
-            </div>
+    const Graph = ({ id, color }: { id: string, color: string }) => (
+      <div className="graph-container">
+        <div className="graph" id={id}>
+          <svg className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
+            <defs>
+              <pattern id={`grid-${uniqueId}`} width="63.75" height="63.75" patternUnits="userSpaceOnUse">
+                <path d="M 63.75 0 L 0 0 0 63.75" fill="none" stroke="hsl(var(--border))" strokeWidth="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="255" height="255" fill={`url(#grid-${uniqueId})`} />
+            <line x1="0" y1="255" x2="255" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" strokeDasharray="3,3"/>
+            <path id={`curve-${id}`} d="" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+          </svg>
         </div>
+      </div>
     );
 
     return (
         <div className="grid grid-cols-3 gap-4">
-             <div className="graph-container">
-                <div className="graph" id={`red-graph-${uniqueId}`}>
-                    <svg className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
-                        <defs>
-                            <pattern id={`grid-${uniqueId}`} width="63.75" height="63.75" patternUnits="userSpaceOnUse">
-                                <path d="M 63.75 0 L 0 0 0 63.75" fill="none" stroke="hsl(var(--border))" strokeWidth="0.5"/>
-                            </pattern>
-                        </defs>
-                        <rect width="255" height="255" fill={`url(#grid-${uniqueId})`} />
-                        <line x1="0" y1="255" x2="255" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" strokeDasharray="3,3"/>
-                        <path id={`red-curve-${uniqueId}`} d="" fill="none" stroke="#ff4d4d" strokeWidth="1.8" strokeLinecap="round"/>
-                    </svg>
-                </div>
-            </div>
-
-            <div className="graph-container">
-                <div className="graph" id={`green-graph-${uniqueId}`}>
-                     <svg className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
-                        <rect width="255" height="255" fill={`url(#grid-${uniqueId})`} />
-                        <line x1="0" y1="255" x2="255" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" strokeDasharray="3,3"/>
-                        <path id={`green-curve-${uniqueId}`} d="" fill="none" stroke="#4dff4d" strokeWidth="1.8" strokeLinecap="round"/>
-                    </svg>
-                </div>
-            </div>
-
-            <div className="graph-container">
-                <div className="graph" id={`blue-graph-${uniqueId}`}>
-                     <svg className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
-                        <rect width="255" height="255" fill={`url(#grid-${uniqueId})`} />
-                        <line x1="0" y1="255" x2="255" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" strokeDasharray="3,3"/>
-                        <path id={`blue-curve-${uniqueId}`} d="" fill="none" stroke="#4d9dff" strokeWidth="1.8" strokeLinecap="round"/>
-                    </svg>
-                </div>
-            </div>
-
+            <Graph id={`red-graph-${uniqueId}`} color="#ff4d4d" />
+            <Graph id={`green-graph-${uniqueId}`} color="#4dff4d" />
+            <Graph id={`blue-graph-${uniqueId}`} color="#4d9dff" />
             <style jsx>{`
                 .graph-container {
                     background: hsl(var(--card));
@@ -196,16 +166,6 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
                     width: 100%;
                     aspect-ratio: 1 / 1;
                     position: relative;
-                }
-                .point {
-                    position: absolute;
-                    width: 8px;
-                    height: 8px;
-                    border-radius: 50%;
-                    transform: translate(-50%, -50%);
-                    background: #222;
-                    border: 2px solid currentColor;
-                    z-index: 2;
                 }
             `}</style>
         </div>

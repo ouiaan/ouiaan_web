@@ -65,6 +65,8 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
         let g = data[i + 1];
         let b = data[i + 2];
         
+        const originalLuminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        
         // --- 1. Apply HSL Adjustments ---
         let [h, s, l] = convert.rgb.hsl(r, g, b);
 
@@ -78,7 +80,6 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
           const hueInfluenceRange = 30; // degrees
 
           if (hueDistance < hueInfluenceRange) {
-            // Use a cosine-based falloff for smooth transitions
             const weight = (1 + Math.cos(Math.PI * hueDistance / hueInfluenceRange)) / 2;
             totalHueShift += shift.hueShift * weight;
             totalSatShift += shift.saturationShift * weight;
@@ -96,12 +97,10 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
         [r, g, b] = convert.hsl.rgb(h, s, l);
 
         // --- 2. Apply Tonal Tints ---
-        const originalLuminance = (0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2]) / 255;
         const blendFactor = 0.35; 
 
         let tintRgb: [number, number, number];
 
-        // Blending tints based on luminance
         if (originalLuminance < 0.33) {
             tintRgb = shadowTintRgb;
         } else if (originalLuminance < 0.66) {
@@ -120,7 +119,6 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
             ];
         }
         
-        // Linear interpolation for blending
         r = r * (1 - blendFactor) + tintRgb[0] * blendFactor;
         g = g * (1 - blendFactor) + tintRgb[1] * blendFactor;
         b = b * (1 - blendFactor) + tintRgb[2] * blendFactor;
