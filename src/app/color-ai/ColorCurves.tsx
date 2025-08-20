@@ -39,6 +39,7 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
         };
 
         // Adjustment function to soften the curve points.
+        // A higher factor means a more subtle effect (closer to the neutral diagonal).
         function adjustToDiagonal(original: {r: number, g: number, b: number}, factor = 0.60) {
             return {
                 r: Math.round(original.r + (128 - original.r) * factor),
@@ -53,23 +54,25 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
             highlights: adjustToDiagonal(colors.highlights)
         };
         
+        // Generates a smooth Cubic Bezier spline through all points.
         function createCurvePath(shadowVal: number, midtoneVal: number, highlightVal: number) {
             const points = [
-                { x: 0, y: 255 },
+                { x: 0, y: 255 }, // Black point
                 { x: 64, y: 255 - shadowVal },
                 { x: 128, y: 255 - midtoneVal },
                 { x: 192, y: 255 - highlightVal },
-                { x: 255, y: 0 }
+                { x: 255, y: 0 }  // White point
             ];
     
             let path = `M ${points[0].x} ${points[0].y}`;
             const tension = 0.5; // Catmull-Rom tension
+    
             for (let i = 0; i < points.length - 1; i++) {
                 const p0 = points[i > 0 ? i - 1 : 0];
                 const p1 = points[i];
                 const p2 = points[i + 1];
                 const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
-
+    
                 const cp1x = p1.x + (p2.x - p0.x) / 6 * tension;
                 const cp1y = p1.y + (p2.y - p0.y) / 6 * tension;
                 
@@ -83,6 +86,7 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
         }
 
         function addPoints(svg: SVGSVGElement, shadowVal: number, midtoneVal: number, highlightVal: number, color: string) {
+            // Clear existing points
             svg.querySelectorAll('.point').forEach(p => p.remove());
 
             const pointsData = [
@@ -94,12 +98,12 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
             pointsData.forEach(point => {
                 const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                 dot.setAttribute("class", "point");
-                dot.setAttribute("cx", String((point.x / 255) * 100) + "%");
-                dot.setAttribute("cy", String(100 - (point.y / 255) * 100) + "%");
-                dot.setAttribute("r", "3");
+                dot.setAttribute("cx", String(point.x));
+                dot.setAttribute("cy", String(255 - point.y));
+                dot.setAttribute("r", "5"); // Slightly larger points
                 dot.setAttribute("fill", "#222");
                 dot.setAttribute("stroke", color);
-                dot.setAttribute("stroke-width", "1.5");
+                dot.setAttribute("stroke-width", "2");
                 svg.appendChild(dot);
             });
         }
@@ -117,7 +121,9 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
         }
         
         function drawAllGraphs() {
-            if (!tonalPalette.shadows || !tonalPalette.midtones || !tonalPalette.highlights) return;
+            if (!tonalPalette.shadows || !tonalPalette.midtones || !tonalPalette.highlights) {
+                return;
+            };
         
             if (redGraphRef.current) {
                 const values = { shadow: adjustedColors.shadows.r, midtone: adjustedColors.midtones.r, highlight: adjustedColors.highlights.r };
@@ -136,42 +142,29 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
         drawAllGraphs();
     }, [tonalPalette, uniqueId]);
 
-    const Graph = ({ graphRef, color }: { graphRef: React.RefObject<SVGSVGElement>, color: string }) => (
-      <div className="graph-container">
-        <div className="graph">
-          <svg ref={graphRef} className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
-            <defs>
-              <pattern id={`grid-${uniqueId}`} width="63.75" height="63.75" patternUnits="userSpaceOnUse">
-                <path d="M 63.75 0 L 0 0 0 63.75" fill="none" stroke="hsl(var(--border))" strokeWidth="0.5"/>
-              </pattern>
-            </defs>
-            <rect width="255" height="255" fill={`url(#grid-${uniqueId})`} />
-            <line x1="0" y1="255" x2="255" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" strokeDasharray="3,3"/>
-            <path d="" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
+    const Graph = ({ graphRef, color, gridId }: { graphRef: React.RefObject<SVGSVGElement>, color: string, gridId: string }) => (
+        <div className="bg-card p-4 rounded-lg shadow-inner">
+            <div className="aspect-square w-full">
+                <svg ref={graphRef} className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
+                    <defs>
+                        <pattern id={gridId} width="63.75" height="63.75" patternUnits="userSpaceOnUse">
+                            <path d="M 63.75 0 L 0 0 0 63.75" fill="none" stroke="hsl(var(--border))" strokeWidth="0.5"/>
+                        </pattern>
+                    </defs>
+                    <rect width="255" height="255" fill={`url(#${gridId})`} />
+                    <line x1="0" y1="255" x2="255" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" strokeDasharray="3,3"/>
+                    <path d="" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+            </div>
         </div>
-      </div>
     );
 
     return (
         <div className="grid grid-cols-3 gap-4">
-            <Graph graphRef={redGraphRef} color="#ff4d4d" />
-            <Graph graphRef={greenGraphRef} color="#4dff4d" />
-            <Graph graphRef={blueGraphRef} color="#4d9dff" />
-            <style jsx>{`
-                .graph-container {
-                    background: hsl(var(--card));
-                    border-radius: 0.5rem;
-                    padding: 1rem;
-                    width: 100%;
-                    box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.05);
-                }
-                .graph {
-                    width: 100%;
-                    aspect-ratio: 1 / 1;
-                    position: relative;
-                }
-            `}</style>
+            <Graph graphRef={redGraphRef} color="#ff4d4d" gridId={`grid-r-${uniqueId}`} />
+            <Graph graphRef={greenGraphRef} color="#4dff4d" gridId={`grid-g-${uniqueId}`} />
+            <Graph graphRef={blueGraphRef} color="#4d9dff" gridId={`grid-b-${uniqueId}`} />
         </div>
     );
 }
+
