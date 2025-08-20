@@ -16,10 +16,11 @@ export default function Test2Page() {
         } : null;
     }
 
+    // Values selected from the "Oppenheimer" still
     const colors = {
-        shadows: hexToRgb('#132227'),   // R:19, G:34, B:39 -> Red is lowest, adds Cyan/Green tint
-        midtones: hexToRgb('#9a948d'),  // R:154, G:148, B:141 -> Relatively neutral
-        highlights: hexToRgb('#e7e4df') // R:231, G:228, B:223 -> Red is highest, adds warm/orange tint
+        shadows: hexToRgb('#2E3A3C'),   // R:46, G:58, B:60  -> Red is lowest, creates cyan tint
+        midtones: hexToRgb('#8A7E74'),  // R:138, G:126, B:116 -> Desaturated skin tone
+        highlights: hexToRgb('#D7CEB5') // R:215, G:206, B:181 -> Pale yellow/warm highlights
     };
 
     if (!colors.shadows || !colors.midtones || !colors.highlights) {
