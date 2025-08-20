@@ -18,10 +18,11 @@ import { ColorCurves } from './ColorCurves';
 
 
 type HSLAdjustment = GenerateColorGradeRecipeOutput['hslAdjustments'][0];
-type TonalPaletteAnalysis = GenerateColorGradeRecipeOutput['tonalPalette'];
+type TonalPalette = GenerateColorGradeRecipeOutput['tonalPalette'];
+type TonalPaletteKey = keyof TonalPalette;
 type WhiteBalanceAnalysis = GenerateColorGradeRecipeOutput['whiteBalanceAnalysis'];
 
-const TonalAnalysisCard = ({ title, analysis }: { title: keyof TonalPaletteAnalysis, analysis: TonalPaletteAnalysis[keyof TonalPaletteAnalysis] }) => {
+const TonalAnalysisCard = ({ title, analysis }: { title: TonalPaletteKey, analysis: TonalPalette[TonalPaletteKey] }) => {
     const { toast } = useToast();
 
     if (!analysis) return null;
@@ -329,9 +330,9 @@ export function ColorAIClient() {
                   </div>
                 </div>
 
-                <div className="w-full flex flex-col items-center">
-                    <h3 className="font-headline text-2xl mb-4">Tonal Analysis</h3>
-                    <div className="grid md:grid-cols-3 gap-6 w-full max-w-4xl">
+                <div className="w-full">
+                    <h3 className="font-headline text-2xl mb-4 text-center">Tonal Analysis</h3>
+                    <div className="grid md:grid-cols-3 gap-6">
                         <TonalAnalysisCard title="shadows" analysis={results.tonalPalette.shadows} />
                         <TonalAnalysisCard title="midtones" analysis={results.tonalPalette.midtones} />
                         <TonalAnalysisCard title="highlights" analysis={results.tonalPalette.highlights} />
@@ -339,9 +340,9 @@ export function ColorAIClient() {
                 </div>
 
                 {results.hslAdjustments && (
-                  <div className="w-full flex flex-col items-center">
-                    <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> HSL Primary Color Analysis</h3>
-                    <div className="grid md:grid-cols-3 gap-6 w-full max-w-4xl">
+                  <div className="w-full">
+                    <h3 className="font-headline text-2xl mb-4 text-center flex items-center justify-center gap-2"><SlidersHorizontal /> HSL Primary Color Analysis</h3>
+                    <div className="grid md:grid-cols-3 gap-6">
                       {results.hslAdjustments.map((adj) => (
                         <HSLAdjustmentCard key={adj.colorName} adjustment={adj} />
                       ))}
@@ -382,3 +383,5 @@ export function ColorAIClient() {
     </div>
   );
 }
+
+    

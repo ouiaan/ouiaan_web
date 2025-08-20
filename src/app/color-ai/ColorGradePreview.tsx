@@ -10,14 +10,12 @@ type ColorGradePreviewProps = {
   recipe: GenerateColorGradeRecipeOutput;
 };
 
-// Helper function to parse HSL adjustment string like "+10" or "-5"
 const parseAdjustment = (adjustment: string): number => {
     return parseInt(adjustment, 10) || 0;
 };
 
-// Helper function to convert hex to an [r, g, b] array
 const hexToRgb = (hex: string): [number, number, number] => {
-  if (!hex || !/^[#a-fA-F0-9]{6,7}$/.test(hex)) return [128, 128, 128]; // Return neutral gray for invalid hex
+  if (!hex || !/^[#a-fA-F0-9]{6,7}$/.test(hex)) return [128, 128, 128];
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
@@ -52,7 +50,6 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
       const midtoneTintRgb = hexToRgb(tonalPalette.midtones.color);
       const highlightTintRgb = hexToRgb(tonalPalette.highlights.color);
 
-      // Prepare HSL adjustments
       const hslShifts = hslAdjustments.map(adj => ({
         targetHsl: convert.hex.hsl(adj.hex),
         hueShift: parseAdjustment(adj.hueShift),
@@ -64,10 +61,10 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
         let r = data[i];
         let g = data[i + 1];
         let b = data[i + 2];
-        const originalLuminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+        // 1. Apply HSL Adjustments
         let [h, s, l] = convert.rgb.hsl(r, g, b);
 
-        // --- 1. Apply HSL Adjustments ---
         let totalHueShift = 0;
         let totalSatShift = 0;
         let totalLumShift = 0;
@@ -85,40 +82,33 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
             totalWeight += weight;
           }
         }
-
+        
         if (totalWeight > 0) {
             h = (h + totalHueShift / totalWeight + 360) % 360;
             s = Math.max(0, Math.min(100, s + totalSatShift / totalWeight));
             l = Math.max(0, Math.min(100, l + totalLumShift / totalWeight));
         }
-        
-        // --- 2. Apply Tonal Tints while preserving original luminance ---
-        let [tintH, tintS] = [0, 0];
-        if (originalLuminance < 0.33) {
-            [tintH, tintS] = convert.rgb.hsl(...shadowTintRgb);
-        } else if (originalLuminance < 0.66) {
-            const mixRatio = (originalLuminance - 0.33) / (0.66 - 0.33);
-            const [h1, s1] = convert.rgb.hsl(...shadowTintRgb);
-            const [h2, s2] = convert.rgb.hsl(...midtoneTintRgb);
-            tintH = h1 * (1 - mixRatio) + h2 * mixRatio;
-            tintS = s1 * (1 - mixRatio) + s2 * mixRatio;
+
+        [r, g, b] = convert.hsl.rgb(h, s, l);
+
+        // 2. Apply Tonal Tints
+        const luminance = (0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2]) / 255;
+        let tintRgb;
+
+        if (luminance < 0.33) {
+            tintRgb = shadowTintRgb;
+        } else if (luminance < 0.66) {
+            tintRgb = midtoneTintRgb;
         } else {
-             const mixRatio = (originalLuminance - 0.66) / (1.0 - 0.66);
-             const [h1, s1] = convert.rgb.hsl(...midtoneTintRgb);
-             const [h2, s2] = convert.rgb.hsl(...highlightTintRgb);
-             tintH = h1 * (1 - mixRatio) + h2 * mixRatio;
-             tintS = s1 * (1 - mixRatio) + s2 * mixRatio;
+            tintRgb = highlightTintRgb;
         }
 
-        // Combine HSL-adjusted hue and saturation with the Tonal Tint
-        // Use a blend factor to control the intensity of the tint
-        const blendFactor = 0.5;
-        const finalH = h * (1 - blendFactor) + tintH * blendFactor;
-        const finalS = s * (1 - blendFactor) + tintS * blendFactor;
+        const blendFactor = 0.35; // How much of the tint to apply
 
-        // Convert back to RGB using the newly calculated H/S and the luminance from the HSL-adjusted color
-        [r, g, b] = convert.hsl.rgb(finalH, finalS, l);
-
+        r = r * (1 - blendFactor) + tintRgb[0] * blendFactor;
+        g = g * (1 - blendFactor) + tintRgb[1] * blendFactor;
+        b = b * (1 - blendFactor) + tintRgb[2] * blendFactor;
+        
         data[i] = Math.max(0, Math.min(255, r));
         data[i + 1] = Math.max(0, Math.min(255, g));
         data[i + 2] = Math.max(0, Math.min(255, b));
@@ -137,3 +127,5 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
       <canvas ref={canvasRef} className="w-full h-auto rounded-lg border border-border" />
   );
 }
+
+    
