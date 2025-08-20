@@ -9,10 +9,30 @@ import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { motion } from 'framer-motion';
 
 const freebies = [
-  { id: 1, name: 'Free Sample LUT', description: 'A versatile LUT for a clean cinematic look.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'cinematic still' },
-  { id: 2, name: 'BW Film Preset', description: 'A classic black and white preset for timeless photos.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'black white' },
-  { id: 3, name: '4K Film Grain Overlay', description: 'Add authentic film texture to your videos.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'abstract texture' },
-  { id: 4, name: 'Light Leak Effect', description: 'A beautiful light leak overlay for a dreamy effect.', image: 'https://placehold.co/1600x900.png', data_ai_hint: 'light leak' },
+  { 
+    id: 1, 
+    name: 'PSD Wiggle Effect', 
+    description: 'Add a dynamic, eye-catching wiggle distortion to your text or images with this easy-to-use PSD effect.', 
+    image: 'https://placehold.co/1600x900.png', 
+    data_ai_hint: 'abstract glitch',
+    link: 'https://sub2get.com/link?l=9208' 
+  },
+  { 
+    id: 2, 
+    name: 'Polaroid Frame Mockup', 
+    description: 'Give your photos a nostalgic, classic feel with this high-resolution Polaroid frame mockup.', 
+    image: 'https://placehold.co/1600x900.png', 
+    data_ai_hint: 'polaroid frame',
+    link: 'https://sub2get.com/link?l=9544' 
+  },
+  { 
+    id: 3, 
+    name: 'Free Sample LUT', 
+    description: 'A versatile cinematic LUT to give your footage a professional and stylized color grade.', 
+    image: 'https://placehold.co/1600x900.png', 
+    data_ai_hint: 'cinematic still',
+    link: 'https://sub2get.com/link?l=9545' 
+  },
 ];
 
 export default function FreebiesPage() {
@@ -28,7 +48,7 @@ export default function FreebiesPage() {
         Enjoy a selection of free tools to get a taste of the quality and style of my products.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {freebies.map((item, index) => (
           <motion.div 
             key={item.id}
@@ -49,7 +69,7 @@ export default function FreebiesPage() {
               </div>
               <h3 className="font-headline text-2xl text-foreground">{item.name}</h3>
               <p className="text-foreground/70 mt-2 flex-grow">{item.description}</p>
-              <Link href="#" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider mt-6">
+              <Link href={item.link} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider mt-6">
                 <span>Download</span>
                 <ArrowDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-1" />
               </Link>
