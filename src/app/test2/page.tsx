@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 
 // Converts hex to an RGB object
@@ -17,21 +17,23 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
 // This function creates a smooth curve path based on the color points for a single channel.
 function createCurvePath(shadowVal: number, midtoneVal: number, highlightVal: number): string {
     const points = [
-        { x: 0,   y: 255 }, // Inverted Y for SVG coords
+        { x: 0,   y: 255 - 0 }, // Inverted Y for SVG coords - BLACK
         { x: 64,  y: 255 - shadowVal },
         { x: 128, y: 255 - midtoneVal },
         { x: 192, y: 255 - highlightVal },
-        { x: 255, y: 0 }
+        { x: 255, y: 255 - 255 } // WHITE
     ];
 
     let path = `M ${points[0].x},${points[0].y}`;
     
     for (let i = 0; i < points.length - 1; i++) {
-        const p0 = points[i > 0 ? i - 1 : 0];
+        // Correctly handle control points to prevent out-of-bounds access
+        const p0 = points[i === 0 ? 0 : i - 1];
         const p1 = points[i];
         const p2 = points[i + 1];
-        const p3 = points[i + 2 < points.length ? i + 2 : p2];
+        const p3 = points[i + 2 < points.length ? points[i + 2] : p2];
         
+        // Catmull-Rom to Cubic Bezier conversion
         const cp1x = p1.x + (p2.x - p0.x) / 6;
         const cp1y = p1.y + (p2.y - p0.y) / 6;
         const cp2x = p2.x - (p3.x - p1.x) / 6;
@@ -43,6 +45,7 @@ function createCurvePath(shadowVal: number, midtoneVal: number, highlightVal: nu
     return path;
 }
 
+
 interface RgbCurveDisplayProps {
     colors: {
         shadows: string | null;
@@ -52,6 +55,8 @@ interface RgbCurveDisplayProps {
 }
 
 function RgbCurveDisplay({ colors }: RgbCurveDisplayProps) {
+    // This logic ensures we don't try to render if colors are incomplete.
+    // It's prepared for when the input is dynamic (from eyedroppers).
     const rgbValues = useMemo(() => {
         if (!colors.shadows || !colors.midtones || !colors.highlights) return null;
         return {
@@ -76,7 +81,7 @@ function RgbCurveDisplay({ colors }: RgbCurveDisplayProps) {
         return createCurvePath(rgbValues.shadows.b, rgbValues.midtones.b, rgbValues.highlights.b);
     }, [rgbValues]);
 
-    const renderCurve = (channel: 'Red' | 'Green' | 'Blue', path: string, color: string) => (
+    const renderCurve = (path: string, color: string) => (
         <BackgroundGradient animate={true} containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground p-4 flex flex-col items-center gap-2">
             <div className="w-full aspect-square relative bg-[#202020] rounded-md overflow-hidden">
                 {/* Grid */}
@@ -97,23 +102,24 @@ function RgbCurveDisplay({ colors }: RgbCurveDisplayProps) {
         </BackgroundGradient>
     );
 
+    // Don't render if colors are incomplete
     if (!rgbValues) {
-        return null; // Don't render if colors are incomplete
+        return null;
     }
 
     return (
         <>
-            {renderCurve('Red', redPath, '#ff4d4d')}
-            {renderCurve('Green', greenPath, '#4dff4d')}
-            {renderCurve('Blue', bluePath, '#4d9dff')}
+            {renderCurve(redPath, '#ff4d4d')}
+            {renderCurve(greenPath, '#4dff4d')}
+            {renderCurve(bluePath, '#4d9dff')}
         </>
     );
 }
 
 
 export default function Test2Page() {
-    // These values are now constants for testing purposes.
-    // In the final implementation, they will come from `selectedColors` state.
+    // These values are the input. The logic is now prepared to handle
+    // them dynamically when they come from an external source like eyedroppers.
     const sampleColors = {
         shadows: '#2B2827',
         midtones: '#8A8784',
@@ -122,7 +128,7 @@ export default function Test2Page() {
 
     return (
         <div className="container mx-auto py-16 md:py-24 px-4">
-             <h3 className="font-headline text-2xl mb-4 text-center">RGB Curves</h3>
+             <h3 className="font-headline text-3xl mb-6 text-center">RGB Curves</h3>
             <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-6">
                 <RgbCurveDisplay colors={sampleColors} />
             </div>
