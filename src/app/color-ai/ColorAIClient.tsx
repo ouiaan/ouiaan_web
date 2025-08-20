@@ -14,13 +14,14 @@ import type { GenerateColorGradeRecipeOutput, GenerateColorGradeRecipeInput } fr
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { cn } from '@/lib/utils';
 import { ReferenceImage, type EyedropperMode } from './ReferenceImage';
+import { RgbCurveDisplay } from './RgbCurveDisplay';
 
 type HSLAdjustment = GenerateColorGradeRecipeOutput['hslAdjustments'][0];
 type TonalPalette = GenerateColorGradeRecipeOutput['tonalPalette'];
 type TonalPaletteKey = keyof TonalPalette;
 type ToneCurve = GenerateColorGradeRecipeOutput['toneCurve'];
 type WhiteBalance = GenerateColorGradeRecipeOutput['whiteBalance'];
-type SelectedColors = {[key in EyedropperMode as string]: string | null};
+export type SelectedColors = {[key in EyedropperMode as string]: string | null};
 
 
 const TonalAnalysisCard = ({ title, analysis }: { title: TonalPaletteKey, analysis: TonalPalette[TonalPaletteKey] }) => {
@@ -383,6 +384,13 @@ export function ColorAIClient() {
                     <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> HSL Analysis</h3>
                     <HSLAnalysisCard adjustments={results.hslAdjustments} />
                   </div>
+                )}
+
+                {allColorsSelected && (
+                    <div className="w-full">
+                        <h3 className="font-headline text-2xl mb-4">RGB Curves</h3>
+                        <RgbCurveDisplay colors={selectedColors} />
+                    </div>
                 )}
             </div>
               
