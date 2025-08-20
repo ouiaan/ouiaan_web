@@ -15,6 +15,10 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
     } : null;
 }
 
+function clamp(value: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, value));
+}
+
 function createCurvePath(shadowVal: number, midtoneVal: number, highlightVal: number): string {
     const points = [
         { x: 0,   y: 255 - 0 },
@@ -38,7 +42,7 @@ function createCurvePath(shadowVal: number, midtoneVal: number, highlightVal: nu
         const cp2x = p2.x - (p3.x - p1.x) / 6;
         const cp2y = p2.y - (p3.y - p1.y) / 6;
         
-        path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
+        path += ` C ${clamp(cp1x, 0, 255)},${clamp(cp1y, 0, 255)} ${clamp(cp2x, 0, 255)},${clamp(cp2y, 0, 255)} ${p2.x},${p2.y}`;
     }
     
     return path;
@@ -116,5 +120,3 @@ export function RgbCurveDisplay({ colors }: RgbCurveDisplayProps) {
         </div>
     );
 }
-
-    
