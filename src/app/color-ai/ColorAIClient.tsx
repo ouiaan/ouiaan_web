@@ -137,6 +137,29 @@ const GeneralAnalysisCard = ({ analysis, toneCurve }: { analysis: WhiteBalance, 
   );
 };
 
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 12
+      }
+    }
+  };
+
 export function ColorAIClient() {
   const [referenceImageFile, setReferenceImageFile] = useState<File | null>(null);
   const [referenceImagePreview, setReferenceImagePreview] = useState<string | null>(null);
@@ -335,14 +358,19 @@ export function ColorAIClient() {
       )}
 
       {results && (
-        <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12">
-
+        <motion.div 
+            key="results"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="mt-12"
+        >
             <div className="flex flex-col gap-12 max-w-4xl mx-auto">
-                <div className="w-full flex flex-col items-center">
+                <motion.div variants={itemVariants} className="w-full flex flex-col items-center">
                     <h3 className="font-headline text-3xl mb-6">Your Color Grade Recipe</h3>
-                </div>
+                </motion.div>
                 
-                <div className="w-full flex flex-col">
+                <motion.div variants={itemVariants} className="w-full flex flex-col">
                   <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Palette/> Generated Palette</h3>
                   <div className="flex flex-wrap gap-4">
                     {results.colorPalette.map((color) => (
@@ -361,36 +389,36 @@ export function ColorAIClient() {
                       </motion.div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
 
                 {results.whiteBalance && results.toneCurve && (
-                  <div className="w-full">
+                  <motion.div variants={itemVariants} className="w-full">
                     <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Info /> General Analysis</h3>
                     <GeneralAnalysisCard analysis={results.whiteBalance} toneCurve={results.toneCurve} />
-                  </div>
+                  </motion.div>
                 )}
     
-                <div className="w-full">
+                <motion.div variants={itemVariants} className="w-full">
                     <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Droplets /> Tonal Analysis</h3>
                     <div className="grid md:grid-cols-3 gap-6">
                         <TonalAnalysisCard title="shadows" analysis={results.tonalPalette.shadows} />
                         <TonalAnalysisCard title="midtones" analysis={results.tonalPalette.midtones} />
                         <TonalAnalysisCard title="highlights" analysis={results.tonalPalette.highlights} />
                     </div>
-                </div>
+                </motion.div>
     
                 {results.hslAdjustments && (
-                  <div className="w-full">
+                  <motion.div variants={itemVariants} className="w-full">
                     <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> HSL Analysis</h3>
                     <HSLAnalysisCard adjustments={results.hslAdjustments} />
-                  </div>
+                  </motion.div>
                 )}
 
                 {allColorsSelected && (
-                    <div className="w-full">
+                    <motion.div variants={itemVariants} className="w-full">
                         <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><BarChart3 /> RGB Curves</h3>
                         <RgbCurveDisplay colors={selectedColors} />
-                    </div>
+                    </motion.div>
                 )}
             </div>
               
@@ -400,5 +428,3 @@ export function ColorAIClient() {
     </div>
   );
 }
-
-    
