@@ -325,7 +325,7 @@ export function ColorAIClient() {
                       {isPending ? (
                       <span className="flex items-center justify-center font-bold text-lg">
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Analyzing...
+                          Almost there Picasso!
                       </span>
                       ) : (
                       <span className="flex items-center justify-center font-bold text-lg">
@@ -367,7 +367,7 @@ export function ColorAIClient() {
         >
             <div className="flex flex-col gap-12 max-w-4xl mx-auto">
                 <motion.div variants={itemVariants} className="w-full flex flex-col items-center">
-                    <h3 className="font-headline text-3xl mb-6">Your Color Grade Recipe</h3>
+                    <h3 className="font-headline text-3xl mb-6">Your Reverse-Engineered Grade</h3>
                 </motion.div>
                 
                 <motion.div variants={itemVariants} className="w-full flex flex-col">

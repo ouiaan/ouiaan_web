@@ -18,7 +18,7 @@ import {
 const desktopNavLinks = [
   { href: '/gear', label: 'Gear' },
   { href: '/freebies', label: 'Freebies' },
-  { href: '/color-ai', label: 'Color AI' },
+  { href: '/color-ai', label: 'Reverse Grade AI' },
   { href: '/contact', label: 'Contact' },
 ];
 
@@ -28,7 +28,7 @@ const mobileNavLinks = [
   { href: '/store/video', label: 'Video' },
   { href: '/gear', label: 'Gear' },
   { href: '/freebies', label: 'Freebies' },
-  { href: '/color-ai', label: 'Color AI' },
+  { href: '/color-ai', label: 'Reverse Grade AI' },
   { href: '/contact', label: 'Contact' },
 ];
 

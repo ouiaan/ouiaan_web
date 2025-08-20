@@ -76,9 +76,9 @@ export function ShowcaseSection() {
           
           <BackgroundGradient containerClassName="rounded-2xl h-full md:col-span-2 lg:col-span-1" className="rounded-2xl h-full bg-card text-card-foreground p-6 md:p-8 flex flex-col">
             <div className="flex-grow">
-                <h3 className="font-headline text-3xl text-foreground">Color AI</h3>
+                <h3 className="font-headline text-3xl text-foreground">Reverse Grade AI</h3>
                 <p className="text-foreground/70 mt-4">
-                  Deconstruct the color grade of any image. Upload a reference and let the AI generate a detailed recipe, including HSL values and RGB curves.
+                  Ever wondered how to get that cinematic look? Upload any reference image and our AI will reverse-engineer the color grade, giving you the exact recipe to recreate it.
                 </p>
             </div>
             <div className="mt-6">
@@ -93,7 +93,7 @@ export function ShowcaseSection() {
                     />
                 </div>
                 <Link href="/color-ai" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider">
-                    <span>Try Color AI</span>
+                    <span>Try The Tool</span>
                     <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
             </div>
