@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useTransition, ChangeEvent, useRef } from 'react';
@@ -391,9 +390,9 @@ export function ColorAIClient() {
                      </div>
                   )}
 
-                  {results && allColorsSelected && (
+                  {allColorsSelected && (
                     <div className="w-full">
-                        <h3 className="font-headline text-2xl mb-4 text-center">Tone Curve Analysis</h3>
+                        <h3 className="font-headline text-2xl mb-4 text-center">Tone Curve from Your Selection</h3>
                         <ColorCurves tonalPalette={selectedColors} />
                     </div>
                   )}
