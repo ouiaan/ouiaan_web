@@ -3,7 +3,7 @@
 
 import React, { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { Wand2, Loader2, AlertCircle, SlidersHorizontal, Palette, Thermometer, Contrast, UploadCloud, Pipette } from 'lucide-react';
+import { Wand2, Loader2, AlertCircle, SlidersHorizontal, Palette, Thermometer, Contrast, UploadCloud, Pipette, Info, BarChart3, Droplets } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -307,7 +307,7 @@ export function ColorAIClient() {
                       ) : (
                       <span className="flex items-center justify-center font-bold text-lg">
                           <Wand2 className="mr-2 h-5 w-5" />
-                          Analyze Grade
+                          Get Your Grade!
                       </span>
                       )}
                   </Button>
@@ -322,7 +322,7 @@ export function ColorAIClient() {
         {isPending && (
           <motion.div key="loader" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="text-center py-10">
             <Loader2 className="h-12 w-12 text-accent animate-spin mx-auto" />
-            <p className="mt-4 text-muted-foreground text-lg font-semibold">Analyzing, please wait...</p>
+            <p className="mt-4 text-muted-foreground text-lg font-semibold">Almost there Picasso!</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -365,13 +365,13 @@ export function ColorAIClient() {
 
                 {results.whiteBalance && results.toneCurve && (
                   <div className="w-full">
-                    <h3 className="font-headline text-2xl mb-4">General Analysis</h3>
+                    <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Info /> General Analysis</h3>
                     <GeneralAnalysisCard analysis={results.whiteBalance} toneCurve={results.toneCurve} />
                   </div>
                 )}
     
                 <div className="w-full">
-                    <h3 className="font-headline text-2xl mb-4">Tonal Analysis</h3>
+                    <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Droplets /> Tonal Analysis</h3>
                     <div className="grid md:grid-cols-3 gap-6">
                         <TonalAnalysisCard title="shadows" analysis={results.tonalPalette.shadows} />
                         <TonalAnalysisCard title="midtones" analysis={results.tonalPalette.midtones} />
@@ -388,7 +388,7 @@ export function ColorAIClient() {
 
                 {allColorsSelected && (
                     <div className="w-full">
-                        <h3 className="font-headline text-2xl mb-4">RGB Curves</h3>
+                        <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><BarChart3 /> RGB Curves</h3>
                         <RgbCurveDisplay colors={selectedColors} />
                     </div>
                 )}
