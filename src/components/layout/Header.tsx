@@ -139,7 +139,7 @@ export function Header() {
         </motion.div>
         
         {isMounted && (
-          <>
+          <React.Fragment>
             {/* Desktop Navigation */}
             <motion.nav
               className="hidden items-center gap-8 md:flex"
@@ -188,7 +188,7 @@ export function Header() {
                 {mobileMenuOpen ? <X className="h-8 w-8" /> : <Menu className="h-8 w-8" />}
               </button>
             </div>
-          </>
+          </React.Fragment>
         )}
       </div>
       
