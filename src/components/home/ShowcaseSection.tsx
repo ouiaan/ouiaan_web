@@ -26,7 +26,7 @@ export function ShowcaseSection() {
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12 items-stretch">
           <BackgroundGradient containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 md:p-8 flex flex-col">
             <div className="flex-grow">
-              <h3 className="font-headline text-3xl text-foreground">LUTs Cinemáticos</h3>
+              <h3 className="font-headline text-3xl text-foreground">Cinematic LUTs</h3>
               <p className="text-foreground/70 mt-4">
                 Transforma tu metraje con un solo clic. Mi colección de Look-Up Tables (LUTs) está diseñada para darle a tus videos un etalonaje de color profesional y cinematográfico.
               </p>
@@ -51,7 +51,7 @@ export function ShowcaseSection() {
           
           <BackgroundGradient containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 md:p-8 flex flex-col">
             <div className="flex-grow">
-                <h3 className="font-headline text-3xl text-foreground">Presets para Fotos</h3>
+                <h3 className="font-headline text-3xl text-foreground">Lightroom Presets</h3>
                 <p className="text-foreground/70 mt-4">
                   Logra un look consistente y pulido en toda tu fotografía. Mis presets para Lightroom proporcionan un punto de partida perfecto para tu visión creativa.
                 </p>
