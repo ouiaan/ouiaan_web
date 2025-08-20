@@ -49,7 +49,7 @@ const TonalAnalysisCard = ({ title, analysis }: { title: TonalPaletteKey, analys
                         <span className="text-white text-sm font-mono">{analysis.color}</span>
                     </div>
                 </div>
-                 <p className="text-sm text-foreground/80 mt-4">{analysis.description}</p>
+                 <p className="text-base text-foreground/80 mt-4">{analysis.description}</p>
             </div>
         </BackgroundGradient>
     );
@@ -72,11 +72,11 @@ const HSLAnalysisCard = ({ adjustments }: { adjustments: HSLAdjustment[] }) => {
                 <React.Fragment key={adj.colorName}>
                     <div className="col-span-2 flex items-center gap-2">
                         <div className={cn("w-3 h-3 rounded-full", `bg-${adj.colorName.toLowerCase()}`)}></div>
-                        <span className="font-semibold text-sm">{adj.colorName}</span>
+                        <span className="font-semibold text-base">{adj.colorName}</span>
                     </div>
-                    <div className="font-mono text-accent text-sm text-center">{adj.hue}</div>
-                    <div className="font-mono text-accent text-sm text-center">{adj.saturation}</div>
-                    <div className="font-mono text-accent text-sm text-center col-span-2 md:col-span-1">{adj.luminance}</div>
+                    <div className="font-mono text-accent text-base text-center">{adj.hue}</div>
+                    <div className="font-mono text-accent text-base text-center">{adj.saturation}</div>
+                    <div className="font-mono text-accent text-base text-center col-span-2 md:col-span-1">{adj.luminance}</div>
                     <div className="hidden md:block col-span-3"></div>
                 </React.Fragment>
             ))}
@@ -104,15 +104,15 @@ const GeneralAnalysisCard = ({ analysis, toneCurve }: { analysis: WhiteBalance, 
         <div className="flex items-start gap-4">
           <Thermometer className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
           <div>
-            <h4 className="font-semibold text-foreground">Temperature</h4>
-            <p className="text-foreground/80 text-sm">{analysis.temperature}</p>
+            <h4 className="font-semibold text-foreground text-lg">Temperature</h4>
+            <p className="text-foreground/80 text-base">{analysis.temperature}</p>
           </div>
         </div>
         <div className="flex items-start gap-4">
           <Palette className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
           <div>
-            <h4 className="font-semibold text-foreground">Tint</h4>
-            <p className="text-foreground/80 text-sm">{analysis.tint}</p>
+            <h4 className="font-semibold text-foreground text-lg">Tint</h4>
+            <p className="text-foreground/80 text-base">{analysis.tint}</p>
           </div>
         </div>
         
@@ -120,8 +120,8 @@ const GeneralAnalysisCard = ({ analysis, toneCurve }: { analysis: WhiteBalance, 
         <div className="flex items-start gap-4">
           <Contrast className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
           <div>
-            <h4 className="font-semibold text-foreground">Tone Curve</h4>
-            <ul className="text-foreground/80 text-sm list-disc pl-5 mt-1 space-y-1">
+            <h4 className="font-semibold text-foreground text-lg">Tone Curve</h4>
+            <ul className="text-foreground/80 text-base list-disc pl-5 mt-1 space-y-1">
                 {toneCurve.map(point => (
                     <li key={point.point}>
                         <span className="font-semibold">{point.point}:</span> {point.adjustment}
@@ -334,55 +334,57 @@ export function ColorAIClient() {
       )}
 
       {results && (
-        <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 flex flex-col gap-12 max-w-4xl mx-auto">
+        <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12">
 
-            <div className="w-full flex flex-col items-center">
-                <h3 className="font-headline text-3xl mb-6">Your Color Grade Recipe</h3>
-            </div>
-            
-            <div className="w-full flex flex-col">
-              <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Palette/> Generated Palette</h3>
-              <div className="flex flex-wrap gap-4">
-                {results.colorPalette.map((color) => (
-                  <motion.div
-                    key={color}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                    className="w-20 h-20 rounded-md cursor-pointer relative group border border-border"
-                    style={{ backgroundColor: color }}
-                    onClick={() => copyToClipboard(color)}
-                  >
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                      <span className="text-white text-xs font-mono">{color}</span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-            
-            {results.whiteBalance && results.toneCurve && (
-              <div className="w-full">
-                <h3 className="font-headline text-2xl mb-4">General Analysis</h3>
-                <GeneralAnalysisCard analysis={results.whiteBalance} toneCurve={results.toneCurve} />
-              </div>
-            )}
-
-            <div className="w-full">
-                <h3 className="font-headline text-2xl mb-4">Tonal Analysis</h3>
-                <div className="grid md:grid-cols-3 gap-6">
-                    <TonalAnalysisCard title="shadows" analysis={results.tonalPalette.shadows} />
-                    <TonalAnalysisCard title="midtones" analysis={results.tonalPalette.midtones} />
-                    <TonalAnalysisCard title="highlights" analysis={results.tonalPalette.highlights} />
+            <div className="flex flex-col gap-12 max-w-4xl mx-auto">
+                <div className="w-full flex flex-col items-center">
+                    <h3 className="font-headline text-3xl mb-6">Your Color Grade Recipe</h3>
                 </div>
-            </div>
+                
+                <div className="w-full flex flex-col">
+                  <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Palette/> Generated Palette</h3>
+                  <div className="flex flex-wrap gap-4">
+                    {results.colorPalette.map((color) => (
+                      <motion.div
+                        key={color}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                        className="w-20 h-20 rounded-md cursor-pointer relative group border border-border"
+                        style={{ backgroundColor: color }}
+                        onClick={() => copyToClipboard(color)}
+                      >
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                          <span className="text-white text-xs font-mono">{color}</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
 
-            {results.hslAdjustments && (
-              <div className="w-full">
-                <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> HSL Analysis</h3>
-                <HSLAnalysisCard adjustments={results.hslAdjustments} />
-              </div>
-            )}
+                {results.whiteBalance && results.toneCurve && (
+                  <div className="w-full">
+                    <h3 className="font-headline text-2xl mb-4">General Analysis</h3>
+                    <GeneralAnalysisCard analysis={results.whiteBalance} toneCurve={results.toneCurve} />
+                  </div>
+                )}
+    
+                <div className="w-full">
+                    <h3 className="font-headline text-2xl mb-4">Tonal Analysis</h3>
+                    <div className="grid md:grid-cols-3 gap-6">
+                        <TonalAnalysisCard title="shadows" analysis={results.tonalPalette.shadows} />
+                        <TonalAnalysisCard title="midtones" analysis={results.tonalPalette.midtones} />
+                        <TonalAnalysisCard title="highlights" analysis={results.tonalPalette.highlights} />
+                    </div>
+                </div>
+    
+                {results.hslAdjustments && (
+                  <div className="w-full">
+                    <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> HSL Analysis</h3>
+                    <HSLAnalysisCard adjustments={results.hslAdjustments} />
+                  </div>
+                )}
+            </div>
               
         </motion.div>
       )}
@@ -390,3 +392,5 @@ export function ColorAIClient() {
     </div>
   );
 }
+
+    
