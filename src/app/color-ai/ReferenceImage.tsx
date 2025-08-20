@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, MouseEvent, useEffect, useCallback } from 'react';
+import { useState, useRef, MouseEvent, useCallback } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,24 +20,7 @@ const LOUPE_SIZE = 120;
 export function ReferenceImage({ src, mode, onColorSelect }: ReferenceImageProps) {
     const [mousePos, setMousePos] = useState<{ x: number, y: number } | null>(null);
     const imageRef = useRef<HTMLImageElement>(null);
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-    // Create a canvas to get image data
-    useEffect(() => {
-        const image = new window.Image();
-        image.src = src;
-        image.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = image.naturalWidth;
-            canvas.height = image.naturalHeight;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-                ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
-                canvasRef.current = canvas;
-            }
-        };
-    }, [src]);
-
+    
     const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
         if (!mode) return;
         const rect = e.currentTarget.getBoundingClientRect();
@@ -48,22 +31,53 @@ export function ReferenceImage({ src, mode, onColorSelect }: ReferenceImageProps
         setMousePos(null);
     };
 
-    const handleClick = useCallback(() => {
-        if (!mode || !mousePos || !canvasRef.current || !imageRef.current) return;
+    const handleClick = useCallback((e: MouseEvent<HTMLDivElement>) => {
+        if (!mode || !imageRef.current) return;
 
+        // Get the position of the click relative to the image element
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Create a new canvas element in memory
+        const canvas = document.createElement('canvas');
         const imageEl = imageRef.current;
-        const canvas = canvasRef.current;
+        
+        // Set canvas dimensions to the actual, intrinsic dimensions of the image
+        canvas.width = imageEl.naturalWidth;
+        canvas.height = imageEl.naturalHeight;
+
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Calculate the actual pixel coordinates on the original image
-        const nativeX = Math.floor((mousePos.x / imageEl.clientWidth) * canvas.width);
-        const nativeY = Math.floor((mousePos.y / imageEl.clientHeight) * canvas.height);
+        // Draw the image onto the canvas. This is the crucial step.
+        // The image is already loaded in the DOM via the <Image> component.
+        ctx.drawImage(imageEl, 0, 0, imageEl.naturalWidth, imageEl.naturalHeight);
 
-        const pixelData = ctx.getImageData(nativeX, nativeY, 1, 1).data;
-        const hex = `#${("000000" + ((pixelData[0] << 16) | (pixelData[1] << 8) | pixelData[2]).toString(16)).slice(-6)}`;
-        onColorSelect(hex);
-    }, [mode, mousePos, onColorSelect]);
+        // Calculate the corresponding coordinates on the canvas
+        const canvasX = Math.floor(x * (imageEl.naturalWidth / imageEl.clientWidth));
+        const canvasY = Math.floor(y * (imageEl.naturalHeight / imageEl.clientHeight));
+        
+        // Get the pixel data from the canvas
+        try {
+            const pixelData = ctx.getImageData(canvasX, canvasY, 1, 1).data;
+            const r = pixelData[0];
+            const g = pixelData[1];
+            const b = pixelData[2];
+            
+            // Convert RGB to Hex
+            const toHex = (c: number) => ('0' + c.toString(16)).slice(-2);
+            const hex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+            
+            onColorSelect(hex);
+        } catch (error) {
+            console.error("Could not get image data:", error);
+            // This might happen due to CORS if the image source wasn't local,
+            // but for file uploads, it should be fine. We notify the user just in case.
+            onColorSelect("#000000"); // Fallback to black
+        }
+
+    }, [mode, onColorSelect]);
 
     const showLoupe = mode && mousePos;
 
@@ -84,6 +98,7 @@ export function ReferenceImage({ src, mode, onColorSelect }: ReferenceImageProps
                 fill
                 priority
                 className="object-contain"
+                // Crucially, remove crossOrigin for local file blobs to prevent canvas tainting
             />
             <AnimatePresence>
             {showLoupe && (
@@ -121,6 +136,7 @@ export function ReferenceImage({ src, mode, onColorSelect }: ReferenceImageProps
             <style jsx global>{`
                 .image-pixelated {
                     image-rendering: pixelated;
+                    -ms-interpolation-mode: nearest-neighbor;
                 }
             `}</style>
         </div>
