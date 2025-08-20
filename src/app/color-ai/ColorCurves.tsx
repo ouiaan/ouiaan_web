@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 
 type TonalPalette = {
     shadows: string | null;
@@ -26,6 +26,9 @@ function hexToRgb(hex: string | null) {
 
 export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
     const uniqueId = useId();
+    const redGraphRef = useRef<SVGSVGElement>(null);
+    const greenGraphRef = useRef<SVGSVGElement>(null);
+    const blueGraphRef = useRef<SVGSVGElement>(null);
 
     useEffect(() => {
         const colors = {
@@ -78,11 +81,8 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
             return path;
         }
 
-        function addPoints(graphId: string, shadowVal: number, midtoneVal: number, highlightVal: number, color: string) {
-            const graph = document.getElementById(graphId);
-            if (!graph) return;
-            
-            graph.querySelectorAll('.point').forEach(p => p.remove());
+        function addPoints(svg: SVGSVGElement, shadowVal: number, midtoneVal: number, highlightVal: number, color: string) {
+            svg.querySelectorAll('.point').forEach(p => p.remove());
 
             const pointsData = [
                 { x: 64, y: shadowVal },
@@ -99,43 +99,46 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
                 dot.setAttribute("fill", "#222");
                 dot.setAttribute("stroke", color);
                 dot.setAttribute("stroke-width", "1.5");
-                
-                const svg = graph.querySelector('svg');
-                if (svg) {
-                    svg.appendChild(dot);
-                }
+                svg.appendChild(dot);
             });
         }
 
-        function drawGraphs() {
+        function drawGraph(svgRef: React.RefObject<SVGSVGElement>, values: {r: number, g: number, b: number}, channel: 'r' | 'g' | 'b', color: string) {
+            const svg = svgRef.current;
+            if (!svg) return;
+
+            const curvePath = createCurvePath(values.r, values.g, values.b);
+            const curveElement = svg.querySelector('path');
+            if (curveElement) {
+                curveElement.setAttribute('d', curvePath);
+            }
+            addPoints(svg, values.r, values.g, values.b, color);
+        }
+        
+        function drawAllGraphs() {
             if (!colors.shadows || !colors.midtones || !colors.highlights) return;
-
-            const redCurve = document.getElementById(`red-curve-${uniqueId}`);
-            if (redCurve) {
-                redCurve.setAttribute('d', createCurvePath(adjustedColors.shadows.r, adjustedColors.midtones.r, adjustedColors.highlights.r));
-                addPoints(`red-graph-${uniqueId}`, adjustedColors.shadows.r, adjustedColors.midtones.r, adjustedColors.highlights.r, '#ff4d4d');
+        
+            if (redGraphRef.current) {
+                const values = { r: adjustedColors.shadows.r, g: adjustedColors.midtones.r, b: adjustedColors.highlights.r };
+                drawGraph(redGraphRef, values, 'r', '#ff4d4d');
             }
-
-            const greenCurve = document.getElementById(`green-curve-${uniqueId}`);
-            if (greenCurve) {
-                greenCurve.setAttribute('d', createCurvePath(adjustedColors.shadows.g, adjustedColors.midtones.g, adjustedColors.highlights.g));
-                addPoints(`green-graph-${uniqueId}`, adjustedColors.shadows.g, adjustedColors.midtones.g, adjustedColors.highlights.g, '#4dff4d');
+            if (greenGraphRef.current) {
+                const values = { r: adjustedColors.shadows.g, g: adjustedColors.midtones.g, b: adjustedColors.highlights.g };
+                drawGraph(greenGraphRef, values, 'g', '#4dff4d');
             }
-
-            const blueCurve = document.getElementById(`blue-curve-${uniqueId}`);
-            if (blueCurve) {
-                blueCurve.setAttribute('d', createCurvePath(adjustedColors.shadows.b, adjustedColors.midtones.b, adjustedColors.highlights.b));
-                addPoints(`blue-graph-${uniqueId}`, adjustedColors.shadows.b, adjustedColors.midtones.b, adjustedColors.highlights.b, '#4d9dff');
+            if (blueGraphRef.current) {
+                const values = { r: adjustedColors.shadows.b, g: adjustedColors.midtones.b, b: adjustedColors.highlights.b };
+                drawGraph(blueGraphRef, values, 'b', '#4d9dff');
             }
         }
 
-        drawGraphs();
+        drawAllGraphs();
     }, [tonalPalette, uniqueId]);
 
-    const Graph = ({ id, color }: { id: string, color: string }) => (
+    const Graph = ({ graphRef, color }: { graphRef: React.RefObject<SVGSVGElement>, color: string }) => (
       <div className="graph-container">
-        <div className="graph" id={id}>
-          <svg className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
+        <div className="graph">
+          <svg ref={graphRef} className="w-full h-full" viewBox="0 0 255 255" preserveAspectRatio="none">
             <defs>
               <pattern id={`grid-${uniqueId}`} width="63.75" height="63.75" patternUnits="userSpaceOnUse">
                 <path d="M 63.75 0 L 0 0 0 63.75" fill="none" stroke="hsl(var(--border))" strokeWidth="0.5"/>
@@ -143,7 +146,7 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
             </defs>
             <rect width="255" height="255" fill={`url(#grid-${uniqueId})`} />
             <line x1="0" y1="255" x2="255" y2="0" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" strokeDasharray="3,3"/>
-            <path id={`curve-${id}`} d="" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+            <path d="" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
           </svg>
         </div>
       </div>
@@ -151,9 +154,9 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
 
     return (
         <div className="grid grid-cols-3 gap-4">
-            <Graph id={`red-graph-${uniqueId}`} color="#ff4d4d" />
-            <Graph id={`green-graph-${uniqueId}`} color="#4dff4d" />
-            <Graph id={`blue-graph-${uniqueId}`} color="#4d9dff" />
+            <Graph graphRef={redGraphRef} color="#ff4d4d" />
+            <Graph graphRef={greenGraphRef} color="#4dff4d" />
+            <Graph graphRef={blueGraphRef} color="#4d9dff" />
             <style jsx>{`
                 .graph-container {
                     background: hsl(var(--card));
