@@ -17,9 +17,9 @@ export default function Test2Page() {
     }
 
     const colors = {
-        shadows: hexToRgb('#2A342E'),   // s: #2A342E
-        midtones: hexToRgb('#7F735F'),  // m: #7F735F
-        highlights: hexToRgb('#DCD9D1') // h: #DCD9D1
+        shadows: hexToRgb('#132227'),   // s: #132227
+        midtones: hexToRgb('#9a948d'),  // m: #9a948d
+        highlights: hexToRgb('#e7e4df') // h: #e7e4df
     };
 
     if (!colors.shadows || !colors.midtones || !colors.highlights) {
