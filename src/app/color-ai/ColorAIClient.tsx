@@ -3,7 +3,7 @@
 
 import { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Wand2, Loader2, AlertCircle, FileImage, Replace, SlidersHorizontal, Palette, Thermometer, Contrast } from 'lucide-react';
+import { UploadCloud, Wand2, Loader2, AlertCircle, FileImage, SlidersHorizontal, Palette, Thermometer, Contrast } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -13,14 +13,13 @@ import { runGenerateGrade } from './actions';
 import type { GenerateColorGradeRecipeOutput } from '@/ai/flows/generate-color-palette';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { cn } from '@/lib/utils';
-import { ColorGradePreview } from './ColorGradePreview';
 import { ColorCurves } from './ColorCurves';
-
 
 type HSLAdjustment = GenerateColorGradeRecipeOutput['hslAdjustments'][0];
 type TonalPalette = GenerateColorGradeRecipeOutput['tonalPalette'];
 type TonalPaletteKey = keyof TonalPalette;
-type WhiteBalanceAnalysis = GenerateColorGradeRecipeOutput['whiteBalanceAnalysis'];
+type WhiteBalance = GenerateColorGradeRecipeOutput['whiteBalance'];
+
 
 const TonalAnalysisCard = ({ title, analysis }: { title: TonalPaletteKey, analysis: TonalPalette[TonalPaletteKey] }) => {
     const { toast } = useToast();
@@ -54,33 +53,49 @@ const TonalAnalysisCard = ({ title, analysis }: { title: TonalPaletteKey, analys
     );
 }
 
-const HSLAdjustmentCard = ({ adjustment }: { adjustment: HSLAdjustment }) => {
-    return (
-        <BackgroundGradient animate={true} containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
-            <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-md border border-border" style={{ backgroundColor: adjustment.hex }} />
-                <h4 className="font-headline text-xl text-foreground">{adjustment.colorName}</h4>
-            </div>
-            <div className="space-y-3 text-sm flex-grow">
-                <div className="flex justify-between items-center">
-                    <span className="text-foreground/80">Hue Shift:</span>
-                    <span className="font-mono text-accent">{adjustment.hueShift}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                    <span className="text-foreground/80">Saturation:</span>
-                    <span className="font-mono text-accent">{adjustment.saturation}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                    <span className="text-foreground/80">Luminance:</span>
-                    <span className="font-mono text-accent">{adjustment.luminance}</span>
-                </div>
-            </div>
-            <p className="text-xs text-foreground/60 mt-4 pt-4 border-t border-border/50">{adjustment.reasoning}</p>
-        </BackgroundGradient>
-    );
+const HSLAnalysisCard = ({ adjustments }: { adjustments: HSLAdjustment[] }) => {
+  return (
+    <BackgroundGradient animate={true} containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground p-6">
+        <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> HSL Analysis</h3>
+        <div className="grid grid-cols-4 md:grid-cols-8 gap-x-4 gap-y-2">
+            {/* Headers */}
+            <div className="font-bold text-foreground/70 text-xs uppercase tracking-wider col-span-2">Color</div>
+            <div className="font-bold text-foreground/70 text-xs uppercase tracking-wider text-center">H</div>
+            <div className="font-bold text-foreground/70 text-xs uppercase tracking-wider text-center">S</div>
+            <div className="font-bold text-foreground/70 text-xs uppercase tracking-wider text-center col-span-2 md:col-span-1">L</div>
+            <div className="hidden md:block font-bold text-foreground/70 text-xs uppercase tracking-wider col-span-3"></div>
+            
+            <div className="col-span-8 border-b border-border/50 my-1"></div>
+
+            {adjustments.map((adj) => (
+                <React.Fragment key={adj.colorName}>
+                    <div className="col-span-2 flex items-center gap-2">
+                        <div className={cn("w-3 h-3 rounded-full", `bg-${adj.colorName.toLowerCase()}`)}></div>
+                        <span className="font-semibold text-sm">{adj.colorName}</span>
+                    </div>
+                    <div className="font-mono text-accent text-sm text-center">{adj.hue}</div>
+                    <div className="font-mono text-accent text-sm text-center">{adj.saturation}</div>
+                    <div className="font-mono text-accent text-sm text-center col-span-2 md:col-span-1">{adj.luminance}</div>
+                    <div className="hidden md:block col-span-3"></div>
+                </React.Fragment>
+            ))}
+        </div>
+        {/* Temp style for colors. In a real app this would be in tailwind config */}
+        <style jsx>{`
+            .bg-reds { background-color: #ef4444; }
+            .bg-oranges { background-color: #f97316; }
+            .bg-yellows { background-color: #eab308; }
+            .bg-greens { background-color: #22c55e; }
+            .bg-aquas { background-color: #14b8a6; }
+            .bg-blues { background-color: #3b82f6; }
+            .bg-purples { background-color: #8b5cf6; }
+            .bg-magentas { background-color: #d946ef; }
+        `}</style>
+    </BackgroundGradient>
+  );
 };
 
-const WhiteBalanceCard = ({ analysis }: { analysis: WhiteBalanceAnalysis }) => {
+const WhiteBalanceCard = ({ analysis }: { analysis: WhiteBalance }) => {
   return (
     <BackgroundGradient animate={true} containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground p-6">
       <h3 className="font-headline text-2xl mb-4 text-center">General Analysis</h3>
@@ -99,17 +114,11 @@ const WhiteBalanceCard = ({ analysis }: { analysis: WhiteBalanceAnalysis }) => {
             <p className="text-foreground/80 text-sm">{analysis.tint}</p>
           </div>
         </div>
-        <div className="flex items-start gap-4">
-          <Contrast className="h-6 w-6 text-accent mt-1" />
-          <div>
-            <h4 className="font-semibold text-foreground">Contrast</h4>
-            <p className="text-foreground/80 text-sm">{analysis.contrast}</p>
-          </div>
-        </div>
       </div>
     </BackgroundGradient>
   );
 };
+
 
 const ImageUploader = ({ title, imagePreview, onFileChange, icon: Icon }: { title: string, imagePreview: string | null, onFileChange: (e: ChangeEvent<HTMLInputElement>) => void, icon: React.ElementType }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -166,9 +175,7 @@ const ImageUploader = ({ title, imagePreview, onFileChange, icon: Icon }: { titl
 
 
 export function ColorAIClient() {
-  const [sourceImageFile, setSourceImageFile] = useState<File | null>(null);
   const [referenceImageFile, setReferenceImageFile] = useState<File | null>(null);
-  const [sourceImagePreview, setSourceImagePreview] = useState<string | null>(null);
   const [referenceImagePreview, setReferenceImagePreview] = useState<string | null>(null);
 
   const [results, setResults] = useState<GenerateColorGradeRecipeOutput | null>(null);
@@ -201,10 +208,10 @@ export function ColorAIClient() {
   }
 
   const handleGenerate = () => {
-    if (!sourceImageFile || !referenceImageFile) {
+    if (!referenceImageFile) {
       toast({
-        title: 'Missing Images',
-        description: 'Please upload both a source and a reference image.',
+        title: 'Missing Image',
+        description: 'Please upload a reference image to analyze.',
         variant: 'destructive',
       });
       return;
@@ -214,13 +221,9 @@ export function ColorAIClient() {
       setError(null);
       setResults(null);
       try {
-        const [sourceBase64, referenceBase64] = await Promise.all([
-            fileToBase64(sourceImageFile),
-            fileToBase64(referenceImageFile)
-        ]);
+        const referenceBase64 = await fileToBase64(referenceImageFile);
 
         const response = await runGenerateGrade({
-          sourcePhotoDataUri: sourceBase64,
           referencePhotoDataUri: referenceBase64,
         });
 
@@ -251,31 +254,25 @@ export function ColorAIClient() {
     <div className="max-w-7xl mx-auto">
       <Card className="bg-card border-dashed border-2">
         <CardContent className="p-6">
-          <div className="grid md:grid-cols-2 gap-8 items-start">
-            <ImageUploader
-                title="Source Image"
-                imagePreview={sourceImagePreview}
-                onFileChange={handleFileChange(setSourceImageFile, setSourceImagePreview)}
-                icon={FileImage}
-            />
+          <div className="max-w-md mx-auto">
             <ImageUploader
                 title="Reference Image"
                 imagePreview={referenceImagePreview}
                 onFileChange={handleFileChange(setReferenceImageFile, setReferenceImagePreview)}
-                icon={Replace}
+                icon={FileImage}
             />
           </div>
           <div className="mt-8 flex justify-center">
-            <Button onClick={handleGenerate} disabled={isPending || !sourceImageFile || !referenceImageFile} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
+            <Button onClick={handleGenerate} disabled={isPending || !referenceImageFile} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
                 {isPending ? (
                 <span className="flex items-center justify-center font-bold text-lg">
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Generating...
+                    Analyzing...
                 </span>
                 ) : (
                 <span className="flex items-center justify-center font-bold text-lg">
                     <Wand2 className="mr-2 h-5 w-5" />
-                    Get Your Grade!
+                    Analyze Grade
                 </span>
                 )}
             </Button>
@@ -298,20 +295,20 @@ export function ColorAIClient() {
           </motion.div>
         )}
 
-        {results && sourceImagePreview && (
+        {results && (
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-12 flex flex-col gap-12">
 
             <div className="w-full flex flex-col items-center">
                 <h3 className="font-headline text-3xl mb-6">Your Color Grade Recipe</h3>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div className="grid lg:grid-cols-2 gap-8 items-start">
               {/* Left Column */}
-              <div className="flex flex-col gap-12">
+              <div className="flex flex-col gap-8">
                 
-                <div className="w-full flex flex-col items-center">
+                <div className="w-full flex flex-col">
                   <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Palette/> Generated Palette</h3>
-                  <div className="flex flex-wrap gap-4 justify-center">
+                  <div className="flex flex-wrap gap-4">
                     {results.colorPalette.map((color) => (
                       <motion.div
                         key={color}
@@ -331,7 +328,7 @@ export function ColorAIClient() {
                 </div>
 
                 <div className="w-full">
-                    <h3 className="font-headline text-2xl mb-4 text-center">Tonal Analysis</h3>
+                    <h3 className="font-headline text-2xl mb-4">Tonal Analysis</h3>
                     <div className="grid md:grid-cols-3 gap-6">
                         <TonalAnalysisCard title="shadows" analysis={results.tonalPalette.shadows} />
                         <TonalAnalysisCard title="midtones" analysis={results.tonalPalette.midtones} />
@@ -341,40 +338,26 @@ export function ColorAIClient() {
 
                 {results.hslAdjustments && (
                   <div className="w-full">
-                    <h3 className="font-headline text-2xl mb-4 text-center flex items-center justify-center gap-2"><SlidersHorizontal /> HSL Primary Color Analysis</h3>
-                    <div className="grid md:grid-cols-3 gap-6">
-                      {results.hslAdjustments.map((adj) => (
-                        <HSLAdjustmentCard key={adj.colorName} adjustment={adj} />
-                      ))}
-                    </div>
+                    <HSLAnalysisCard adjustments={results.hslAdjustments} />
                   </div>
                 )}
               </div>
 
               {/* Right Column */}
-              <div className="flex flex-col gap-12 items-center sticky top-24">
-                  <div className="w-full max-w-2xl">
-                    <h3 className="font-headline text-2xl mb-4 text-center">Preview</h3>
-                    <ColorGradePreview
-                      sourceImage={sourceImagePreview}
-                      recipe={results}
-                    />
-                  </div>
-
-                  {results.whiteBalanceAnalysis && (
-                     <div className="w-full max-w-2xl">
-                        <WhiteBalanceCard analysis={results.whiteBalanceAnalysis} />
+              <div className="flex flex-col gap-8 sticky top-24">
+                  {results.whiteBalance && (
+                     <div className="w-full">
+                        <WhiteBalanceCard analysis={results.whiteBalance} />
                      </div>
                   )}
 
                   {results.tonalPalette && (
-                    <div className="w-full max-w-2xl">
+                    <div className="w-full">
                         <h3 className="font-headline text-2xl mb-4 text-center">Tone Curve Analysis</h3>
                         <ColorCurves tonalPalette={results.tonalPalette} />
                     </div>
                   )}
               </div>
-
             </div>
 
           </motion.div>
@@ -383,5 +366,3 @@ export function ColorAIClient() {
     </div>
   );
 }
-
-    
