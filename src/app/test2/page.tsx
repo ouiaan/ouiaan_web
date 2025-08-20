@@ -18,7 +18,7 @@ export default function Test2Page() {
     // Values selected from the user's photo
     const colors = {
         shadows: hexToRgb('#2B2827'),   // Dark, warm brown from hair/curtains
-        midtones: hexToRgb('#B29B8E'),  // Natural skin tone
+        midtones: hexToRgb('#8A8784'),  // Neutral gray to preserve skin tones
         highlights: hexToRgb('#E8E1D3') // Warm off-white from ambient light
     };
 
