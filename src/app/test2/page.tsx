@@ -1,8 +1,10 @@
 
+
 'use client';
 
 import { useMemo } from 'react';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
+import { cn } from '@/lib/utils';
 
 // Converts hex to an RGB object
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
@@ -27,15 +29,14 @@ function createCurvePath(shadowVal: number, midtoneVal: number, highlightVal: nu
     let path = `M ${points[0].x},${points[0].y}`;
     
     for (let i = 0; i < points.length - 1; i++) {
-        // Correctly handle control points to prevent out-of-bounds access
-        const p0 = points[i === 0 ? 0 : i - 1];
+        const p0 = points[Math.max(0, i - 1)];
         const p1 = points[i];
         const p2 = points[i + 1];
-        const p3 = points[i + 2 < points.length ? points[i + 2] : p2];
-        
-        // Catmull-Rom to Cubic Bezier conversion
+        const p3 = points[Math.min(points.length - 1, i + 2)];
+
         const cp1x = p1.x + (p2.x - p0.x) / 6;
         const cp1y = p1.y + (p2.y - p0.y) / 6;
+
         const cp2x = p2.x - (p3.x - p1.x) / 6;
         const cp2y = p2.y - (p3.y - p1.y) / 6;
         
@@ -55,29 +56,30 @@ interface RgbCurveDisplayProps {
 }
 
 function RgbCurveDisplay({ colors }: RgbCurveDisplayProps) {
-    // This logic ensures we don't try to render if colors are incomplete.
-    // It's prepared for when the input is dynamic (from eyedroppers).
+
     const rgbValues = useMemo(() => {
         if (!colors.shadows || !colors.midtones || !colors.highlights) return null;
-        return {
-            shadows: hexToRgb(colors.shadows),
-            midtones: hexToRgb(colors.midtones),
-            highlights: hexToRgb(colors.highlights),
-        };
+        const shadows = hexToRgb(colors.shadows);
+        const midtones = hexToRgb(colors.midtones);
+        const highlights = hexToRgb(colors.highlights);
+
+        if (!shadows || !midtones || !highlights) return null;
+
+        return { shadows, midtones, highlights };
     }, [colors]);
 
     const redPath = useMemo(() => {
-        if (!rgbValues?.shadows || !rgbValues.midtones || !rgbValues.highlights) return "M 0,255 L 255,0";
+        if (!rgbValues) return "M 0,255 L 255,0";
         return createCurvePath(rgbValues.shadows.r, rgbValues.midtones.r, rgbValues.highlights.r);
     }, [rgbValues]);
     
     const greenPath = useMemo(() => {
-        if (!rgbValues?.shadows || !rgbValues.midtones || !rgbValues.highlights) return "M 0,255 L 255,0";
+        if (!rgbValues) return "M 0,255 L 255,0";
         return createCurvePath(rgbValues.shadows.g, rgbValues.midtones.g, rgbValues.highlights.g);
     }, [rgbValues]);
 
     const bluePath = useMemo(() => {
-        if (!rgbValues?.shadows || !rgbValues.midtones || !rgbValues.highlights) return "M 0,255 L 255,0";
+        if (!rgbValues) return "M 0,255 L 255,0";
         return createCurvePath(rgbValues.shadows.b, rgbValues.midtones.b, rgbValues.highlights.b);
     }, [rgbValues]);
 
@@ -102,9 +104,14 @@ function RgbCurveDisplay({ colors }: RgbCurveDisplayProps) {
         </BackgroundGradient>
     );
 
-    // Don't render if colors are incomplete
     if (!rgbValues) {
-        return null;
+        return (
+            <>
+                <div className="rounded-2xl bg-card text-card-foreground p-4 flex flex-col items-center gap-2 aspect-square justify-center text-muted-foreground">No color data</div>
+                <div className="rounded-2xl bg-card text-card-foreground p-4 flex flex-col items-center gap-2 aspect-square justify-center text-muted-foreground">No color data</div>
+                <div className="rounded-2xl bg-card text-card-foreground p-4 flex flex-col items-center gap-2 aspect-square justify-center text-muted-foreground">No color data</div>
+            </>
+        )
     }
 
     return (
@@ -118,8 +125,8 @@ function RgbCurveDisplay({ colors }: RgbCurveDisplayProps) {
 
 
 export default function Test2Page() {
-    // These values are the input. The logic is now prepared to handle
-    // them dynamically when they come from an external source like eyedroppers.
+    // These values simulate the input from the eyedroppers.
+    // The logic is now prepared to handle them dynamically.
     const sampleColors = {
         shadows: '#2B2827',
         midtones: '#8A8784',
