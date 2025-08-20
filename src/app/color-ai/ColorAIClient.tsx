@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition, ChangeEvent, useRef } from 'react';
+import React, { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
 import { UploadCloud, Wand2, Loader2, AlertCircle, FileImage, SlidersHorizontal, Palette, Thermometer, Contrast } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +18,7 @@ import { ColorCurves } from './ColorCurves';
 type HSLAdjustment = GenerateColorGradeRecipeOutput['hslAdjustments'][0];
 type TonalPalette = GenerateColorGradeRecipeOutput['tonalPalette'];
 type TonalPaletteKey = keyof TonalPalette;
+type ToneCurve = GenerateColorGradeRecipeOutput['toneCurve'];
 type WhiteBalance = GenerateColorGradeRecipeOutput['whiteBalance'];
 
 
@@ -95,25 +96,42 @@ const HSLAnalysisCard = ({ adjustments }: { adjustments: HSLAdjustment[] }) => {
   );
 };
 
-const WhiteBalanceCard = ({ analysis }: { analysis: WhiteBalance }) => {
+const GeneralAnalysisCard = ({ analysis, toneCurve }: { analysis: WhiteBalance, toneCurve: ToneCurve }) => {
   return (
     <BackgroundGradient animate={true} containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground p-6">
       <h3 className="font-headline text-2xl mb-4 text-center">General Analysis</h3>
-      <div className="space-y-4">
+      <div className="space-y-6">
+        {/* White Balance */}
         <div className="flex items-start gap-4">
-          <Thermometer className="h-6 w-6 text-accent mt-1" />
+          <Thermometer className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
           <div>
             <h4 className="font-semibold text-foreground">Temperature</h4>
             <p className="text-foreground/80 text-sm">{analysis.temperature}</p>
           </div>
         </div>
         <div className="flex items-start gap-4">
-          <Palette className="h-6 w-6 text-accent mt-1" />
+          <Palette className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
           <div>
             <h4 className="font-semibold text-foreground">Tint</h4>
             <p className="text-foreground/80 text-sm">{analysis.tint}</p>
           </div>
         </div>
+        
+        {/* Tone Curve */}
+        <div className="flex items-start gap-4">
+          <Contrast className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
+          <div>
+            <h4 className="font-semibold text-foreground">Tone Curve</h4>
+            <ul className="text-foreground/80 text-sm list-disc pl-5 mt-1 space-y-1">
+                {toneCurve.map(point => (
+                    <li key={point.point}>
+                        <span className="font-semibold">{point.point}:</span> {point.adjustment}
+                    </li>
+                ))}
+            </ul>
+          </div>
+        </div>
+
       </div>
     </BackgroundGradient>
   );
@@ -345,9 +363,9 @@ export function ColorAIClient() {
 
               {/* Right Column */}
               <div className="flex flex-col gap-8 sticky top-24">
-                  {results.whiteBalance && (
+                  {results.whiteBalance && results.toneCurve && (
                      <div className="w-full">
-                        <WhiteBalanceCard analysis={results.whiteBalance} />
+                        <GeneralAnalysisCard analysis={results.whiteBalance} toneCurve={results.toneCurve} />
                      </div>
                   )}
 
@@ -366,3 +384,4 @@ export function ColorAIClient() {
     </div>
   );
 }
+
