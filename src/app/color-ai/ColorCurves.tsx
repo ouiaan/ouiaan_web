@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useId, useRef } from 'react';
@@ -103,32 +104,32 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
             });
         }
 
-        function drawGraph(svgRef: React.RefObject<SVGSVGElement>, values: {r: number, g: number, b: number}, channel: 'r' | 'g' | 'b', color: string) {
+        function drawGraph(svgRef: React.RefObject<SVGSVGElement>, channelValues: { shadow: number, midtone: number, highlight: number }, color: string) {
             const svg = svgRef.current;
             if (!svg) return;
 
-            const curvePath = createCurvePath(values.r, values.g, values.b);
+            const curvePath = createCurvePath(channelValues.shadow, channelValues.midtone, channelValues.highlight);
             const curveElement = svg.querySelector('path');
             if (curveElement) {
                 curveElement.setAttribute('d', curvePath);
             }
-            addPoints(svg, values.r, values.g, values.b, color);
+            addPoints(svg, channelValues.shadow, channelValues.midtone, channelValues.highlight, color);
         }
         
         function drawAllGraphs() {
-            if (!colors.shadows || !colors.midtones || !colors.highlights) return;
+            if (!tonalPalette.shadows || !tonalPalette.midtones || !tonalPalette.highlights) return;
         
             if (redGraphRef.current) {
-                const values = { r: adjustedColors.shadows.r, g: adjustedColors.midtones.r, b: adjustedColors.highlights.r };
-                drawGraph(redGraphRef, values, 'r', '#ff4d4d');
+                const values = { shadow: adjustedColors.shadows.r, midtone: adjustedColors.midtones.r, highlight: adjustedColors.highlights.r };
+                drawGraph(redGraphRef, values, '#ff4d4d');
             }
             if (greenGraphRef.current) {
-                const values = { r: adjustedColors.shadows.g, g: adjustedColors.midtones.g, b: adjustedColors.highlights.g };
-                drawGraph(greenGraphRef, values, 'g', '#4dff4d');
+                const values = { shadow: adjustedColors.shadows.g, midtone: adjustedColors.midtones.g, highlight: adjustedColors.highlights.g };
+                drawGraph(greenGraphRef, values, '#4dff4d');
             }
             if (blueGraphRef.current) {
-                const values = { r: adjustedColors.shadows.b, g: adjustedColors.midtones.b, b: adjustedColors.highlights.b };
-                drawGraph(blueGraphRef, values, 'b', '#4d9dff');
+                const values = { shadow: adjustedColors.shadows.b, midtone: adjustedColors.midtones.b, highlight: adjustedColors.highlights.b };
+                drawGraph(blueGraphRef, values, '#4d9dff');
             }
         }
 
