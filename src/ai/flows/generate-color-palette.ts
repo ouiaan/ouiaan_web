@@ -80,7 +80,7 @@ You have a deep understanding of professional color grading principles, includin
         *   \`description\`: A professional analysis explaining the artistic choice behind this tint and how it contributes to the reference image's mood, considering the principles of cinematic color.
 
 3.  **Perform a Comprehensive HSL Analysis:** Deconstruct the image's color manipulation into the 8 primary HSL vectors used in professional software (DaVinci Resolve, Lightroom). For each of the 8 colors (Reds, Oranges, Yellows, Greens, Aquas, Blues, Purples, Magentas), analyze the image and determine the necessary adjustments to achieve its look from a neutral starting point.
-    *   Provide specific, numerical estimates for `hue`, `saturation`, and `luminance` shifts (e.g., '+8', '-15', '0'). These values represent the *grade* applied to the image.
+    *   Provide specific, numerical estimates for \`hue\`, \`saturation\`, and \`luminance\` shifts (e.g., '+8', '-15', '0'). These values represent the *grade* applied to the image.
 
 4.  **Analyze White Balance:**
     *   Describe the overall color temperature and tint. Provide specific, professional direction (e.g., "Warm, approx. 4500K", "Slight green tint, approx -12").
