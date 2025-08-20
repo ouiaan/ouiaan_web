@@ -60,6 +60,11 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
 
+  const [isMounted, setIsMounted] = React.useState(false);
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const NavLink = ({ href, label, className }: { href: string; label: string, className?: string }) => (
     <Link href={href} passHref>
       <span
@@ -133,46 +138,48 @@ export function Header() {
           </Link>
         </motion.div>
         {/* Desktop Navigation */}
-        <motion.nav
-          className="hidden items-center gap-8 md:flex"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
-        >
-          <NavLink href="/" label="Inicio" />
-
-          <div
-            onMouseEnter={() => setStoreMenuOpen(true)}
-            onMouseLeave={() => setStoreMenuOpen(false)}
-            className="relative"
+        {isMounted && (
+          <motion.nav
+            className="hidden items-center gap-8 md:flex"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
           >
-            <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
-              <DropdownMenuTrigger
-                className={cn(
-                  'group flex items-center gap-1 font-headline uppercase tracking-wider text-xl transition-colors duration-300 outline-none cursor-pointer',
-                  pathname.startsWith('/store')
-                    ? 'text-accent'
-                    : 'text-foreground/70 hover:text-foreground'
-                )}
-              >
-                Tienda
-                <ChevronDown className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent sideOffset={0}>
-                <DropdownMenuItem asChild>
-                  <Link href="/store/photo">Foto</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/store/video">Video</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+            <NavLink href="/" label="Inicio" />
 
-          {desktopNavLinks.map((link) => (
-            <NavLink key={link.href} href={link.href} label={link.label} />
-          ))}
-        </motion.nav>
+            <div
+              onMouseEnter={() => setStoreMenuOpen(true)}
+              onMouseLeave={() => setStoreMenuOpen(false)}
+              className="relative"
+            >
+              <DropdownMenu open={storeMenuOpen} onOpenChange={setStoreMenuOpen}>
+                <DropdownMenuTrigger
+                  className={cn(
+                    'group flex items-center gap-1 font-headline uppercase tracking-wider text-xl transition-colors duration-300 outline-none cursor-pointer',
+                    pathname.startsWith('/store')
+                      ? 'text-accent'
+                      : 'text-foreground/70 hover:text-foreground'
+                  )}
+                >
+                  Tienda
+                  <ChevronDown className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent sideOffset={0}>
+                  <DropdownMenuItem asChild>
+                    <Link href="/store/photo">Foto</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/store/video">Video</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {desktopNavLinks.map((link) => (
+              <NavLink key={link.href} href={link.href} label={link.label} />
+            ))}
+          </motion.nav>
+        )}
 
         {/* Mobile Navigation */}
         <div className="flex items-center md:hidden">
@@ -200,3 +207,5 @@ export function Header() {
     </motion.header>
   );
 }
+
+    
