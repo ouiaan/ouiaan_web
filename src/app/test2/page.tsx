@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect } from 'react';
@@ -16,11 +15,11 @@ export default function Test2Page() {
         } : null;
     }
 
-    // Values selected from the "Dog" photo
+    // Values selected from the "The Covenant" photo
     const colors = {
-        shadows: hexToRgb('#343A34'),   // Dark, desaturated green
-        midtones: hexToRgb('#BFAE9C'),  // Muted, warm beige
-        highlights: hexToRgb('#DEDCD7') // Soft, off-white
+        shadows: hexToRgb('#272C2B'),   // Cool, desaturated black
+        midtones: hexToRgb('#7E7364'),  // Muted, warm brown
+        highlights: hexToRgb('#C6BEAE') // Off-white, pale yellow
     };
 
     if (!colors.shadows || !colors.midtones || !colors.highlights) {
@@ -28,12 +27,8 @@ export default function Test2Page() {
         return;
     }
 
-    // This function maps an input value (0-255) to an output value based on the color curve.
-    // It uses Catmull-Rom interpolation to create a smooth curve.
+    // This function creates a smooth curve path based on the color points.
     function createCurve(shadowVal: number, midtoneVal: number, highlightVal: number) {
-        // Control points for the curve.
-        // Input values (X-axis) are fixed at 0, 64, 128, 192, 255.
-        // Output values (Y-axis) are based on the selected colors.
         const points = [
             { x: 0,   y: 0 },
             { x: 64,  y: shadowVal },
@@ -44,17 +39,15 @@ export default function Test2Page() {
 
         let path = `M ${points[0].x},${255 - points[0].y}`;
         
-        // Use Catmull-Rom to Cubic Bezier conversion logic for a smooth path
-        const tension = 0; // Use 0 for a standard Catmull-Rom spline, which passes through all points.
         for (let i = 0; i < points.length - 1; i++) {
             const p0 = points[i > 0 ? i - 1 : i];
             const p1 = points[i];
             const p2 = points[i + 1];
             const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
-
+            
+            const tension = 0; 
             const cp1x = p1.x + (p2.x - p0.x) / 6 * (1 - tension);
             const cp1y = 255 - (p1.y + (p2.y - p0.y) / 6 * (1 - tension));
-            
             const cp2x = p2.x - (p3.x - p1.x) / 6 * (1 - tension);
             const cp2y = 255 - (p2.y - (p3.y - p1.y) / 6 * (1 - tension));
             
@@ -79,9 +72,8 @@ export default function Test2Page() {
         points.forEach(point => {
             const dot = document.createElement('div');
             dot.className = 'point';
-            // Correctly map X and Y to left and bottom
             dot.style.left = `${(point.x / 255) * 100}%`;
-            dot.style.bottom = `${(point.y / 255) * 100}%`; // Direct mapping, no inversion
+            dot.style.bottom = `${(point.y / 255) * 100}%`;
             dot.style.color = color;
             graph.appendChild(dot);
         });
@@ -90,7 +82,6 @@ export default function Test2Page() {
     function drawGraphs() {
         if (!colors.shadows || !colors.midtones || !colors.highlights) return;
 
-        // Correctly pass the RGB values to the curve and point functions.
         const { shadows, midtones, highlights } = colors;
 
         const redCurve = document.getElementById('red-curve');
@@ -235,4 +226,3 @@ export default function Test2Page() {
   );
 }
 
-    
