@@ -1,8 +1,9 @@
 
+
 'use server';
 
 /**
- * @fileOverview An AI agent that analyzes the color grade of a single reference image.
+ * @fileOverview An AI agent that analyzes a reference image and user-selected tonal colors to generate a color grade recipe.
  *
  * - generateColorGradeRecipe - A function that analyzes a reference image and generates a color grading recipe.
  * - GenerateColorGradeRecipeInput - The input type for the generateColorGradeRecipe function.
@@ -18,12 +19,17 @@ const GenerateColorGradeRecipeInputSchema = z.object({
     .describe(
         "The reference image with the desired look (e.g., a still from a movie), as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+  userSelectedTones: z.object({
+    shadows: z.string().describe("The hex color for shadows, selected by the user with an eyedropper from the reference image."),
+    midtones: z.string().describe("The hex color for midtones, selected by the user with an eyedropper from the reference image."),
+    highlights: z.string().describe("The hex color for highlights, selected by the user with an eyedropper from the reference image."),
+  }).describe("The key tonal colors manually selected by the user."),
 });
 export type GenerateColorGradeRecipeInput = z.infer<typeof GenerateColorGradeRecipeInputSchema>;
 
 const TonalPaletteColorSchema = z.object({
   description: z.string().describe("A brief, professional analysis of why this color was chosen for this tonal range and its effect on the image's mood. Explain the artistic choice."),
-  color: z.string().describe("The hex code representing the tint for this tonal range, sampled directly from the reference image."),
+  color: z.string().describe("The hex code representing the tint for this tonal range, as provided by the user."),
 });
 
 const HSLAdjustmentSchema = z.object({
@@ -41,9 +47,9 @@ const ToneCurvePointSchema = z.object({
 const GenerateColorGradeRecipeOutputSchema = z.object({
   colorPalette: z.array(z.string()).describe('An array of 5 key color palette hex codes extracted from the REFERENCE image.'),
   tonalPalette: z.object({
-      shadows: TonalPaletteColorSchema.describe("The generated color and analysis for the shadows (darkest areas) to match the reference."),
-      midtones: TonalPaletteColorSchema.describe("The generated color and analysis for the midtones (middle grey areas) to match the reference."),
-      highlights: TonalPaletteColorSchema.describe("The generated color and analysis for the highlights (brightest areas) to match the reference."),
+      shadows: TonalPaletteColorSchema.describe("The user-selected color and AI analysis for the shadows."),
+      midtones: TonalPaletteColorSchema.describe("The user-selected color and AI analysis for the midtones."),
+      highlights: TonalPaletteColorSchema.describe("The user-selected color and AI analysis for the highlights."),
     }).describe("A 3-color palette representing the color tint in the shadows, midtones, and highlights of the reference image."),
   hslAdjustments: z.array(HSLAdjustmentSchema).length(8).describe("An array of actionable HSL (Hue, Saturation, Luminance) adjustment recommendations for all 8 primary color ranges, similar to a professional editing tool."),
   toneCurve: z.array(ToneCurvePointSchema).length(5).describe("An analysis of the tone curve adjustments required to match the contrast and exposure of the source image to the reference image."),
@@ -62,24 +68,29 @@ const prompt = ai.definePrompt({
   name: 'generateColorGradeRecipePrompt',
   input: {schema: GenerateColorGradeRecipeInputSchema},
   output: {schema: GenerateColorGradeRecipeOutputSchema},
-  prompt: `You are a world-class colorist and digital image technician (DIT). Your task is to analyze a single "Reference" image (e.g. a movie frame) and deconstruct its color grade into a precise, actionable recipe.
+  prompt: `You are a world-class colorist and digital image technician (DIT). Your task is to analyze a "Reference" image and a set of user-selected colors to generate a precise, actionable color grading recipe.
 
-You have a deep understanding of professional color grading principles, including the characteristics of digital cinema cameras (like ARRI, RED) and classic film stocks (like Kodak and Fuji). You must act as an analysis tool, not a creative one.
+You have a deep understanding of professional color grading principles, including the characteristics of digital cinema cameras (like ARRI, RED) and classic film stocks (like Kodak and Fuji). You must act as an analysis tool that expands on the user's initial selections.
 
 **Core Color Grading Principles to follow:**
 - **Anchor Points:** Professionally graded images maintain clean anchor points. Deep blacks should be truly black (or near-black) and peak whites should be white, without color contamination. The "look" is created in the tones between.
 - **Cinematic Tinting:** The mood is primarily created by introducing specific, subtle color tints into the **shadows** and **midtones**. Highlights are generally kept clean or have a very slight, motivated tint to avoid an amateurish, "filtered" look.
 
-**Your Task:**
+**USER-PROVIDED DATA:**
+The user has already used an eyedropper tool on the reference image to select the following key tonal colors:
+- **Shadows Color:** {{{userSelectedTones.shadows}}}
+- **Midtones Color:** {{{userSelectedTones.midtones}}}
+- **Highlights Color:** {{{userSelectedTones.highlights}}}
 
-1.  **Extract a General Palette:** Analyze the **Reference image** and extract an array of 5 key color palette hex codes that represent the overall aesthetic.
+**YOUR TASK:**
 
-2.  **Analyze the Tonal Palette (Precise Eyedropper Task):** This is critical. You must act as a precise color eyedropper tool. Sample the **Reference Image** to determine the exact color tint applied to its shadows, midtones, and highlights.
-    *   For each tonal range (Shadows, Midtones, Highlights), you MUST provide:
-        *   \`color\`: The exact hex code of the tint you sampled from the Reference image's respective tonal range. If the shadows have a clear blue cast, sample that blue and provide its hex code. Do not guess or average; find a representative pixel.
-        *   \`description\`: A professional analysis explaining the artistic choice behind this tint and how it contributes to the reference image's mood, considering the principles of cinematic color.
+1.  **Extract a General Palette:** Analyze the overall **Reference image** and extract an array of 5 key color palette hex codes that represent the overall aesthetic.
 
-3.  **Perform a Comprehensive HSL Analysis:** Deconstruct the image's color manipulation into the 8 primary HSL vectors used in professional software (DaVinci Resolve, Lightroom). For each of the 8 colors (Reds, Oranges, Yellows, Greens, Aquas, Blues, Purples, Magentas), analyze the image and determine the necessary adjustments to achieve its look from a neutral starting point.
+2.  **Analyze and Justify the Tonal Palette:** The user has provided the key colors. Your job is to act as the expert colorist and explain *why* these choices are effective. For each tonal range (Shadows, Midtones, Highlights):
+    *   Use the hex code provided by the user as the 'color' value.
+    *   Provide a professional 'description' analyzing the artistic choice behind this tint and how it contributes to the reference image's mood, considering the principles of cinematic color. For example, explain how the selected blue in the shadows creates a cold, somber mood.
+
+3.  **Perform a Comprehensive HSL Analysis:** Based on the overall look of the reference image, deconstruct its color manipulation into the 8 primary HSL vectors used in professional software (DaVinci Resolve, Lightroom). For each of the 8 colors (Reds, Oranges, Yellows, Greens, Aquas, Blues, Purples, Magentas), analyze the image and determine the necessary adjustments to achieve its look from a neutral starting point.
     *   Provide specific, numerical estimates for \`hue\`, \`saturation\`, and \`luminance\` shifts (e.g., '+8', '-15', '0'). These values represent the *grade* applied to the image.
 
 4.  **Analyze White Balance:**
@@ -88,7 +99,7 @@ You have a deep understanding of professional color grading principles, includin
 5.  **Analyze Tone Curve:**
     *   Describe the adjustments on a 5-point tone curve (Blacks, Shadows, Midtones, Highlights, Whites). Pay attention to cinematic principles. For each point, describe the adjustment (e.g., "Blacks: Crushed significantly to create a deep, rich black point", "Highlights: Rolled off gently to create a softer, filmic look").
 
-**Input:**
+**Input Image:**
 *   **Reference Image:** {{media url=referencePhotoDataUri}}
 
 Respond in JSON format.`,
@@ -102,6 +113,16 @@ const generateColorPaletteFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    
+    if (!output) {
+      throw new Error("AI failed to return a response.");
+    }
+    
+    // Ensure the output includes the user-selected colors.
+    output.tonalPalette.shadows.color = input.userSelectedTones.shadows;
+    output.tonalPalette.midtones.color = input.userSelectedTones.midtones;
+    output.tonalPalette.highlights.color = input.userSelectedTones.highlights;
+    
+    return output;
   }
 );

@@ -1,19 +1,21 @@
 
+
 'use client';
 
 import React, { useState, useTransition, ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Wand2, Loader2, AlertCircle, FileImage, SlidersHorizontal, Palette, Thermometer, Contrast } from 'lucide-react';
+import { Wand2, Loader2, AlertCircle, SlidersHorizontal, Palette, Thermometer, Contrast, UploadCloud, Pipette } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { runGenerateGrade } from './actions';
-import type { GenerateColorGradeRecipeOutput } from '@/ai/flows/generate-color-palette';
+import type { GenerateColorGradeRecipeOutput, GenerateColorGradeRecipeInput } from '@/ai/flows/generate-color-palette';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { cn } from '@/lib/utils';
 import { ColorCurves } from './ColorCurves';
+import { ReferenceImage, type EyedropperMode } from './ReferenceImage';
 
 type HSLAdjustment = GenerateColorGradeRecipeOutput['hslAdjustments'][0];
 type TonalPalette = GenerateColorGradeRecipeOutput['tonalPalette'];
@@ -137,82 +139,49 @@ const GeneralAnalysisCard = ({ analysis, toneCurve }: { analysis: WhiteBalance, 
   );
 };
 
-
-const ImageUploader = ({ title, imagePreview, onFileChange, icon: Icon }: { title: string, imagePreview: string | null, onFileChange: (e: ChangeEvent<HTMLInputElement>) => void, icon: React.ElementType }) => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    return (
-        <div className="flex flex-col items-center gap-4 w-full">
-            <h3 className="font-headline text-2xl flex items-center gap-2 text-foreground/80"><Icon className="h-6 w-6"/> {title}</h3>
-            <div
-                className={cn(
-                    "relative flex flex-col items-center justify-center p-4 border-2 border-dashed border-border rounded-lg h-[250px] w-full cursor-pointer hover:bg-secondary transition-colors"
-                )}
-                onClick={() => fileInputRef.current?.click()}
-            >
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={onFileChange}
-                  className="hidden"
-                  accept="image/png, image/jpeg"
-                />
-                 <AnimatePresence>
-                  {imagePreview ? (
-                     <motion.div
-                       key="image"
-                       initial={{ opacity: 0, scale: 0.8 }}
-                       animate={{ opacity: 1, scale: 1 }}
-                       exit={{ opacity: 0, scale: 0.8 }}
-                       className="absolute inset-0 p-2"
-                     >
-                       <Image
-                         src={imagePreview}
-                         alt={`${title} preview`}
-                         fill
-                         style={{ objectFit: 'contain' }}
-                         className="rounded-lg"
-                       />
-                     </motion.div>
-                  ) : (
-                    <motion.div
-                      key="placeholder"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="absolute flex flex-col items-center justify-center text-center text-muted-foreground"
-                    >
-                      <UploadCloud className="h-10 w-10 mb-2" />
-                      <p>Click to upload</p>
-                    </motion.div>
-                  )}
-                 </AnimatePresence>
-            </div>
-        </div>
-    );
-};
-
-
 export function ColorAIClient() {
   const [referenceImageFile, setReferenceImageFile] = useState<File | null>(null);
   const [referenceImagePreview, setReferenceImagePreview] = useState<string | null>(null);
+  
+  const [eyedropperMode, setEyedropperMode] = useState<EyedropperMode>(null);
+  const [selectedColors, setSelectedColors] = useState<{[key in EyedropperMode as string]: string | null}>({
+    shadows: null,
+    midtones: null,
+    highlights: null,
+  });
 
   const [results, setResults] = useState<GenerateColorGradeRecipeOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (setter: (file: File | null) => void, previewSetter: (url: string | null) => void) => (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      setter(selectedFile);
+      setReferenceImageFile(selectedFile);
       setResults(null);
       setError(null);
+      setEyedropperMode(null);
+      setSelectedColors({ shadows: null, midtones: null, highlights: null });
+      
       const reader = new FileReader();
       reader.onloadend = () => {
-        previewSetter(reader.result as string);
+        setReferenceImagePreview(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const handleColorSelect = (color: string) => {
+    if (eyedropperMode) {
+      setSelectedColors(prev => ({...prev, [eyedropperMode]: color}));
+      toast({
+        title: `${eyedropperMode.charAt(0).toUpperCase() + eyedropperMode.slice(1)} Color Selected`,
+        description: `Set to ${color}`,
+      });
+      setEyedropperMode(null); // Exit eyedropper mode after selection
     }
   };
 
@@ -226,10 +195,10 @@ export function ColorAIClient() {
   }
 
   const handleGenerate = () => {
-    if (!referenceImageFile) {
+    if (!referenceImageFile || !selectedColors.shadows || !selectedColors.midtones || !selectedColors.highlights) {
       toast({
-        title: 'Missing Image',
-        description: 'Please upload a reference image to analyze.',
+        title: 'Missing Inputs',
+        description: 'Please upload a reference image and select colors for shadows, midtones, and highlights.',
         variant: 'destructive',
       });
       return;
@@ -241,9 +210,16 @@ export function ColorAIClient() {
       try {
         const referenceBase64 = await fileToBase64(referenceImageFile);
 
-        const response = await runGenerateGrade({
+        const input: GenerateColorGradeRecipeInput = {
           referencePhotoDataUri: referenceBase64,
-        });
+          userSelectedTones: {
+            shadows: selectedColors.shadows!,
+            midtones: selectedColors.midtones!,
+            highlights: selectedColors.highlights!,
+          }
+        };
+
+        const response = await runGenerateGrade(input);
 
         if (response && 'error' in response) {
           setError(response.error);
@@ -267,34 +243,80 @@ export function ColorAIClient() {
       description: `Color ${text} copied.`,
     });
   }
+  
+  const allColorsSelected = selectedColors.shadows && selectedColors.midtones && selectedColors.highlights;
 
   return (
     <div className="max-w-7xl mx-auto">
       <Card className="bg-card border-dashed border-2">
         <CardContent className="p-6">
-          <div className="max-w-md mx-auto">
-            <ImageUploader
-                title="Reference Image"
-                imagePreview={referenceImagePreview}
-                onFileChange={handleFileChange(setReferenceImageFile, setReferenceImagePreview)}
-                icon={FileImage}
-            />
-          </div>
-          <div className="mt-8 flex justify-center">
-            <Button onClick={handleGenerate} disabled={isPending || !referenceImageFile} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
-                {isPending ? (
-                <span className="flex items-center justify-center font-bold text-lg">
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Analyzing...
-                </span>
-                ) : (
-                <span className="flex items-center justify-center font-bold text-lg">
-                    <Wand2 className="mr-2 h-5 w-5" />
-                    Analyze Grade
-                </span>
-                )}
-            </Button>
-          </div>
+          
+          {!referenceImagePreview && (
+            <div
+                className="relative flex flex-col items-center justify-center p-4 border-2 border-dashed border-border rounded-lg h-[250px] w-full cursor-pointer hover:bg-secondary transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+            >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  accept="image/png, image/jpeg"
+                />
+                <div className="absolute flex flex-col items-center justify-center text-center text-muted-foreground">
+                    <UploadCloud className="h-10 w-10 mb-2" />
+                    <p>Click to upload Reference Image</p>
+                </div>
+            </div>
+          )}
+
+          {referenceImagePreview && (
+            <div className="grid md:grid-cols-2 gap-8 items-start">
+              <ReferenceImage 
+                src={referenceImagePreview} 
+                mode={eyedropperMode} 
+                onColorSelect={handleColorSelect} 
+              />
+              <div className="flex flex-col gap-4">
+                <h3 className="font-headline text-2xl">Eyedropper Tool</h3>
+                <p className="text-muted-foreground">Click a button, then click on the image to select the corresponding color tint.</p>
+                <div className="space-y-3">
+                  {(['shadows', 'midtones', 'highlights'] as const).map(mode => (
+                    <div key={mode} className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
+                      <Button 
+                        variant={eyedropperMode === mode ? 'default' : 'outline'}
+                        onClick={() => setEyedropperMode(mode)} 
+                        className="w-full justify-start gap-2"
+                      >
+                        <Pipette className="w-5 h-5" />
+                        Pick {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                      </Button>
+                      <div 
+                        className="w-10 h-10 rounded-md border-2" 
+                        style={{ backgroundColor: selectedColors[mode] || 'transparent' }}
+                      ></div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-8 flex justify-center">
+                  <Button onClick={handleGenerate} disabled={isPending || !allColorsSelected} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 w-full max-w-xs">
+                      {isPending ? (
+                      <span className="flex items-center justify-center font-bold text-lg">
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Analyzing...
+                      </span>
+                      ) : (
+                      <span className="flex items-center justify-center font-bold text-lg">
+                          <Wand2 className="mr-2 h-5 w-5" />
+                          Analyze Grade
+                      </span>
+                      )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -384,4 +406,3 @@ export function ColorAIClient() {
     </div>
   );
 }
-
