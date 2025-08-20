@@ -17,9 +17,9 @@ export default function Test2Page() {
     }
 
     const colors = {
-        shadows: hexToRgb('#132227'),   // s: #132227
-        midtones: hexToRgb('#9a948d'),  // m: #9a948d
-        highlights: hexToRgb('#e7e4df') // h: #e7e4df
+        shadows: hexToRgb('#132227'),   // R:19, G:34, B:39 -> Red is lowest, adds Cyan/Green tint
+        midtones: hexToRgb('#9a948d'),  // R:154, G:148, B:141 -> Relatively neutral
+        highlights: hexToRgb('#e7e4df') // R:231, G:228, B:223 -> Red is highest, adds warm/orange tint
     };
 
     if (!colors.shadows || !colors.midtones || !colors.highlights) {
@@ -27,64 +27,50 @@ export default function Test2Page() {
         return;
     }
 
-    // Adjustment function to soften the curve points.
-    // A higher factor means a more subtle effect (closer to the neutral diagonal).
-    function adjustToDiagonal(original: {r: number, g: number, b: number}, factor = 0.60) {
-        return {
-            r: Math.round(original.r + (128 - original.r) * factor),
-            g: Math.round(original.g + (128 - original.g) * factor),
-            b: Math.round(original.b + (128 - original.b) * factor)
-        };
-    }
-
-    const adjustedColors = {
-        shadows: adjustToDiagonal(colors.shadows),
-        midtones: adjustToDiagonal(colors.midtones),
-        highlights: adjustToDiagonal(colors.highlights)
-    };
-    
-    // Generates a smooth Cubic Bezier spline through all points.
-    function createCurvePath(shadowVal: number, midtoneVal: number, highlightVal: number) {
+    // This function maps an input value (0-255) to an output value based on the color curve.
+    // It uses Catmull-Rom interpolation to create a smooth curve.
+    function createCurve(shadowVal: number, midtoneVal: number, highlightVal: number) {
+        // Control points for the curve.
+        // Input values (X-axis) are fixed at 0, 64, 128, 192, 255.
+        // Output values (Y-axis) are based on the selected colors.
         const points = [
-            { x: 0, y: 255 },
-            { x: 64, y: 255 - shadowVal },
-            { x: 128, y: 255 - midtoneVal },
-            { x: 192, y: 255 - highlightVal },
-            { x: 255, y: 0 }
+            { x: 0,   y: 0 },
+            { x: 64,  y: shadowVal },
+            { x: 128, y: midtoneVal },
+            { x: 192, y: highlightVal },
+            { x: 255, y: 255 }
         ];
 
-        let path = `M ${points[0].x} ${points[0].y}`;
+        let path = `M ${points[0].x},${255 - points[0].y}`;
         
-        // Catmull-Rom to Cubic Bezier conversion logic
-        const tension = 0.5; // Adjust this for more or less curve smoothness
+        // Use Catmull-Rom to Cubic Bezier conversion logic for a smooth path
+        const tension = 0; // Use 0 for a standard Catmull-Rom spline, which passes through all points.
         for (let i = 0; i < points.length - 1; i++) {
             const p0 = points[i > 0 ? i - 1 : i];
             const p1 = points[i];
             const p2 = points[i + 1];
             const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
 
-            const cp1x = p1.x + (p2.x - p0.x) / 6 * tension;
-            const cp1y = p1.y + (p2.y - p0.y) / 6 * tension;
+            const cp1x = p1.x + (p2.x - p0.x) / 6 * (1 - tension);
+            const cp1y = 255 - (p1.y + (p2.y - p0.y) / 6 * (1 - tension));
             
-            const cp2x = p2.x - (p3.x - p1.x) / 6 * tension;
-            const cp2y = p2.y - (p3.y - p1.y) / 6 * tension;
+            const cp2x = p2.x - (p3.x - p1.x) / 6 * (1 - tension);
+            const cp2y = 255 - (p2.y - (p3.y - p1.y) / 6 * (1 - tension));
             
-            path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
+            path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${255 - p2.y}`;
         }
         
         return path;
     }
 
-
     function addPoints(graphId: string, shadowVal: number, midtoneVal: number, highlightVal: number, color: string) {
         const graph = document.getElementById(graphId);
         if (!graph) return;
         
-        // Clear existing points before adding new ones
         graph.querySelectorAll('.point').forEach(p => p.remove());
 
         const points = [
-            { x: 64, y: shadowVal },
+            { x: 64,  y: shadowVal },
             { x: 128, y: midtoneVal },
             { x: 192, y: highlightVal }
         ];
@@ -92,8 +78,9 @@ export default function Test2Page() {
         points.forEach(point => {
             const dot = document.createElement('div');
             dot.className = 'point';
+            // Correctly map X and Y to left and bottom
             dot.style.left = `${(point.x / 255) * 100}%`;
-            dot.style.bottom = `${(point.y / 255) * 100}%`;
+            dot.style.bottom = `${(point.y / 255) * 100}%`; // Direct mapping, no inversion
             dot.style.color = color;
             graph.appendChild(dot);
         });
@@ -102,22 +89,25 @@ export default function Test2Page() {
     function drawGraphs() {
         if (!colors.shadows || !colors.midtones || !colors.highlights) return;
 
+        // Correctly pass the RGB values to the curve and point functions.
+        const { shadows, midtones, highlights } = colors;
+
         const redCurve = document.getElementById('red-curve');
         if (redCurve) {
-            redCurve.setAttribute('d', createCurvePath(adjustedColors.shadows.r, adjustedColors.midtones.r, adjustedColors.highlights.r));
-            addPoints('red-graph', adjustedColors.shadows.r, adjustedColors.midtones.r, adjustedColors.highlights.r, '#ff4d4d');
+            redCurve.setAttribute('d', createCurve(shadows.r, midtones.r, highlights.r));
+            addPoints('red-graph', shadows.r, midtones.r, highlights.r, '#ff4d4d');
         }
 
         const greenCurve = document.getElementById('green-curve');
         if (greenCurve) {
-            greenCurve.setAttribute('d', createCurvePath(adjustedColors.shadows.g, adjustedColors.midtones.g, adjustedColors.highlights.g));
-            addPoints('green-graph', adjustedColors.shadows.g, adjustedColors.midtones.g, adjustedColors.highlights.g, '#4dff4d');
+            greenCurve.setAttribute('d', createCurve(shadows.g, midtones.g, highlights.g));
+            addPoints('green-graph', shadows.g, midtones.g, highlights.g, '#4dff4d');
         }
 
         const blueCurve = document.getElementById('blue-curve');
         if (blueCurve) {
-            blueCurve.setAttribute('d', createCurvePath(adjustedColors.shadows.b, adjustedColors.midtones.b, adjustedColors.highlights.b));
-            addPoints('blue-graph', adjustedColors.shadows.b, adjustedColors.midtones.b, adjustedColors.highlights.b, '#4d9dff');
+            blueCurve.setAttribute('d', createCurve(shadows.b, midtones.b, highlights.b));
+            addPoints('blue-graph', shadows.b, midtones.b, highlights.b, '#4d9dff');
         }
     }
 
@@ -130,98 +120,112 @@ export default function Test2Page() {
         .graph-page-container {
             font-family: Arial, sans-serif;
             background: #1a1a1a;
+            color: #f0f0f0;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            gap: 15px;
         }
         .graph-container {
-            background: #222;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 15px;
-            width: 280px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            background: #282828;
+            border-radius: 8px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 1px solid #333;
+        }
+        .graph-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
         }
         .graph {
             width: 100%;
-            height: 200px;
+            padding-bottom: 100%; /* Create a square aspect ratio */
             position: relative;
-            background: #222;
+            background: #202020;
+            border-radius: 4px;
         }
         .grid {
             position: absolute;
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(to right, #333 1px, transparent 1px),
-                linear-gradient(to bottom, #333 1px, transparent 1px);
-            background-size: 25% 33.33%;
-            background-position: 0 0, 0 0;
+                linear-gradient(to right, #383838 1px, transparent 1px),
+                linear-gradient(to bottom, #383838 1px, transparent 1px);
+            background-size: 25% 25%;
         }
-        .curve {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-        .point {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            transform: translate(-50%, 50%);
-            background: #222;
-            border: 2px solid currentColor;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.5);
-            z-index: 2;
-        }
-        .diagonal-line {
+        .curve-svg, .diagonal-line-svg {
             position: absolute;
             width: 100%;
             height: 100%;
             top: 0;
             left: 0;
-            pointer-events: none;
+        }
+        .point {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            transform: translate(-50%, 50%); /* Center the point on the coordinate */
+            background: #282828;
+            border: 2px solid currentColor;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+        .diagonal-line {
+            stroke: #555;
+            stroke-width: 1.5;
+        }
+        .color-curve {
+            fill: none;
+            stroke-width: 2.2;
+            stroke-linecap: round;
         }
       `}</style>
       <div className="graph-page-container">
         {/* Red Graph */}
         <div className="graph-container">
+            <h3 className="graph-title" style={{ color: '#ff4d4d' }}>Red Channel</h3>
             <div className="graph" id="red-graph">
                 <div className="grid"></div>
-                <svg className="diagonal-line" viewBox="0 0 255 255" preserveAspectRatio="none">
-                    <line x1="0" y1="255" x2="255" y2="0" stroke="#444" strokeWidth="1"/>
+                <svg className="diagonal-line-svg" viewBox="0 0 255 255" preserveAspectRatio="none">
+                    <line className="diagonal-line" x1="0" y1="255" x2="255" y2="0"/>
                 </svg>
-                <svg className="curve" viewBox="0 0 255 255" preserveAspectRatio="none">
-                    <path id="red-curve" d="" fill="none" stroke="#ff4d4d" strokeWidth="1.8" strokeLinecap="round"/>
+                <svg className="curve-svg" viewBox="0 0 255 255" preserveAspectRatio="none">
+                    <path id="red-curve" className="color-curve" d="" stroke="#ff4d4d"/>
                 </svg>
             </div>
         </div>
 
         {/* Green Graph */}
         <div className="graph-container">
+            <h3 className="graph-title" style={{ color: '#4dff4d' }}>Green Channel</h3>
             <div className="graph" id="green-graph">
                 <div className="grid"></div>
-                <svg className="diagonal-line" viewBox="0 0 255 255" preserveAspectRatio="none">
-                    <line x1="0" y1="255" x2="255" y2="0" stroke="#444" strokeWidth="1"/>
+                <svg className="diagonal-line-svg" viewBox="0 0 255 255" preserveAspectRatio="none">
+                    <line className="diagonal-line" x1="0" y1="255" x2="255" y2="0"/>
                 </svg>
-                <svg className="curve" viewBox="0 0 255 255" preserveAspectRatio="none">
-                    <path id="green-curve" d="" fill="none" stroke="#4dff4d" strokeWidth="1.8" strokeLinecap="round"/>
+                <svg className="curve-svg" viewBox="0 0 255 255" preserveAspectRatio="none">
+                    <path id="green-curve" className="color-curve" d="" stroke="#4dff4d"/>
                 </svg>
             </div>
         </div>
 
         {/* Blue Graph */}
         <div className="graph-container">
+            <h3 className="graph-title" style={{ color: '#4d9dff' }}>Blue Channel</h3>
             <div className="graph" id="blue-graph">
                 <div className="grid"></div>
-                <svg className="diagonal-line" viewBox="0 0 255 255" preserveAspectRatio="none">
-                    <line x1="0" y1="255" x2="255" y2="0" stroke="#444" strokeWidth="1"/>
+                <svg className="diagonal-line-svg" viewBox="0 0 255 255" preserveAspectRatio="none">
+                    <line className="diagonal-line" x1="0" y1="255" x2="255" y2="0"/>
                 </svg>
-                <svg className="curve" viewBox="0 0 255 255" preserveAspectRatio="none">
-                    <path id="blue-curve" d="" fill="none" stroke="#4d9dff" strokeWidth="1.8" strokeLinecap="round"/>
+                <svg className="curve-svg" viewBox="0 0 255 255" preserveAspectRatio="none">
+                    <path id="blue-curve" className="color-curve" d="" stroke="#4d9dff"/>
                 </svg>
             </div>
         </div>
@@ -229,3 +233,5 @@ export default function Test2Page() {
     </>
   );
 }
+
+    
