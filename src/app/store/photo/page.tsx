@@ -23,7 +23,7 @@ import { motion } from 'framer-motion';
 
 const product = { 
   id: 2, 
-  name: 'Paquete de Presets Ouiaan V1', 
+  name: 'Ouiaan Lightroom Presets V1', 
   price: '$15', 
   category: 'Presets', 
   description: 'Resalta verdes ricos y profundos y añade un toque de contraste temperamental, perfecto para fotografía de bosques y naturaleza. Este paquete contiene 10 presets únicos.',

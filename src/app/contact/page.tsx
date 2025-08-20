@@ -52,7 +52,7 @@ export default function ContactPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <SectionTitle>Ponte en Contacto</SectionTitle>
+      <SectionTitle>Hablemos :)</SectionTitle>
       <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
         ¿Tienes un proyecto en mente, una pregunta sobre un producto, o simplemente quieres saludar? Escríbeme.
       </p>

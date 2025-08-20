@@ -23,7 +23,7 @@ import { motion } from 'framer-motion';
 
 const product = { 
   id: 1, 
-  name: 'Paquete de LUTs Ouiaan V1', 
+  name: 'Ouiaan Cinematic LUTs V1', 
   price: '$29', 
   category: 'LUTs', 
   description: 'Una colección de 15 LUTs únicos diseñados para darle a tu metraje un look de película nostálgico y cinematográfico. Perfecto para todo, desde videos de viajes hasta cortometrajes.',
