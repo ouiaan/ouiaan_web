@@ -64,10 +64,10 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
         let r = data[i];
         let g = data[i + 1];
         let b = data[i + 2];
-
-        // --- 1. Apply HSL Adjustments ---
+        const originalLuminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
         let [h, s, l] = convert.rgb.hsl(r, g, b);
 
+        // --- 1. Apply HSL Adjustments ---
         let totalHueShift = 0;
         let totalSatShift = 0;
         let totalLumShift = 0;
@@ -92,37 +92,32 @@ export function ColorGradePreview({ sourceImage, recipe }: ColorGradePreviewProp
             l = Math.max(0, Math.min(100, l + totalLumShift / totalWeight));
         }
         
-        [r, g, b] = convert.hsl.rgb(h, s, l);
-        
-        const originalLuminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-
-        // --- 2. Apply Tonal Tints using linear interpolation ---
-        const blendFactor = 0.25; // Softer blend
-
-        let tintRgb: [number, number, number];
-
+        // --- 2. Apply Tonal Tints while preserving original luminance ---
+        let [tintH, tintS] = [0, 0];
         if (originalLuminance < 0.33) {
-            tintRgb = shadowTintRgb;
+            [tintH, tintS] = convert.rgb.hsl(...shadowTintRgb);
         } else if (originalLuminance < 0.66) {
             const mixRatio = (originalLuminance - 0.33) / (0.66 - 0.33);
-            tintRgb = [
-                shadowTintRgb[0] * (1 - mixRatio) + midtoneTintRgb[0] * mixRatio,
-                shadowTintRgb[1] * (1 - mixRatio) + midtoneTintRgb[1] * mixRatio,
-                shadowTintRgb[2] * (1 - mixRatio) + midtoneTintRgb[2] * mixRatio,
-            ];
+            const [h1, s1] = convert.rgb.hsl(...shadowTintRgb);
+            const [h2, s2] = convert.rgb.hsl(...midtoneTintRgb);
+            tintH = h1 * (1 - mixRatio) + h2 * mixRatio;
+            tintS = s1 * (1 - mixRatio) + s2 * mixRatio;
         } else {
              const mixRatio = (originalLuminance - 0.66) / (1.0 - 0.66);
-             tintRgb = [
-                midtoneTintRgb[0] * (1 - mixRatio) + highlightTintRgb[0] * mixRatio,
-                midtoneTintRgb[1] * (1 - mixRatio) + highlightTintRgb[1] * mixRatio,
-                midtoneTintRgb[2] * (1 - mixRatio) + highlightTintRgb[2] * mixRatio,
-            ];
+             const [h1, s1] = convert.rgb.hsl(...midtoneTintRgb);
+             const [h2, s2] = convert.rgb.hsl(...highlightTintRgb);
+             tintH = h1 * (1 - mixRatio) + h2 * mixRatio;
+             tintS = s1 * (1 - mixRatio) + s2 * mixRatio;
         }
 
-        r = r * (1 - blendFactor) + tintRgb[0] * blendFactor;
-        g = g * (1 - blendFactor) + tintRgb[1] * blendFactor;
-        b = b * (1 - blendFactor) + tintRgb[2] * blendFactor;
+        // Combine HSL-adjusted hue and saturation with the Tonal Tint
+        // Use a blend factor to control the intensity of the tint
+        const blendFactor = 0.5;
+        const finalH = h * (1 - blendFactor) + tintH * blendFactor;
+        const finalS = s * (1 - blendFactor) + tintS * blendFactor;
+
+        // Convert back to RGB using the newly calculated H/S and the luminance from the HSL-adjusted color
+        [r, g, b] = convert.hsl.rgb(finalH, finalS, l);
 
         data[i] = Math.max(0, Math.min(255, r));
         data[i + 1] = Math.max(0, Math.min(255, g));

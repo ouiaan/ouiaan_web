@@ -305,7 +305,9 @@ export function ColorAIClient() {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-12 items-start">
+              {/* Left Column */}
               <div className="flex flex-col gap-12">
+                
                 <div className="w-full flex flex-col items-center">
                   <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Palette/> Generated Palette</h3>
                   <div className="flex flex-wrap gap-4 justify-center">
@@ -348,7 +350,8 @@ export function ColorAIClient() {
                 )}
               </div>
 
-              <div className="flex flex-col gap-12 items-center">
+              {/* Right Column */}
+              <div className="flex flex-col gap-12 items-center sticky top-24">
                   <div className="w-full max-w-2xl">
                     <h3 className="font-headline text-2xl mb-4 text-center">Preview</h3>
                     <ColorGradePreview
@@ -363,10 +366,12 @@ export function ColorAIClient() {
                      </div>
                   )}
 
-                  <div className="w-full max-w-2xl">
-                    <h3 className="font-headline text-2xl mb-4 text-center">Tone Curve Analysis</h3>
-                     <ColorCurves tonalPalette={results.tonalPalette} />
-                  </div>
+                  {results.tonalPalette && (
+                    <div className="w-full max-w-2xl">
+                        <h3 className="font-headline text-2xl mb-4 text-center">Tone Curve Analysis</h3>
+                        <ColorCurves tonalPalette={results.tonalPalette} />
+                    </div>
+                  )}
               </div>
 
             </div>

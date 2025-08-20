@@ -55,9 +55,9 @@ const GenerateColorGradeRecipeOutputSchema = z.object({
   hslAdjustments: z.array(HSLAdjustmentSchema).length(3).describe("An array of actionable HSL (Hue, Saturation, Luminance) adjustment recommendations for the 3 most important colors to transform the source image to the reference look."),
   toneCurveAdjustments: z.array(ToneCurveAdjustmentSchema).length(5).describe("An analysis of the tone curve adjustments required to match the contrast and exposure of the source image to the reference image."),
   whiteBalanceAnalysis: z.object({
-      temperature: z.string().describe("Describes the white balance temperature shift needed (e.g., 'Warmer', 'Cooler', 'Neutral')."),
-      tint: z.string().describe("Describes the white balance tint shift needed (e.g., 'Shift towards magenta', 'Shift towards green', 'Neutral')."),
-      contrast: z.string().describe("A brief analysis of the overall contrast difference."),
+      temperature: z.string().describe("Describes the white balance temperature shift needed (e.g., 'Warmer, push towards +15', 'Cooler, around -10', 'Neutral')."),
+      tint: z.string().describe("Describes the white balance tint shift needed (e.g., 'Shift towards magenta, +8', 'Shift towards green, -5', 'Neutral')."),
+      contrast: z.string().describe("A brief analysis of the overall contrast difference (e.g., 'Increased contrast significantly', 'Slightly lowered contrast for a softer look')."),
   }).describe("A general analysis of the white balance and contrast adjustments needed."),
 });
 export type GenerateColorGradeRecipeOutput = z.infer<typeof GenerateColorGradeRecipeOutputSchema>;
@@ -76,8 +76,7 @@ You have a deep understanding of professional color grading principles, includin
 
 **Core Color Grading Principles to follow:**
 - **Anchor Points:** Professionally graded images maintain clean anchor points. This means deep blacks should be truly black (or near-black) and peak whites should be white, without color contamination.
-- **Cinematic Tinting:** The mood and "look" are primarily created by introducing specific, subtle color tints into the **shadows** and **midtones**. Highlights are generally kept clean or have a very slight, motivated tint to avoid an amateurish look.
-- **White Balance:** Before detailed adjustments, the overall white balance must be matched.
+- **Cinematic Tinting:** The mood and "look" are primarily created by introducing specific, subtle color tints into the **shadows** and **midtones**. Highlights are generally kept clean or have a very slight, motivated tint to avoid an amateurish look. For example, shadows in a desert scene might be tinted blue to contrast with the warm highlights.
 
 **Your Task:**
 
@@ -98,7 +97,7 @@ You have a deep understanding of professional color grading principles, includin
         *   \`reasoning\`: A professional justification explaining *why* these adjustments are needed (e.g., "The greens in the source are too vibrant. Reducing saturation and shifting the hue towards yellow will match the muted, earthy tones characteristic of the Fuji Eterna film stock emulated in the reference.").
 
 4.  **Analyze White Balance and Tone Curve:**
-    *   **White Balance & Contrast:** Compare the overall color temperature, tint, and contrast. Describe the necessary adjustments.
+    *   **White Balance & Contrast:** Compare the overall color temperature, tint, and contrast. Describe the necessary adjustments with specific direction (e.g., "Warmer, push towards +15", "Shift tint towards green, approx -12").
     *   **Tone Curve:** Compare the contrast and exposure of the Source and Reference images. Describe the adjustments needed on a 5-point tone curve (Blacks, Shadows, Midtones, Highlights, Whites) to make the source match the reference, paying attention to the cinematic principles. For each of the 5 points, describe the adjustment (e.g., "Blacks: Crushed significantly to create a deep, rich black point and increase contrast", "Highlights: Rolled off gently to create a softer, filmic look and prevent digital clipping").
 
 **Inputs:**
