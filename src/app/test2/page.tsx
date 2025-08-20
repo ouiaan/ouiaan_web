@@ -15,11 +15,11 @@ export default function Test2Page() {
         } : null;
     }
 
-    // Values selected from the "The Covenant" photo
+    // Values selected from the user's photo
     const colors = {
-        shadows: hexToRgb('#272C2B'),   // Cool, desaturated black
-        midtones: hexToRgb('#7E7364'),  // Muted, warm brown
-        highlights: hexToRgb('#C6BEAE') // Off-white, pale yellow
+        shadows: hexToRgb('#2B2827'),   // Dark, warm brown from hair/curtains
+        midtones: hexToRgb('#B29B8E'),  // Natural skin tone
+        highlights: hexToRgb('#E8E1D3') // Warm off-white from ambient light
     };
 
     if (!colors.shadows || !colors.midtones || !colors.highlights) {
@@ -225,4 +225,3 @@ export default function Test2Page() {
     </>
   );
 }
-
