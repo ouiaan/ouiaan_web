@@ -16,11 +16,11 @@ export default function Test2Page() {
         } : null;
     }
 
-    // Values selected from the "Oppenheimer" still
+    // Values selected from the "Dog" photo
     const colors = {
-        shadows: hexToRgb('#2E3A3C'),   // R:46, G:58, B:60  -> Red is lowest, creates cyan tint
-        midtones: hexToRgb('#8A7E74'),  // R:138, G:126, B:116 -> Desaturated skin tone
-        highlights: hexToRgb('#D7CEB5') // R:215, G:206, B:181 -> Pale yellow/warm highlights
+        shadows: hexToRgb('#343A34'),   // Dark, desaturated green
+        midtones: hexToRgb('#BFAE9C'),  // Muted, warm beige
+        highlights: hexToRgb('#DEDCD7') // Soft, off-white
     };
 
     if (!colors.shadows || !colors.midtones || !colors.highlights) {
