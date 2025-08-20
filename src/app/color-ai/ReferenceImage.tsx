@@ -25,7 +25,6 @@ export function ReferenceImage({ src, mode, onColorSelect }: ReferenceImageProps
     // Create a canvas to get image data
     useEffect(() => {
         const image = new window.Image();
-        // image.crossOrigin = 'anonymous'; // This was causing the issue with local files
         image.src = src;
         image.onload = () => {
             const canvas = document.createElement('canvas');
