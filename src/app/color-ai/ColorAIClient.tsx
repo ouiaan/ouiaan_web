@@ -13,7 +13,6 @@ import { runGenerateGrade } from './actions';
 import type { GenerateColorGradeRecipeOutput, GenerateColorGradeRecipeInput } from '@/ai/flows/generate-color-palette';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { cn } from '@/lib/utils';
-import { ColorCurves } from './ColorCurves';
 import { ReferenceImage, type EyedropperMode } from './ReferenceImage';
 
 type HSLAdjustment = GenerateColorGradeRecipeOutput['hslAdjustments'][0];
@@ -385,19 +384,11 @@ export function ColorAIClient() {
             </div>
 
             {/* Right Column */}
-            <div className="flex flex-col gap-8 sticky top-24">
+            <div className="flex flex-col gap-8">
                 {results.whiteBalance && results.toneCurve && (
                    <div className="w-full">
                       <GeneralAnalysisCard analysis={results.whiteBalance} toneCurve={results.toneCurve} />
                    </div>
-                )}
-                
-                {/* This is the corrected section for ColorCurves */}
-                {allColorsSelected && (
-                  <div className="w-full">
-                      <h3 className="font-headline text-2xl mb-4 text-center">Tone Curve from Your Selection</h3>
-                      <ColorCurves tonalPalette={selectedColors} />
-                  </div>
                 )}
             </div>
           </div>
@@ -408,5 +399,3 @@ export function ColorAIClient() {
     </div>
   );
 }
-
-    
