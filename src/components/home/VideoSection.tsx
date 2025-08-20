@@ -14,9 +14,9 @@ export function VideoSection() {
       transition={{ duration: 0.5 }}
     >
       <div className="container mx-auto px-4 relative z-10">
-        <SectionTitle>From the Channel</SectionTitle>
+        <SectionTitle>Desde el Canal</SectionTitle>
         <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
-          Dive deeper into my creative process and learn new techniques with tutorials and behind-the-scenes content from my YouTube channel.
+          Profundiza en mi proceso creativo y aprende nuevas técnicas con tutoriales y contenido detrás de cámaras de mi canal de YouTube.
         </p>
         <div className="aspect-video max-w-4xl mx-auto rounded-lg overflow-hidden shadow-2xl">
           <iframe

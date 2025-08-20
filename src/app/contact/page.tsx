@@ -19,9 +19,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-  email: z.string().email({ message: 'Please enter a valid email.' }),
-  message: z.string().min(10, { message: 'Message must be at least 10 characters.' }),
+  name: z.string().min(2, { message: 'El nombre debe tener al menos 2 caracteres.' }),
+  email: z.string().email({ message: 'Por favor, introduce un email válido.' }),
+  message: z.string().min(10, { message: 'El mensaje debe tener al menos 10 caracteres.' }),
 });
 
 export default function ContactPage() {
@@ -39,8 +39,8 @@ export default function ContactPage() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     toast({
-      title: 'Message Sent!',
-      description: "Thanks for reaching out. I'll get back to you soon.",
+      title: '¡Mensaje Enviado!',
+      description: "Gracias por contactar. Te responderé pronto.",
     });
     form.reset();
   }
@@ -52,9 +52,9 @@ export default function ContactPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <SectionTitle>Get In Touch</SectionTitle>
+      <SectionTitle>Ponte en Contacto</SectionTitle>
       <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
-        Have a project in mind, a question about a product, or just want to say hello? Drop me a line.
+        ¿Tienes un proyecto en mente, una pregunta sobre un producto, o simplemente quieres saludar? Escríbeme.
       </p>
 
       <div className="max-w-xl mx-auto">
@@ -65,9 +65,9 @@ export default function ContactPage() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-headline text-lg text-foreground/80">Name</FormLabel>
+                  <FormLabel className="font-headline text-lg text-foreground/80">Nombre</FormLabel>
                   <FormControl>
-                    <Input placeholder="Your Name" {...field} className="bg-card border-border/50 h-12" />
+                    <Input placeholder="Tu Nombre" {...field} className="bg-card border-border/50 h-12" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -80,7 +80,7 @@ export default function ContactPage() {
                 <FormItem>
                   <FormLabel className="font-headline text-lg text-foreground/80">Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="your@email.com" {...field} className="bg-card border-border/50 h-12" />
+                    <Input placeholder="tu@email.com" {...field} className="bg-card border-border/50 h-12" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -91,10 +91,10 @@ export default function ContactPage() {
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-headline text-lg text-foreground/80">Message</FormLabel>
+                  <FormLabel className="font-headline text-lg text-foreground/80">Mensaje</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Tell me about your project or question..."
+                      placeholder="Cuéntame sobre tu proyecto o pregunta..."
                       {...field}
                       className="bg-card border-border/50 min-h-[150px]"
                     />
@@ -105,7 +105,7 @@ export default function ContactPage() {
             />
             <div className="text-right">
                 <button type="submit" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider text-lg">
-                    <span>Send Message</span>
+                    <span>Enviar Mensaje</span>
                     <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
             </div>

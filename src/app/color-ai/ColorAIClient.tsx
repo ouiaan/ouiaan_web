@@ -32,15 +32,21 @@ const TonalAnalysisCard = ({ title, analysis }: { title: TonalPaletteKey, analys
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
         toast({
-          title: 'Copied to Clipboard!',
-          description: `Color ${text} copied.`,
+          title: '¡Copiado al Portapapeles!',
+          description: `Color ${text} copiado.`,
         });
       }
+
+    const titleMap = {
+      shadows: 'Sombras',
+      midtones: 'Medios Tonos',
+      highlights: 'Altas Luces',
+    }
 
     return (
         <BackgroundGradient animate={true} containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 flex flex-col">
             <div className="flex-grow">
-                <h4 className="font-headline text-xl text-foreground flex items-center gap-2 capitalize">{title}</h4>
+                <h4 className="font-headline text-xl text-foreground flex items-center gap-2 capitalize">{titleMap[title]}</h4>
                  <div
                     className="w-full h-24 rounded-md cursor-pointer border border-border mt-4 relative group"
                     style={{ backgroundColor: analysis.color }}
@@ -62,7 +68,7 @@ const HSLAnalysisCard = ({ adjustments }: { adjustments: HSLAdjustment[] }) => {
         <div className="grid grid-cols-4 md:grid-cols-8 gap-x-4 gap-y-2">
             {/* Headers */}
             <div className="font-bold text-foreground/70 text-xs uppercase tracking-wider col-span-2">Color</div>
-            <div className="font-bold text-foreground/70 text-xs uppercase tracking-wider text-center">H</div>
+            <div className="font-bold text-foreground/70 text-xs uppercase tracking-wider text-center">T</div>
             <div className="font-bold text-foreground/70 text-xs uppercase tracking-wider text-center">S</div>
             <div className="font-bold text-foreground/70 text-xs uppercase tracking-wider text-center col-span-2 md:col-span-1">L</div>
             <div className="hidden md:block font-bold text-foreground/70 text-xs uppercase tracking-wider col-span-3"></div>
@@ -105,14 +111,14 @@ const GeneralAnalysisCard = ({ analysis, toneCurve }: { analysis: WhiteBalance, 
         <div className="flex items-start gap-4">
           <Thermometer className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
           <div>
-            <h4 className="font-semibold text-foreground text-lg">Temperature</h4>
+            <h4 className="font-semibold text-foreground text-lg">Temperatura</h4>
             <p className="text-foreground/80 text-base">{analysis.temperature}</p>
           </div>
         </div>
         <div className="flex items-start gap-4">
           <Palette className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
           <div>
-            <h4 className="font-semibold text-foreground text-lg">Tint</h4>
+            <h4 className="font-semibold text-foreground text-lg">Tinte</h4>
             <p className="text-foreground/80 text-base">{analysis.tint}</p>
           </div>
         </div>
@@ -121,7 +127,7 @@ const GeneralAnalysisCard = ({ analysis, toneCurve }: { analysis: WhiteBalance, 
         <div className="flex items-start gap-4">
           <Contrast className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
           <div>
-            <h4 className="font-semibold text-foreground text-lg">Tone Curve</h4>
+            <h4 className="font-semibold text-foreground text-lg">Curva de Tonos</h4>
             <ul className="text-foreground/80 text-base list-disc pl-5 mt-1 space-y-1">
                 {toneCurve.map(point => (
                     <li key={point.point}>
@@ -196,11 +202,16 @@ export function ColorAIClient() {
   };
 
   const handleColorSelect = (color: string) => {
+    const modeTranslations = {
+        shadows: "Sombras",
+        midtones: "Medios Tonos",
+        highlights: "Altas Luces",
+    }
     if (eyedropperMode) {
       setSelectedColors(prev => ({...prev, [eyedropperMode]: color}));
       toast({
-        title: `${eyedropperMode.charAt(0).toUpperCase() + eyedropperMode.slice(1)} Color Selected`,
-        description: `Set to ${color}`,
+        title: `Color de ${modeTranslations[eyedropperMode]} Seleccionado`,
+        description: `Establecido a ${color}`,
       });
       setEyedropperMode(null); // Exit eyedropper mode after selection
     }
@@ -218,8 +229,8 @@ export function ColorAIClient() {
   const handleGenerate = () => {
     if (!referenceImageFile || !selectedColors.shadows || !selectedColors.midtones || !selectedColors.highlights) {
       toast({
-        title: 'Missing Inputs',
-        description: 'Please upload a reference image and select colors for shadows, midtones, and highlights.',
+        title: 'Faltan Datos',
+        description: 'Por favor, sube una imagen de referencia y selecciona los colores para sombras, medios tonos y altas luces.',
         variant: 'destructive',
       });
       return;
@@ -247,10 +258,10 @@ export function ColorAIClient() {
         } else if (response) {
           setResults(response);
         } else {
-            setError("Received an unexpected null response from the server.");
+            setError("Recibí una respuesta nula inesperada del servidor.");
         }
       } catch (e) {
-          const message = e instanceof Error ? e.message : "An unknown error occurred during file processing.";
+          const message = e instanceof Error ? e.message : "Ocurrió un error desconocido durante el procesamiento del archivo.";
           setError(message);
           console.error(e);
       }
@@ -260,12 +271,18 @@ export function ColorAIClient() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: 'Copied to Clipboard!',
-      description: `Color ${text} copied.`,
+      title: '¡Copiado al Portapapeles!',
+      description: `Color ${text} copiado.`,
     });
   }
   
   const allColorsSelected = selectedColors.shadows && selectedColors.midtones && selectedColors.highlights;
+
+  const modeTranslations = {
+      shadows: "Sombras",
+      midtones: "Medios Tonos",
+      highlights: "Altas Luces",
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -286,7 +303,7 @@ export function ColorAIClient() {
                 />
                 <div className="absolute flex flex-col items-center justify-center text-center text-muted-foreground">
                     <UploadCloud className="h-10 w-10 mb-2" />
-                    <p>Click to upload Reference Image</p>
+                    <p>Click para subir Imagen de Referencia</p>
                 </div>
             </div>
           )}
@@ -299,8 +316,8 @@ export function ColorAIClient() {
                 onColorSelect={handleColorSelect} 
               />
               <div className="flex flex-col gap-4">
-                <h3 className="font-headline text-2xl">Eyedropper Tool</h3>
-                <p className="text-muted-foreground">Click a button, then click on the image to select the corresponding color tint.</p>
+                <h3 className="font-headline text-2xl">Gotero</h3>
+                <p className="text-muted-foreground">Haz clic en un botón, luego en la imagen para seleccionar el tinte de color correspondiente.</p>
                 <div className="space-y-3">
                   {(['shadows', 'midtones', 'highlights'] as const).map(mode => (
                     <div key={mode} className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
@@ -310,7 +327,7 @@ export function ColorAIClient() {
                         className="w-full justify-start gap-2"
                       >
                         <Pipette className="w-5 h-5" />
-                        Pick {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                        Seleccionar {modeTranslations[mode]}
                       </Button>
                       <div 
                         className="w-10 h-10 rounded-md border-2" 
@@ -325,12 +342,12 @@ export function ColorAIClient() {
                       {isPending ? (
                       <span className="flex items-center justify-center font-bold text-lg">
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Almost there Picasso!
+                          ¡Casi listo, Picasso!
                       </span>
                       ) : (
                       <span className="flex items-center justify-center font-bold text-lg">
                           <Wand2 className="mr-2 h-5 w-5" />
-                          Get Your Grade!
+                          Obtén tu Grade!
                       </span>
                       )}
                   </Button>
@@ -345,7 +362,7 @@ export function ColorAIClient() {
         {isPending && (
           <motion.div key="loader" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="text-center py-10">
             <Loader2 className="h-12 w-12 text-accent animate-spin mx-auto" />
-            <p className="mt-4 text-muted-foreground text-lg font-semibold">Almost there Picasso!</p>
+            <p className="mt-4 text-muted-foreground text-lg font-semibold">¡Casi listo, Picasso!</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -367,11 +384,11 @@ export function ColorAIClient() {
         >
             <div className="flex flex-col gap-12 max-w-4xl mx-auto">
                 <motion.div variants={itemVariants} className="w-full flex flex-col items-center">
-                    <h3 className="font-headline text-3xl mb-6">Your Reverse-Engineered Grade</h3>
+                    <h3 className="font-headline text-3xl mb-6">Tu Grade con Ingeniería Inversa</h3>
                 </motion.div>
                 
                 <motion.div variants={itemVariants} className="w-full flex flex-col">
-                  <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Palette/> Generated Palette</h3>
+                  <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Palette/> Paleta Generada</h3>
                   <div className="flex flex-wrap gap-4">
                     {results.colorPalette.map((color) => (
                       <motion.div
@@ -393,13 +410,13 @@ export function ColorAIClient() {
 
                 {results.whiteBalance && results.toneCurve && (
                   <motion.div variants={itemVariants} className="w-full">
-                    <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Info /> General Analysis</h3>
+                    <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Info /> Análisis General</h3>
                     <GeneralAnalysisCard analysis={results.whiteBalance} toneCurve={results.toneCurve} />
                   </motion.div>
                 )}
     
                 <motion.div variants={itemVariants} className="w-full">
-                    <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Droplets /> Tonal Analysis</h3>
+                    <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><Droplets /> Análisis Tonal</h3>
                     <div className="grid md:grid-cols-3 gap-6">
                         <TonalAnalysisCard title="shadows" analysis={results.tonalPalette.shadows} />
                         <TonalAnalysisCard title="midtones" analysis={results.tonalPalette.midtones} />
@@ -409,14 +426,14 @@ export function ColorAIClient() {
     
                 {results.hslAdjustments && (
                   <motion.div variants={itemVariants} className="w-full">
-                    <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> HSL Analysis</h3>
+                    <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> Análisis HSL</h3>
                     <HSLAnalysisCard adjustments={results.hslAdjustments} />
                   </motion.div>
                 )}
 
                 {allColorsSelected && (
                     <motion.div variants={itemVariants} className="w-full">
-                        <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><BarChart3 /> RGB Curves</h3>
+                        <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><BarChart3 /> Curvas RGB</h3>
                         <RgbCurveDisplay colors={selectedColors} />
                     </motion.div>
                 )}

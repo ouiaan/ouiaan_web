@@ -23,10 +23,10 @@ import { motion } from 'framer-motion';
 
 const product = { 
   id: 1, 
-  name: 'Ouiaan V1 LUT Pack', 
+  name: 'Paquete de LUTs Ouiaan V1', 
   price: '$29', 
   category: 'LUTs', 
-  description: 'A collection of 15 unique LUTs designed to give your footage a nostalgic, cinematic film look. Perfect for everything from travel videos to short films.',
+  description: 'Una colección de 15 LUTs únicos diseñados para darle a tu metraje un look de película nostálgico y cinematográfico. Perfecto para todo, desde videos de viajes hasta cortometrajes.',
   images: [
     { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Vintage film look 1", data_ai_hint: 'vintage film' },
     { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Cinematic scene 2", data_ai_hint: 'cinematic scene' },
@@ -43,20 +43,20 @@ const product = {
 
 const faqs = [
   {
-    question: "What software is compatible with these LUTs?",
-    answer: "Our LUTs (.cube files) are compatible with most major video editing software, including Adobe Premiere Pro, Final Cut Pro X, DaVinci Resolve, and Filmora."
+    question: "¿Qué software es compatible con estos LUTs?",
+    answer: "Nuestros LUTs (archivos .cube) son compatibles con la mayoría de los principales programas de edición de video, incluyendo Adobe Premiere Pro, Final Cut Pro X, DaVinci Resolve y Filmora."
   },
   {
-    question: "How will I receive the LUTs after purchase?",
-    answer: "You will receive an email with a secure download link immediately after your payment is processed. The download includes the LUT files and a PDF installation guide."
+    question: "¿Cómo recibiré los LUTs después de la compra?",
+    answer: "Recibirás un correo electrónico con un enlace de descarga seguro inmediatamente después de que se procese tu pago. La descarga incluye los archivos LUT y una guía de instalación en PDF."
   },
   {
-    question: "Can I use these LUTs on photos?",
-    answer: "While LUTs are designed for video, they can be used in photo editing software like Adobe Photoshop. However, for best results on photos, we recommend our dedicated photo presets."
+    question: "¿Puedo usar estos LUTs en fotos?",
+    answer: "Aunque los LUTs están diseñados para video, pueden usarse en software de edición de fotos como Adobe Photoshop. Sin embargo, para obtener los mejores resultados en fotos, recomendamos nuestros presets de fotos dedicados."
   },
   {
-    question: "What is your refund policy?",
-    answer: "Due to the digital nature of our products, all sales are final and we cannot offer refunds. If you encounter any issues with your files, please contact our support and we'll be happy to assist you."
+    question: "¿Cuál es su política de reembolso?",
+    answer: "Debido a la naturaleza digital de nuestros productos, todas las ventas son finales y no podemos ofrecer reembolsos. Si encuentras algún problema con tus archivos, por favor contacta a nuestro soporte y estaremos encantados de ayudarte."
   }
 ];
 
@@ -100,7 +100,7 @@ export default function VideoStorePage() {
 
               <div className="flex items-center justify-between mt-4">
                   <span className="text-accent font-headline text-4xl">{product.price}</span>
-                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl">Buy Now</Button>
+                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl">Comprar Ahora</Button>
               </div>
           </div>
         </BackgroundGradient>
@@ -113,7 +113,7 @@ export default function VideoStorePage() {
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.5 }}
       >
-        <h3 className="font-headline text-3xl text-center mb-8">Frequently Asked Questions</h3>
+        <h3 className="font-headline text-3xl text-center mb-8">Preguntas Frecuentes</h3>
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, index) => (
             <AccordionItem value={`item-${index}`} key={index}>

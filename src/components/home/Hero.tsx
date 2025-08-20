@@ -37,7 +37,7 @@ export function Hero() {
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
           className="mt-4 font-normal text-base text-neutral-300 max-w-lg text-center mx-auto"
         >
-          Digital assets for the modern creator.
+          Recursos digitales para el creador moderno.
         </motion.p>
       </div>
     </section>

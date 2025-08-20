@@ -11,24 +11,24 @@ import { motion } from 'framer-motion';
 const freebies = [
   { 
     id: 1, 
-    name: 'PSD Wiggle Effect', 
-    description: 'Add a dynamic, eye-catching wiggle distortion to your text or images with this easy-to-use PSD effect.', 
+    name: 'Efecto "Wiggle" para PSD', 
+    description: 'Añade una distorsión "wiggle" dinámica y llamativa a tu texto o imágenes con este efecto PSD fácil de usar.', 
     image: 'https://placehold.co/1600x900.png', 
     data_ai_hint: 'abstract glitch',
     link: 'https://sub2get.com/link?l=9208' 
   },
   { 
     id: 2, 
-    name: 'Polaroid Frame Mockup', 
-    description: 'Give your photos a nostalgic, classic feel with this high-resolution Polaroid frame mockup.', 
+    name: 'Mockup de Marco Polaroid', 
+    description: 'Dale a tus fotos un toque nostálgico y clásico con este mockup de marco Polaroid de alta resolución.', 
     image: 'https://placehold.co/1600x900.png', 
     data_ai_hint: 'polaroid frame',
     link: 'https://sub2get.com/link?l=9544' 
   },
   { 
     id: 3, 
-    name: 'Free Sample LUT', 
-    description: 'A versatile cinematic LUT to give your footage a professional and stylized color grade.', 
+    name: 'LUT de Muestra Gratis', 
+    description: 'Un LUT cinematográfico versátil para darle a tu metraje un etalonaje de color profesional y estilizado.', 
     image: 'https://placehold.co/1600x900.png', 
     data_ai_hint: 'cinematic still',
     link: 'https://sub2get.com/link?l=9545' 
@@ -43,9 +43,9 @@ export default function FreebiesPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <SectionTitle>Free Resources</SectionTitle>
+      <SectionTitle>Recursos Gratuitos</SectionTitle>
       <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
-        Enjoy a selection of free tools to get a taste of the quality and style of my products.
+        Disfruta de una selección de herramientas gratuitas para que pruebes la calidad y el estilo de mis productos.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -70,7 +70,7 @@ export default function FreebiesPage() {
               <h3 className="font-headline text-2xl text-foreground">{item.name}</h3>
               <p className="text-foreground/70 mt-2 flex-grow">{item.description}</p>
               <Link href={item.link} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider mt-6">
-                <span>Download</span>
+                <span>Descargar</span>
                 <ArrowDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-1" />
               </Link>
             </BackgroundGradient>

@@ -16,20 +16,20 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const desktopNavLinks = [
-  { href: '/gear', label: 'Gear' },
-  { href: '/freebies', label: 'Freebies' },
+  { href: '/gear', label: 'Mi Equipo' },
+  { href: '/freebies', label: 'Gratis' },
   { href: '/color-ai', label: 'Reverse Grade AI' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/contact', label: 'Contacto' },
 ];
 
 const mobileNavLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/store/photo', label: 'Photo' },
+  { href: '/', label: 'Inicio' },
+  { href: '/store/photo', label: 'Foto' },
   { href: '/store/video', label: 'Video' },
-  { href: '/gear', label: 'Gear' },
-  { href: '/freebies', label: 'Freebies' },
+  { href: '/gear', label: 'Mi Equipo' },
+  { href: '/freebies', label: 'Gratis' },
   { href: '/color-ai', label: 'Reverse Grade AI' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/contact', label: 'Contacto' },
 ];
 
 const logoVariants = {
@@ -139,7 +139,7 @@ export function Header() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
         >
-          <NavLink href="/" label="Home" />
+          <NavLink href="/" label="Inicio" />
 
           <div
             onMouseEnter={() => setStoreMenuOpen(true)}
@@ -155,12 +155,12 @@ export function Header() {
                     : 'text-foreground/70 hover:text-foreground'
                 )}
               >
-                Store
+                Tienda
                 <ChevronDown className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </DropdownMenuTrigger>
               <DropdownMenuContent sideOffset={0}>
                 <DropdownMenuItem asChild>
-                  <Link href="/store/photo">Photo</Link>
+                  <Link href="/store/photo">Foto</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/store/video">Video</Link>
@@ -200,5 +200,3 @@ export function Header() {
     </motion.header>
   );
 }
-
-    

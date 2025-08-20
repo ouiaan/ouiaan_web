@@ -18,17 +18,17 @@ export function ShowcaseSection() {
       transition={{ duration: 0.5 }}
     >
       <div className="container mx-auto px-4">
-        <SectionTitle>Digital Store & Tools</SectionTitle>
+        <SectionTitle>Tienda Digital y Herramientas</SectionTitle>
         <p className="text-center max-w-2xl mx-auto mb-16 text-foreground/70">
-          Craft your unique visual identity with professionally designed LUTs, presets, and intelligent color tools.
+          Crea tu identidad visual única con LUTs, presets y herramientas de color inteligentes diseñadas profesionalmente.
         </p>
         
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12 items-stretch">
           <BackgroundGradient containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 md:p-8 flex flex-col">
             <div className="flex-grow">
-              <h3 className="font-headline text-3xl text-foreground">Cinematic LUTs</h3>
+              <h3 className="font-headline text-3xl text-foreground">LUTs Cinemáticos</h3>
               <p className="text-foreground/70 mt-4">
-                Transform your footage with a single click. My collection of Look-Up Tables (LUTs) is designed to give your videos a professional, cinematic color grade.
+                Transforma tu metraje con un solo clic. Mi colección de Look-Up Tables (LUTs) está diseñada para darle a tus videos un etalonaje de color profesional y cinematográfico.
               </p>
             </div>
             <div className="mt-6">
@@ -43,7 +43,7 @@ export function ShowcaseSection() {
                   />
                 </div>
                 <Link href="/store/video" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider">
-                    <span>Explore LUTs</span>
+                    <span>Explorar LUTs</span>
                     <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
             </div>
@@ -51,9 +51,9 @@ export function ShowcaseSection() {
           
           <BackgroundGradient containerClassName="rounded-2xl h-full" className="rounded-2xl h-full bg-card text-card-foreground p-6 md:p-8 flex flex-col">
             <div className="flex-grow">
-                <h3 className="font-headline text-3xl text-foreground">Photo Presets</h3>
+                <h3 className="font-headline text-3xl text-foreground">Presets para Fotos</h3>
                 <p className="text-foreground/70 mt-4">
-                  Achieve a consistent, polished look across your photography. My presets for Lightroom provide a perfect starting point for your creative vision.
+                  Logra un look consistente y pulido en toda tu fotografía. Mis presets para Lightroom proporcionan un punto de partida perfecto para tu visión creativa.
                 </p>
             </div>
             <div className="mt-6">
@@ -68,7 +68,7 @@ export function ShowcaseSection() {
                     />
                 </div>
                 <Link href="/store/photo" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider">
-                    <span>View Presets</span>
+                    <span>Ver Presets</span>
                     <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
             </div>
@@ -78,7 +78,7 @@ export function ShowcaseSection() {
             <div className="flex-grow">
                 <h3 className="font-headline text-3xl text-foreground">Reverse Grade AI</h3>
                 <p className="text-foreground/70 mt-4">
-                  Ever wondered how to get that cinematic look? Upload any reference image and our AI will reverse-engineer the color grade, giving you the exact recipe to recreate it.
+                  ¿Alguna vez te has preguntado cómo conseguir ese look cinematográfico? Sube cualquier imagen de referencia y nuestra IA hará ingeniería inversa del etalonaje, dándote la receta exacta para recrearlo.
                 </p>
             </div>
             <div className="mt-6">
@@ -93,7 +93,7 @@ export function ShowcaseSection() {
                     />
                 </div>
                 <Link href="/color-ai" className="group inline-flex items-center gap-2 font-headline text-accent uppercase tracking-wider">
-                    <span>Try The Tool</span>
+                    <span>Probar Herramienta</span>
                     <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
             </div>

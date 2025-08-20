@@ -23,10 +23,10 @@ import { motion } from 'framer-motion';
 
 const product = { 
   id: 2, 
-  name: 'Ouiaan V1 Preset Pack', 
+  name: 'Paquete de Presets Ouiaan V1', 
   price: '$15', 
   category: 'Presets', 
-  description: 'Brings out rich, deep greens and adds a touch of moody contrast, perfect for forest and nature photography. This pack contains 10 unique presets.',
+  description: 'Resalta verdes ricos y profundos y añade un toque de contraste temperamental, perfecto para fotografía de bosques y naturaleza. Este paquete contiene 10 presets únicos.',
   images: [
     { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Moody forest scene 1", data_ai_hint: 'moody forest' },
     { before: 'https://placehold.co/1600x900.png', after: 'https://placehold.co/1600x900.png', alt: "Moody nature scene 2", data_ai_hint: 'moody nature' },
@@ -43,20 +43,20 @@ const product = {
 
 const faqs = [
   {
-    question: "What software do I need to use these presets?",
-    answer: "Our presets are compatible with Adobe Lightroom Classic, Lightroom CC (Desktop & Mobile), and Adobe Camera Raw."
+    question: "¿Qué software necesito para usar estos presets?",
+    answer: "Nuestros presets son compatibles con Adobe Lightroom Classic, Lightroom CC (Escritorio y Móvil), y Adobe Camera Raw."
   },
   {
-    question: "How do I install the presets?",
-    answer: "After your purchase, you'll receive a download link with a PDF guide that includes step-by-step installation instructions for all compatible software."
+    question: "¿Cómo instalo los presets?",
+    answer: "Después de tu compra, recibirás un enlace de descarga con una guía en PDF que incluye instrucciones de instalación paso a paso para todo el software compatible."
   },
   {
-    question: "Can I use these on my phone?",
-    answer: "Yes! You can install them in the free Adobe Lightroom mobile app to edit photos directly on your phone."
+    question: "¿Puedo usarlos en mi teléfono?",
+    answer: "¡Sí! Puedes instalarlos en la aplicación gratuita de Adobe Lightroom para editar fotos directamente en tu teléfono."
   },
   {
-    question: "What if I'm not happy with my purchase?",
-    answer: "Due to the digital nature of our products, we generally do not offer refunds. However, if you are experiencing technical issues, please contact our support, and we'll be happy to help."
+    question: "¿Qué pasa si no estoy contento con mi compra?",
+    answer: "Debido a la naturaleza digital de nuestros productos, generalmente no ofrecemos reembolsos. Sin embargo, si tienes problemas técnicos, por favor contacta a nuestro soporte y estaremos encantados de ayudarte."
   }
 ];
 
@@ -100,7 +100,7 @@ export default function PhotoStorePage() {
 
               <div className="flex items-center justify-between mt-4">
                   <span className="text-accent font-headline text-4xl">{product.price}</span>
-                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl">Buy Now</Button>
+                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xl">Comprar Ahora</Button>
               </div>
           </div>
         </BackgroundGradient>
@@ -113,7 +113,7 @@ export default function PhotoStorePage() {
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.5 }}
       >
-        <h3 className="font-headline text-3xl text-center mb-8">Frequently Asked Questions</h3>
+        <h3 className="font-headline text-3xl text-center mb-8">Preguntas Frecuentes</h3>
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, index) => (
             <AccordionItem value={`item-${index}`} key={index}>

@@ -29,10 +29,10 @@ export function Footer() {
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
 
         <div className="max-w-xl mx-auto text-center mb-12">
-            <h3 className="font-headline text-2xl text-foreground mb-4">Stay Inspired</h3>
-            <p className="text-foreground/70 mb-4">Join my newsletter to receive updates on new products, freebies, and creative tutorials straight to your inbox.</p>
+            <h3 className="font-headline text-2xl text-foreground mb-4">Mantente Inspirado</h3>
+            <p className="text-foreground/70 mb-4">Únete a mi boletín para recibir actualizaciones sobre nuevos productos, regalos y tutoriales creativos directamente en tu bandeja de entrada.</p>
             <form className="flex gap-2">
-                <Input type="email" placeholder="Your Email" className="bg-card border-border/50 flex-grow" />
+                <Input type="email" placeholder="Tu Email" className="bg-card border-border/50 flex-grow" />
                 <Button type="submit" size="icon" className="bg-accent text-accent-foreground hover:bg-accent/90 flex-shrink-0">
                     <ArrowRight />
                 </Button>

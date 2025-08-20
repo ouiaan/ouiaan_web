@@ -16,7 +16,7 @@ export default function ColorAIPage() {
     >
       <SectionTitle className="text-4xl md:text-5xl">Reverse Grade AI</SectionTitle>
       <p className="text-center max-w-2xl mx-auto mb-12 text-foreground/70">
-        Upload a reference image and use the eyedropper to select the key tones. The AI will deconstruct the color grade into an actionable recipe.
+        Sube una imagen de referencia y usa el gotero para seleccionar los tonos clave. La IA deconstruirá el etalonaje (color grade) en una receta que puedes usar.
       </p>
       <ColorAIClient />
     </motion.div>
