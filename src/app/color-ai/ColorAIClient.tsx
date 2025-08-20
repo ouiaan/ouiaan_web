@@ -58,7 +58,6 @@ const TonalAnalysisCard = ({ title, analysis }: { title: TonalPaletteKey, analys
 const HSLAnalysisCard = ({ adjustments }: { adjustments: HSLAdjustment[] }) => {
   return (
     <BackgroundGradient animate={true} containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground p-6">
-        <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> HSL Analysis</h3>
         <div className="grid grid-cols-4 md:grid-cols-8 gap-x-4 gap-y-2">
             {/* Headers */}
             <div className="font-bold text-foreground/70 text-xs uppercase tracking-wider col-span-2">Color</div>
@@ -361,6 +360,13 @@ export function ColorAIClient() {
                 ))}
               </div>
             </div>
+            
+            {results.whiteBalance && results.toneCurve && (
+              <div className="w-full">
+                <h3 className="font-headline text-2xl mb-4">General Analysis</h3>
+                <GeneralAnalysisCard analysis={results.whiteBalance} toneCurve={results.toneCurve} />
+              </div>
+            )}
 
             <div className="w-full">
                 <h3 className="font-headline text-2xl mb-4">Tonal Analysis</h3>
@@ -373,21 +379,14 @@ export function ColorAIClient() {
 
             {results.hslAdjustments && (
               <div className="w-full">
+                <h3 className="font-headline text-2xl mb-4 flex items-center gap-2"><SlidersHorizontal /> HSL Analysis</h3>
                 <HSLAnalysisCard adjustments={results.hslAdjustments} />
               </div>
             )}
               
-            {results.whiteBalance && results.toneCurve && (
-              <div className="w-full">
-                <h3 className="font-headline text-2xl mb-4">General Analysis</h3>
-                <GeneralAnalysisCard analysis={results.whiteBalance} toneCurve={results.toneCurve} />
-              </div>
-            )}
         </motion.div>
       )}
 
     </div>
   );
 }
-
-    
