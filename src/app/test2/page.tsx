@@ -182,7 +182,6 @@ export default function Test2Page() {
       <div className="graph-page-container">
         {/* Red Graph */}
         <div className="graph-container">
-            <h3 className="graph-title" style={{ color: '#ff4d4d' }}>Red Channel</h3>
             <div className="graph" id="red-graph">
                 <div className="grid"></div>
                 <svg className="diagonal-line-svg" viewBox="0 0 255 255" preserveAspectRatio="none">
@@ -196,7 +195,6 @@ export default function Test2Page() {
 
         {/* Green Graph */}
         <div className="graph-container">
-            <h3 className="graph-title" style={{ color: '#4dff4d' }}>Green Channel</h3>
             <div className="graph" id="green-graph">
                 <div className="grid"></div>
                 <svg className="diagonal-line-svg" viewBox="0 0 255 255" preserveAspectRatio="none">
@@ -210,7 +208,6 @@ export default function Test2Page() {
 
         {/* Blue Graph */}
         <div className="graph-container">
-            <h3 className="graph-title" style={{ color: '#4d9dff' }}>Blue Channel</h3>
             <div className="graph" id="blue-graph">
                 <div className="grid"></div>
                 <svg className="diagonal-line-svg" viewBox="0 0 255 255" preserveAspectRatio="none">
