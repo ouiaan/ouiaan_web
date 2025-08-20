@@ -19,7 +19,7 @@ const desktopNavLinks = [
   { href: '/gear', label: 'Mi Equipo' },
   { href: '/freebies', label: 'Gratis' },
   { href: '/color-ai', label: 'Reverse Grade AI' },
-  { href: '/contact', label: 'Hablemos :)' },
+  { href: '/contact', label: 'Contacto' },
 ];
 
 const mobileNavLinks = [
@@ -29,7 +29,7 @@ const mobileNavLinks = [
   { href: '/gear', label: 'Mi Equipo' },
   { href: '/freebies', label: 'Gratis' },
   { href: '/color-ai', label: 'Reverse Grade AI' },
-  { href: '/contact', label: 'Hablemos :)' },
+  { href: '/contact', label: 'Contacto' },
 ];
 
 const logoVariants = {
