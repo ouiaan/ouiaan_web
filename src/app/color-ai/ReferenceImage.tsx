@@ -25,15 +25,15 @@ export function ReferenceImage({ src, mode, onColorSelect }: ReferenceImageProps
     // Create a canvas to get image data
     useEffect(() => {
         const image = new window.Image();
-        image.crossOrigin = 'anonymous';
+        // image.crossOrigin = 'anonymous'; // This was causing the issue with local files
         image.src = src;
         image.onload = () => {
             const canvas = document.createElement('canvas');
-            canvas.width = image.width;
-            canvas.height = image.height;
+            canvas.width = image.naturalWidth;
+            canvas.height = image.naturalHeight;
             const ctx = canvas.getContext('2d');
             if (ctx) {
-                ctx.drawImage(image, 0, 0, image.width, image.height);
+                ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
                 canvasRef.current = canvas;
             }
         };
@@ -127,4 +127,3 @@ export function ReferenceImage({ src, mode, onColorSelect }: ReferenceImageProps
         </div>
     );
 }
-
