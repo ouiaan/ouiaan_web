@@ -4,9 +4,9 @@
 import { useEffect, useId } from 'react';
 
 type TonalPalette = {
-    shadows: { color: string };
-    midtones: { color: string };
-    highlights: { color: string };
+    shadows: string | null;
+    midtones: string | null;
+    highlights: string | null;
 };
 
 interface ColorCurvesProps {
@@ -14,7 +14,7 @@ interface ColorCurvesProps {
 }
 
 // Converts hex to an RGB object
-function hexToRgb(hex: string) {
+function hexToRgb(hex: string | null) {
     if (!hex) return { r: 128, g: 128, b: 128 }; // Return neutral gray if hex is invalid
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
@@ -29,9 +29,9 @@ export function ColorCurves({ tonalPalette }: ColorCurvesProps) {
 
     useEffect(() => {
         const colors = {
-            shadows: hexToRgb(tonalPalette.shadows.color),
-            midtones: hexToRgb(tonalPalette.midtones.color),
-            highlights: hexToRgb(tonalPalette.highlights.color)
+            shadows: hexToRgb(tonalPalette.shadows),
+            midtones: hexToRgb(tonalPalette.midtones),
+            highlights: hexToRgb(tonalPalette.highlights)
         };
 
         // Adjustment function to soften the curve points.

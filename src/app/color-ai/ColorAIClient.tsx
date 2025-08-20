@@ -391,10 +391,10 @@ export function ColorAIClient() {
                      </div>
                   )}
 
-                  {results.tonalPalette && (
+                  {allColorsSelected && (
                     <div className="w-full">
                         <h3 className="font-headline text-2xl mb-4 text-center">Tone Curve Analysis</h3>
-                        <ColorCurves tonalPalette={results.tonalPalette} />
+                        <ColorCurves tonalPalette={selectedColors} />
                     </div>
                   )}
               </div>
