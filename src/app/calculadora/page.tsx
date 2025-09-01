@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm, FormProvider, useWatch } from 'react-hook-form';
@@ -33,7 +34,7 @@ export default function CalculadoraPage() {
         <form onSubmit={(e) => e.preventDefault()}>
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
             <div className="lg:col-span-2"><div className="space-y-8"><ProfileForm /><ClientForm /><DescriptionForm /><FinancialsForm /><CostTables /><TotalsForm /></div></div>
-            <div className="lg:col-span-1"><SummaryCard results={results} getFormData={methods.getValues} /></div>
+            <div className="lg:col-span-1"><SummaryCard results={results} /></div>
           </div>
         </form>
       </main>

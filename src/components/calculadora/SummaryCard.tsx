@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,10 +22,9 @@ interface CalculationResults {
 
 interface SummaryCardProps {
   results: CalculationResults;
-  getFormData: () => FormValues;
 }
 
-export function SummaryCard({ results, getFormData }: SummaryCardProps) {
+export function SummaryCard({ results }: SummaryCardProps) {
   return (
     <Card className="sticky top-24 border-neutral-800 bg-neutral-900">
       <CardHeader>
@@ -47,7 +47,7 @@ export function SummaryCard({ results, getFormData }: SummaryCardProps) {
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">Saldo Restante</span><span className="font-medium">{formatCurrency(results.remainingBalance)}</span></div>
         </div>
         
-        <ActionButtons results={results} getFormData={getFormData} />
+        <ActionButtons results={results} />
       </CardContent>
     </Card>
   );

@@ -1,11 +1,11 @@
+
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import { useQuoteStore } from '@/context/QuoteContext';
+import { Button } from '@/components/ui/button';
+import { useFormContext } from 'react-hook-form';
 import { type FormValues } from '@/app/calculadora/schema';
 
-// ¡INTERFAZ SINCRONIZADA!
 interface CalculationResults {
   totalLabor: number;
   totalVariableCosts: number;
@@ -21,16 +21,17 @@ interface CalculationResults {
 }
 
 interface ActionButtonsProps {
-  getFormData: () => FormValues;
   results: CalculationResults;
 }
 
-export function ActionButtons({ getFormData, results }: ActionButtonsProps) {
-  const setQuoteData = useQuoteStore((state: any) => state.setQuoteData);
+export function ActionButtons({ results }: ActionButtonsProps) {
+  const { getValues } = useFormContext<FormValues>();
+  const setQuoteData = useQuoteStore((state) => state.setQuoteData);
 
   const handleGenerate = (viewType: 'proposal' | 'proforma' | 'internal') => {
-    const formData = getFormData();
-    setQuoteData({ formData, results, viewType });
+    // Obtenemos los datos más frescos del formulario justo en el momento del click
+    const currentFormData = getValues(); 
+    setQuoteData({ formData: currentFormData, results, viewType });
     window.open('/quote', '_blank');
   };
 
