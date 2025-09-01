@@ -30,8 +30,10 @@ export default function CalculadoraPage() {
     <TooltipProvider>
       <FormProvider {...methods}>
         <main className="container mx-auto px-4 py-24 sm:py-32">
-          <SectionTitle>Calculadora de Presupuestos</SectionTitle>
-          <p className="mt-4 max-w-2xl text-lg text-muted-foreground">Una herramienta para creativos. Define tus costos, establece tu ganancia y genera propuestas profesionales en minutos.</p>
+          <div className="text-center">
+            <SectionTitle>Calculadora de Presupuestos</SectionTitle>
+            <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">Una herramienta para creativos. Define tus costos, establece tu ganancia y genera propuestas profesionales en minutos.</p>
+          </div>
           <div className="my-12"><PackageManager onReset={handleReset} onLoadPackage={handleLoadPackage} /></div>
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
