@@ -28,7 +28,7 @@ export function FinancialsForm() {
       <CardHeader>
         <CardTitle className="font-headline text-xl">Análisis de Rentabilidad</CardTitle>
         <p className="pt-1 text-sm text-muted-foreground">
-          Establece tu contribución a fijos y tu margen de ganancia.
+          Establece tu contribución a fijos, tu tarifa por hora y tu margen de ganancia.
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -61,6 +61,22 @@ export function FinancialsForm() {
               className="bg-neutral-950 pl-8"
             />
              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center">
+            <Label htmlFor="defaultLaborRate">Tarifa de Mano de Obra por Hora</Label>
+            <InfoTooltip content="Define tu costo estándar por hora de trabajo. Este valor se usará para calcular automáticamente el costo total de tu mano de obra en todos los proyectos." />
+          </div>
+           <div className="relative">
+            <Input
+              id="defaultLaborRate"
+              type="number"
+              {...register('defaultLaborRate', { valueAsNumber: true })}
+              className="bg-neutral-950 pl-8"
+            />
+             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
           </div>
         </div>
       </CardContent>

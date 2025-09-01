@@ -63,9 +63,8 @@ export function CostTables() {
           <div className="rounded-lg border border-neutral-800 p-2 space-y-2">
             {laborFields.map((item, index) => (
               <div key={item.id} className="grid grid-cols-1 md:grid-cols-12 items-center gap-2">
-                <div className="md:col-span-5"><Input {...register(`laborItems.${index}.description`)} placeholder="Descripción" className="bg-neutral-900" /></div>
+                <div className="md:col-span-7"><Input {...register(`laborItems.${index}.description`)} placeholder="Descripción" className="bg-neutral-900" /></div>
                 <div className="md:col-span-2"><Input {...register(`laborItems.${index}.hours`, { valueAsNumber: true })} type="number" placeholder="Horas" className="bg-neutral-900 text-center" /></div>
-                <div className="md:col-span-2"><Input {...register(`laborItems.${index}.rate`, { valueAsNumber: true })} type="number" placeholder="Tarifa/Hora" className="bg-neutral-900 text-center" /></div>
                 <div className="md:col-span-2">
                    <Controller
                     control={control}
@@ -82,7 +81,7 @@ export function CostTables() {
               </div>
             ))}
           </div>
-          <Button type="button" variant="outline" onClick={() => appendLabor({ description: '', hours: 1, rate: 170, category: "Cobertura del Evento" })} className="border-dashed"><PlusCircle className="mr-2 h-4 w-4" />Agregar Mano de Obra</Button>
+          <Button type="button" variant="outline" onClick={() => appendLabor({ description: '', hours: 1, category: "Cobertura del Evento" })} className="border-dashed"><PlusCircle className="mr-2 h-4 w-4" />Agregar Mano de Obra</Button>
         </div>
 
         {/* Tabla de Costos Variables */}

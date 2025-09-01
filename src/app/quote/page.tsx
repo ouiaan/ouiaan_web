@@ -41,12 +41,11 @@ const QuotePageClient = () => {
   const InternalCostsTable = () => (
     <div className="space-y-8">
         <table className="w-full text-sm" style={{ tableLayout: 'fixed' }}>
-            {/* MANO DE OBRA */}
             <colgroup>
-                <col style={{ width: '35%' }} />
-                <col style={{ width: '10%' }} />
+                <col style={{ width: '40%' }} />
                 <col style={{ width: '15%' }} />
-                <col style={{ width: '25%' }} />
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '15%' }} />
                 <col style={{ width: '15%' }} />
             </colgroup>
             <thead>
@@ -64,9 +63,9 @@ const QuotePageClient = () => {
                     <tr key={`labor-${index}`} className="border-b border-neutral-700/50">
                         <td className="p-2 text-left">{item.description}</td>
                         <td className="p-2 text-right">{item.hours}</td>
-                        <td className="p-2 text-right">{formatCurrency(item.rate)}</td>
+                        <td className="p-2 text-right">{formatCurrency(formData.defaultLaborRate)}</td>
                         <td className="p-2 text-left pl-4">{item.category}</td>
-                        <td className="p-2 text-right font-mono">{formatCurrency(item.hours * item.rate)}</td>
+                        <td className="p-2 text-right font-mono">{formatCurrency(item.hours * formData.defaultLaborRate)}</td>
                     </tr>
                 ))}
             </tbody>
