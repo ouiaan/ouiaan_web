@@ -27,8 +27,8 @@ const QuotePageClient = () => {
     return (
       <main className="bg-neutral-900 min-h-screen flex items-center justify-center text-center">
         <div>
-          <h1 className="text-2xl font-bold text-white">No hay datos</h1>
-          <p className="mt-4 text-neutral-400">Vuelve a la calculadora y genera una propuesta.</p>
+          <h1 className="text-2xl font-bold text-white">No hay datos de propuesta</h1>
+          <p className="mt-4 text-neutral-400">Por favor, vuelve a la calculadora y genera una nueva propuesta.</p>
         </div>
       </main>
     );

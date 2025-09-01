@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { type FormValues } from '@/app/calculadora/schema';
 
 // Definimos esta interfaz aquí para que esté completa
@@ -30,10 +30,13 @@ export const useQuoteStore = create<QuoteState>()(
       formData: null,
       results: null,
       viewType: 'proposal',
-      setQuoteData: (data) => set(data), // Simplificado y con tipos correctos
+      setQuoteData: (data) => set(data),
     }),
     {
       name: 'quote-storage',
+      // Especificamos que queremos usar JSON.stringify/parse
+      // para asegurar que solo se guardan los datos serializables.
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 );
