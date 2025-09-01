@@ -3,15 +3,27 @@
 import { useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea'; // Usaremos el componente Textarea
+import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 
-// Definimos las categorías que necesitan una descripción
+const InfoTooltip = ({ content }: { content: string }) => (
+    <Tooltip>
+        <TooltipTrigger asChild>
+            <span className="ml-2 cursor-help"><Info className="h-4 w-4 text-muted-foreground" /></span>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+            <p className="text-sm">{content}</p>
+        </TooltipContent>
+    </Tooltip>
+);
+
 const descriptionCategories = [
-  "Planeación y Pre-Boda",
-  "Cobertura del Evento",
-  "Post-Producción",
-  "Plataforma Digital",
-  "Costos de Estudio y Gestión de Proyecto",
+  { name: "Planeación y Pre-Boda", tooltip: "Servicios antes del evento principal. Ej: Sesión de compromiso, reuniones de planificación, scouting de locaciones." },
+  { name: "Cobertura del Evento", tooltip: "Todos los servicios durante el evento. Ej: Horas de cobertura, fotógrafo principal, segundo fotógrafo, cobertura con dron." },
+  { name: "Post-Producción", tooltip: "El trabajo después del evento. Ej: Edición de fotos, etalonaje de video, selección de música, revisiones." },
+  { name: "Plataforma Digital", tooltip: "Entregables digitales. Ej: Galería online, video destacado (highlight), video completo, archivos RAW." },
+  { name: "Costos de Estudio y Gestión de Proyecto", tooltip: "Costos administrativos y de gestión relacionados con este proyecto específico. Se calcula automáticamente en base a tu 'Overhead' y 'Ganancia'." },
 ];
 
 export function DescriptionForm() {
@@ -20,20 +32,26 @@ export function DescriptionForm() {
   return (
     <Card className="border-neutral-800 bg-neutral-900">
       <CardHeader>
-        <CardTitle className="font-headline text-xl">Descripción de Servicios por Categoría</CardTitle>
+        <CardTitle className="font-headline text-xl flex items-center">
+          Descripción de Servicios por Categoría
+          <InfoTooltip content="Describe qué incluye cada fase del proyecto. Usa viñetas (guiones) para crear listas. Esta información es clave en la propuesta para el cliente." />
+        </CardTitle>
         <p className="pt-1 text-sm text-muted-foreground">
           Este texto aparecerá en la propuesta del cliente. Personalízalo para cada cotización.
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
         {descriptionCategories.map((category) => (
-          <div key={category} className="space-y-2">
-            <Label htmlFor={`categoryDescriptions.${category}`}>{category}</Label>
+          <div key={category.name} className="space-y-2">
+            <div className="flex items-center">
+                <Label htmlFor={`categoryDescriptions.${category.name}`}>{category.name}</Label>
+                <InfoTooltip content={category.tooltip} />
+            </div>
             <Textarea
-              id={`categoryDescriptions.${category}`}
-              {...register(`categoryDescriptions.${category}` as const)}
+              id={`categoryDescriptions.${category.name}`}
+              {...register(`categoryDescriptions.${category.name}` as const)}
               className="min-h-[100px] bg-neutral-950"
-              placeholder={`Detalla los servicios incluidos en ${category.toLowerCase()}...`}
+              placeholder={`Detalla los servicios incluidos en ${category.name.toLowerCase()}...`}
             />
           </div>
         ))}

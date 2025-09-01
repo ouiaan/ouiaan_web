@@ -4,6 +4,19 @@ import { useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
+
+const InfoTooltip = ({ content }: { content: string }) => (
+    <Tooltip>
+        <TooltipTrigger asChild>
+            <span className="ml-2 cursor-help"><Info className="h-4 w-4 text-muted-foreground" /></span>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+            <p className="text-sm">{content}</p>
+        </TooltipContent>
+    </Tooltip>
+);
 
 export function ClientForm() {
   const { register, formState: { errors } } = useFormContext();
@@ -30,7 +43,10 @@ export function ClientForm() {
 
           {/* Campo Tipo de Evento */}
           <div className="space-y-2">
-            <Label htmlFor="eventType">Tipo de Evento</Label>
+            <div className="flex items-center">
+              <Label htmlFor="eventType">Tipo de Evento</Label>
+              <InfoTooltip content="Ejemplos: Boda, Sesión de Retrato, Video Corporativo. Esto aparecerá en la propuesta." />
+            </div>
             <Input
               id="eventType"
               {...register('eventType')}
@@ -43,7 +59,10 @@ export function ClientForm() {
 
           {/* Campo Número de Propuesta */}
           <div className="space-y-2">
-            <Label htmlFor="invoiceNumber">Número de Propuesta</Label>
+             <div className="flex items-center">
+              <Label htmlFor="invoiceNumber">Número de Propuesta</Label>
+              <InfoTooltip content="Un identificador único para tu control. Ejemplo: 2024-001." />
+            </div>
             <Input
               id="invoiceNumber"
               {...register('invoiceNumber')}

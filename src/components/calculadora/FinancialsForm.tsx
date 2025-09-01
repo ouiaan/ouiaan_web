@@ -35,7 +35,7 @@ export function FinancialsForm() {
         <div className="space-y-2">
             <div className="flex items-center">
                 <Label htmlFor="overheadContributionPercentage">% de Contribución a Fijos (Overhead)</Label>
-                <InfoTooltip content="Un porcentaje de tus costos fijos totales que cada proyecto debe 'aportar' para ayudar a cubrir los gastos generales del negocio (renta, software, etc.)." />
+                <InfoTooltip content="Imagina que es la 'renta' que este proyecto paga para mantener tu negocio funcionando. Ayuda a cubrir tus gastos fijos mensuales (como Adobe, seguros, etc.) para que no salgan de tu ganancia. Un 15-25% es un buen punto de partida." />
             </div>
            <div className="relative">
             <Input
