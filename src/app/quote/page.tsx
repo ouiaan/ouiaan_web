@@ -44,23 +44,23 @@ const QuotePageClient = () => {
       </div>
       <div id="proposal-container-for-pdf">
         <div className="mx-auto max-w-4xl rounded-lg border border-neutral-700 bg-neutral-800 p-8 md:p-16">
-          <header className="flex justify-between items-start pb-8">
-            <div>
-              {formData.companyLogo && (
-                <div className="mb-4">
-                    <Image src={formData.companyLogo} alt="Logo" width={80} height={80} className="object-contain" />
+            <header className="flex justify-between items-start pb-8">
+                <div className="flex flex-col items-start">
+                    {formData.companyLogo && (
+                    <div className="mb-4">
+                        <Image src={formData.companyLogo} alt="Logo" width={80} height={80} className="object-contain" />
+                    </div>
+                    )}
+                    {formData.companyName && <h1 className="text-2xl font-headline font-bold">{formData.companyName}</h1>}
                 </div>
-              )}
-              <h1 className="text-2xl font-headline font-bold">{formData.companyName}</h1>
-            </div>
-            <div className="text-right">
-              <h2 className="text-2xl font-headline font-bold">{documentTitle}</h2>
-              <div className="mt-2 text-sm">
-                <p><span className="font-semibold text-neutral-400">Fecha:</span> {new Date().toLocaleDateString('es-ES')}</p>
-                <p className="mt-1"><span className="font-semibold text-neutral-400">Propuesta #:</span> {formData.invoiceNumber}</p>
-              </div>
-            </div>
-          </header>
+                <div className="text-right">
+                <h2 className="text-2xl font-headline font-bold">{documentTitle}</h2>
+                <div className="mt-2 text-sm">
+                    <p><span className="font-semibold text-neutral-400">Fecha:</span> {new Date().toLocaleDateString('es-ES')}</p>
+                    <p className="mt-1"><span className="font-semibold text-neutral-400">Propuesta #:</span> {formData.invoiceNumber}</p>
+                </div>
+                </div>
+            </header>
 
           <section className="py-8">
             <h2 className="text-sm uppercase tracking-widest text-neutral-400">Preparado para</h2>
