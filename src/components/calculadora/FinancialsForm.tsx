@@ -35,7 +35,7 @@ export function FinancialsForm() {
         <div className="space-y-2">
             <div className="flex items-center">
                 <Label htmlFor="overheadContributionPercentage">% de Contribución a Fijos (Overhead)</Label>
-                <InfoTooltip content="Imagina que es la 'renta' que este proyecto paga para mantener tu negocio funcionando. Ayuda a cubrir tus gastos fijos mensuales (como Adobe, seguros, etc.) para que no salgan de tu ganancia. Un 15-25% es un buen punto de partida." />
+                <InfoTooltip content="Imagina que es la 'renta' que este proyecto paga para mantener tu negocio. Ayuda a cubrir tus gastos fijos (Adobe, seguros, etc.). Un 15-25% es un buen punto de partida." />
             </div>
            <div className="relative">
             <Input
@@ -67,7 +67,7 @@ export function FinancialsForm() {
         <div className="space-y-2">
           <div className="flex items-center">
             <Label htmlFor="defaultLaborRate">Tarifa de Mano de Obra por Hora</Label>
-            <InfoTooltip content="Define tu costo estándar por hora de trabajo. Este valor se usará para calcular automáticamente el costo total de tu mano de obra en todos los proyectos." />
+            <InfoTooltip content="Define tu costo estándar por hora de trabajo. Este valor se usará para calcular automáticamente el costo total de tu mano de obra. Como referencia en la industria (MXN): Jr. $150-$250/hr, Mid $250-$450/hr, Sr. $450-$700+/hr. Ajústalo a tu mercado." />
           </div>
            <div className="relative">
             <Input
