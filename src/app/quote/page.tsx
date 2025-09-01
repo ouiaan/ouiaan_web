@@ -43,14 +43,14 @@ const QuotePageClient = () => {
       </div>
       <div id="proposal-container-for-pdf">
         <div className="mx-auto max-w-4xl rounded-lg border border-neutral-700 bg-neutral-800 p-8 md:p-16">
-          <header className="flex justify-between items-start">
-            <div className="flex flex-col items-start">
-              {formData.companyLogo ? (
-                <Image src={formData.companyLogo} alt="Logo" width={150} height={75} className="object-contain" />
-              ) : (
-                <h1 className="text-4xl font-headline font-bold">{formData.companyName}</h1>
+          <header className="flex justify-between items-start pb-8">
+            <div className="flex items-center gap-4">
+              {formData.companyLogo && (
+                <Image src={formData.companyLogo} alt="Logo" width={80} height={80} className="object-contain" />
               )}
-              <p className="text-neutral-400 mt-2">{formData.companyWebsite}</p>
+              <div>
+                <h1 className="text-4xl font-headline font-bold">{formData.companyName}</h1>
+              </div>
             </div>
             <div className="text-right">
               <h2 className="text-2xl font-headline font-bold">{documentTitle}</h2>
@@ -61,7 +61,7 @@ const QuotePageClient = () => {
             </div>
           </header>
 
-          <section className="py-8 border-t border-b border-neutral-700 mt-8">
+          <section className="py-8 border-t border-neutral-700">
             <h2 className="text-sm uppercase tracking-widest text-neutral-400">Preparado para</h2>
             <p className="text-xl font-bold text-white mt-1">{formData.clientName}</p>
             <p className="text-neutral-300">{formData.eventType}</p>
@@ -97,7 +97,10 @@ const QuotePageClient = () => {
              {formData.companyNotes && (
               <div className="mb-8 text-left"><h4 className="font-bold text-base text-white mb-2">Notas Importantes:</h4><ul className="list-disc pl-5 space-y-1">{formData.companyNotes.split('\n').map((line: string, i: number) => (line.trim() && <li key={i}>{line.replace(/^- /, '')}</li>))}</ul></div>
             )}
-            <div className="text-center"><p>¡Será un honor ser parte de tu historia!</p><p className="mt-4">{formData.companyEmail} | {formData.companyPhone}</p></div>
+            <div className="text-center">
+              <p>¡Será un honor ser parte de tu historia!</p>
+              <p className="mt-4">{formData.companyWebsite} | {formData.companyEmail} | {formData.companyPhone}</p>
+            </div>
           </footer>
         </div>
       </div>
