@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, Controller } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +12,8 @@ import Image from 'next/image';
 import { type FormValues } from '@/app/calculadora/schema';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
-import { BackgroundGradient } from '@/components/ui/background-gradient';
+import { BackgroundGradient } from '../ui/background-gradient';
+import { FormField, FormItem, FormControl } from '../ui/form';
 
 const profileFields: { label: string, name: keyof FormValues }[] = [
   { label: 'Nombre de la Compañía', name: 'companyName' },
@@ -34,7 +35,7 @@ const InfoTooltip = ({ content }: { content: string }) => (
 );
 
 export function ProfileForm() {
-  const { register, setValue, watch } = useFormContext<FormValues>(); 
+  const { register, setValue, watch, control } = useFormContext<FormValues>(); 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   const companyLogo = watch('companyLogo');
@@ -123,12 +124,25 @@ export function ProfileForm() {
                     {...register('paymentInstructions')}
                     className="min-h-[120px] bg-card"
                 />
-                <div className="flex items-center space-x-2 pt-2">
-                    <Checkbox id="includePaymentInfo" {...register('includePaymentInfo')} />
-                    <Label htmlFor="includePaymentInfo" className="text-sm font-light text-muted-foreground">
-                    Incluir esta información en la Factura Proforma
-                    </Label>
-                </div>
+                 <FormField
+                    control={control}
+                    name="includePaymentInfo"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md pt-2">
+                            <FormControl>
+                                <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                                <Label htmlFor="includePaymentInfo" className="text-sm font-light text-muted-foreground">
+                                    Incluir esta información en la Factura Proforma
+                                </Label>
+                            </div>
+                        </FormItem>
+                    )}
+                />
                 </div>
             </CardContent>
         </Card>
