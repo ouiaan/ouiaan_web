@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
 import { type FormValues } from '@/app/calculadora/schema';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 
 const profileFields: { label: string, name: keyof FormValues }[] = [
   { label: 'Nombre de la Compañía', name: 'companyName' },
@@ -17,6 +20,17 @@ const profileFields: { label: string, name: keyof FormValues }[] = [
   { label: 'Dirección (Opcional)', name: 'companyAddress' },
   { label: 'Teléfono (Opcional)', name: 'companyPhone' },
 ];
+
+const InfoTooltip = ({ content }: { content: string }) => (
+    <Tooltip>
+        <TooltipTrigger asChild>
+            <span className="ml-2 cursor-help"><Info className="h-4 w-4 text-muted-foreground" /></span>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+            <p className="text-sm">{content}</p>
+        </TooltipContent>
+    </Tooltip>
+);
 
 export function ProfileForm() {
   const { register, setValue, watch } = useFormContext<FormValues>(); 
@@ -98,7 +112,10 @@ export function ProfileForm() {
         </div>
         
         <div className="mt-6 space-y-2">
-          <Label htmlFor="paymentInstructions">Información de Pago</Label>
+          <div className='flex items-center'>
+            <Label htmlFor="paymentInstructions">Información de Pago</Label>
+            <InfoTooltip content="Estos datos (CLABE, PayPal, etc.) se mostrarán en la Factura Proforma si marcas la casilla de abajo. Útil para que tus clientes sepan cómo pagarte." />
+          </div>
           <Textarea
             id="paymentInstructions"
             {...register('paymentInstructions')}

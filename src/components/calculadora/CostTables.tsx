@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useFormContext, useFieldArray, Controller } from 'react-hook-form';
@@ -11,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { PlusCircle, Trash2, Info } from 'lucide-react';
 
 const clientFacingCategories = [
   "Planeación y Pre-Boda",
@@ -20,6 +22,17 @@ const clientFacingCategories = [
   "Plataforma Digital",
   "Costos de Estudio y Gestión de Proyecto",
 ] as const;
+
+const InfoTooltip = ({ content }: { content: React.ReactNode }) => (
+    <Tooltip>
+        <TooltipTrigger asChild>
+            <span className="ml-2 cursor-help"><Info className="h-4 w-4 text-muted-foreground" /></span>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+            <div className="text-sm">{content}</div>
+        </TooltipContent>
+    </Tooltip>
+);
 
 export function CostTables() {
   const { control, register } = useFormContext();
@@ -36,7 +49,17 @@ export function CostTables() {
       <CardContent className="space-y-12">
         {/* Tabla de Mano de Obra */}
         <div className="space-y-4">
-          <h4 className="text-lg font-medium">Costos de Mano de Obra</h4>
+          <h4 className="text-lg font-medium flex items-center">
+            Costos de Mano de Obra
+            <InfoTooltip content={
+                <ul className="list-disc pl-4 space-y-1 text-left">
+                    <li>Reuniones con cliente</li>
+                    <li>Búsqueda de inspiración</li>
+                    <li>Tiempo de edición/post-producción</li>
+                    <li>Horas de cobertura de evento</li>
+                </ul>
+            } />
+          </h4>
           <div className="rounded-lg border border-neutral-800 p-2 space-y-2">
             {laborFields.map((item, index) => (
               <div key={item.id} className="grid grid-cols-1 md:grid-cols-12 items-center gap-2">
@@ -64,7 +87,17 @@ export function CostTables() {
 
         {/* Tabla de Costos Variables */}
         <div className="space-y-4">
-          <h4 className="text-lg font-medium">Costos Variables</h4>
+          <h4 className="text-lg font-medium flex items-center">
+            Costos Variables
+            <InfoTooltip content={
+                <ul className="list-disc pl-4 space-y-1 text-left">
+                    <li>Transporte / Viáticos</li>
+                    <li>Segundo fotógrafo / asistente</li>
+                    <li>Renta de equipo adicional</li>
+                    <li>Costos de hosting o plataformas</li>
+                </ul>
+            } />
+          </h4>
           <div className="rounded-lg border border-neutral-800 p-2 space-y-2">
             {variableFields.map((item, index) => (
                <div key={item.id} className="grid grid-cols-1 md:grid-cols-12 items-center gap-2">
@@ -92,7 +125,20 @@ export function CostTables() {
         
         {/* Tabla de Costos Fijos */}
         <div className="space-y-4">
-           <h4 className="text-lg font-medium">Costos Fijos (Interno)</h4>
+           <h4 className="text-lg font-medium flex items-center">
+                Costos Fijos (Interno)
+                <InfoTooltip content={
+                    <>
+                        <p className='text-left mb-2'>Costos mensuales de tu negocio que no dependen de un proyecto específico. Están ligados a la "Contribución a Fijos (Overhead)".</p>
+                        <ul className="list-disc pl-4 space-y-1 text-left">
+                            <li>Suscripciones (Adobe, etc.)</li>
+                            <li>Renta de oficina/estudio</li>
+                            <li>Seguros</li>
+                            <li>Marketing</li>
+                        </ul>
+                    </>
+                } />
+           </h4>
            <div className="rounded-lg border border-neutral-800 p-2 space-y-2">
              {fixedFields.map((item, index) => (
                <div key={item.id} className="grid grid-cols-1 md:grid-cols-12 items-center gap-2">

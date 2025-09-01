@@ -1,9 +1,24 @@
+
 'use client';
 
 import { useFormContext } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
+
+const InfoTooltip = ({ content }: { content: string }) => (
+    <Tooltip>
+        <TooltipTrigger asChild>
+            <span className="ml-2 cursor-help"><Info className="h-4 w-4 text-muted-foreground" /></span>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+            <p className="text-sm">{content}</p>
+        </TooltipContent>
+    </Tooltip>
+);
+
 
 export function FinancialsForm() {
   const { register } = useFormContext();
@@ -18,7 +33,10 @@ export function FinancialsForm() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="overheadContributionPercentage">% de Contribución a Fijos (Overhead)</Label>
+            <div className="flex items-center">
+                <Label htmlFor="overheadContributionPercentage">% de Contribución a Fijos (Overhead)</Label>
+                <InfoTooltip content="Un porcentaje de tus costos fijos totales que cada proyecto debe 'aportar' para ayudar a cubrir los gastos generales del negocio (renta, software, etc.)." />
+            </div>
            <div className="relative">
             <Input
               id="overheadContributionPercentage"
@@ -31,7 +49,10 @@ export function FinancialsForm() {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="profitMarginPercentage">Margen de Ganancia del Negocio (%)</Label>
+          <div className="flex items-center">
+            <Label htmlFor="profitMarginPercentage">Margen de Ganancia del Negocio (%)</Label>
+            <InfoTooltip content="El porcentaje de ganancia que deseas obtener sobre el costo total de producción (mano de obra + costos variables + contribución a fijos)." />
+          </div>
            <div className="relative">
             <Input
               id="profitMarginPercentage"
