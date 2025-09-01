@@ -37,6 +37,31 @@ const QuotePageClient = () => {
   const descriptionEntries = Object.entries(formData.categoryDescriptions || {}).filter(([key, value]) => typeof value === 'string' && value.trim() !== '');
   const documentTitle = viewType === 'proforma' ? 'Factura Proforma' : viewType === 'internal' ? 'Desglose Interno' : 'Propuesta de Servicios';
 
+  // Componente para la tabla de costos internos
+  const InternalCostsTable = ({ title, items, columns }: { title: string; items: any[]; columns: { header: string; accessor: string }[] }) => (
+    <div className="border-b border-neutral-700 pb-6 mb-6">
+      <h3 className="text-xl font-headline font-semibold mb-3">{title}</h3>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left">
+          <thead className="bg-neutral-700/50">
+            <tr>
+              {columns.map(col => <th key={col.header} className="p-2 font-semibold">{col.header}</th>)}
+              <th className="p-2 font-semibold text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item, index) => (
+              <tr key={index} className="border-b border-neutral-700/50">
+                {columns.map(col => <td key={col.accessor} className="p-2">{item[col.accessor]}</td>)}
+                <td className="p-2 text-right font-mono">{formatCurrency((item.hours || item.quantity) * (item.rate || item.cost))}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
   return (
     <main className="p-4 sm:p-8 md:p-12 font-sans bg-neutral-900 text-neutral-200 min-h-screen">
       <div className="max-w-4xl mx-auto mb-4 text-right">
@@ -51,46 +76,82 @@ const QuotePageClient = () => {
                         <Image src={formData.companyLogo} alt="Logo" width={80} height={80} className="object-contain" />
                     </div>
                     )}
-                    {formData.companyName && <h1 className="text-2xl font-headline font-bold">{formData.companyName}</h1>}
+                    {formData.companyName && <h1 className="text-xl font-headline font-bold">{formData.companyName}</h1>}
                 </div>
                 <div className="text-right">
                 <h2 className="text-2xl font-headline font-bold">{documentTitle}</h2>
                 <div className="mt-2 text-sm">
                     <p><span className="font-semibold text-neutral-400">Fecha:</span> {new Date().toLocaleDateString('es-ES')}</p>
                     <p className="mt-1"><span className="font-semibold text-neutral-400">Propuesta #:</span> {formData.invoiceNumber}</p>
+                    <p className="mt-1"><span className="font-semibold text-neutral-400">Cliente:</span> {formData.clientName}</p>
                 </div>
                 </div>
             </header>
 
-          <section className="py-8">
-            <h2 className="text-sm uppercase tracking-widest text-neutral-400">Preparado para</h2>
-            <p className="text-xl font-bold text-white mt-1">{formData.clientName}</p>
-            <p className="text-neutral-300">{formData.eventType}</p>
-          </section>
+          {viewType === 'internal' ? (
+            <section className="py-8">
+              <InternalCostsTable 
+                title="Mano de Obra" 
+                items={formData.laborItems} 
+                columns={[{header: 'Descripción', accessor: 'description'}, {header: 'Horas', accessor: 'hours'}, {header: 'Tarifa', accessor: 'rate'}, {header: 'Categoría', accessor: 'category'}]}
+              />
+              <InternalCostsTable 
+                title="Costos Variables" 
+                items={formData.variableCostItems} 
+                columns={[{header: 'Descripción', accessor: 'description'}, {header: 'Cantidad', accessor: 'quantity'}, {header: 'Costo', accessor: 'cost'}, {header: 'Categoría', accessor: 'category'}]}
+              />
+              <InternalCostsTable 
+                title="Costos Fijos" 
+                items={formData.fixedCostItems} 
+                columns={[{header: 'Descripción', accessor: 'description'}, {header: 'Cantidad', accessor: 'quantity'}, {header: 'Costo', accessor: 'cost'}]}
+              />
 
-          <section className="space-y-8 py-8">
-            {descriptionEntries.map(([category, description]: [string, any]) => (
-              <div key={category} className="border-b border-neutral-700 pb-8 last:border-b-0">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-2xl font-headline font-semibold">{category}</h3>
-                  <span className="text-xl font-semibold">{formatCurrency(results.categoryTotals[category] || 0)}</span>
-                </div>
-                <div className="max-w-none text-neutral-300">
-                  <ul className="list-disc pl-5 space-y-1">{description.split('\n').map((line: string, i: number) => (line.trim() && <li key={i}>{line.replace(/^- /, '')}</li>))}</ul>
+              <div className="pt-8 mt-8 flex justify-end">
+                <div className="w-full max-w-sm space-y-4">
+                  <h3 className="text-xl font-headline font-semibold mb-3">Resumen Financiero</h3>
+                  <div className="flex justify-between text-sm"><span className="text-neutral-400">Total Mano de Obra</span><span>{formatCurrency(results.totalLabor)}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-neutral-400">Total Costos Variables</span><span>{formatCurrency(results.totalVariableCosts)}</span></div>
+                  <div className="flex justify-between border-b border-neutral-700 pb-2 text-sm"><span className="text-neutral-400">Total Costos Fijos</span><span>{formatCurrency(formData.fixedCostItems.reduce((acc, item) => acc + item.quantity * item.cost, 0))}</span></div>
+                  <div className="flex justify-between font-semibold"><span className="text-neutral-300">Costo de Producción (Labor + Variables)</span><span>{formatCurrency(results.totalLabor + results.totalVariableCosts)}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-neutral-400">Contribución a Fijos ({formData.overheadContributionPercentage}%)</span><span>{formatCurrency(results.overheadContribution)}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-neutral-400">Ganancia del Negocio ({formData.profitMarginPercentage}%)</span><span>{formatCurrency(results.profit)}</span></div>
+                  <div className="flex justify-between font-bold border-t border-neutral-700 pt-2"><span className="text-white">Precio de Venta (Subtotal)</span><span className="text-lime-400">{formatCurrency(results.subtotal)}</span></div>
                 </div>
               </div>
-            ))}
-          </section>
+            </section>
+          ) : (
+            <>
+              <section className="py-8">
+                <h2 className="text-sm uppercase tracking-widest text-neutral-400">Preparado para</h2>
+                <p className="text-xl font-bold text-white mt-1">{formData.clientName}</p>
+                <p className="text-neutral-300">{formData.eventType}</p>
+              </section>
 
-          <section className="pt-8 mt-8 flex justify-end">
-            <div className="w-full max-w-xs space-y-4">
-              <div className="flex justify-between"><span className="text-neutral-400">Subtotal</span><span>{formatCurrency(results.subtotal)}</span></div>
-              <div className="flex justify-between"><span className="text-neutral-400">Descuento</span><span className="text-red-400">-{formatCurrency(results.discountAmount)}</span></div>
-              <div className="flex justify-between"><span className="text-neutral-400">IVA ({formData.vatPercentage}%)</span><span>{formatCurrency(results.vatAmount)}</span></div>
-              <div className="flex justify-between text-2xl font-bold text-lime-400 pt-4 border-t border-neutral-700"><span>Total</span><span>{formatCurrency(results.total)}</span></div>
-            </div>
-          </section>
-          
+              <section className="space-y-8 py-8">
+                {descriptionEntries.map(([category, description]: [string, any]) => (
+                  <div key={category} className="border-b border-neutral-700 pb-8 last:border-b-0">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-2xl font-headline font-semibold">{category}</h3>
+                      <span className="text-xl font-semibold">{formatCurrency(results.categoryTotals[category] || 0)}</span>
+                    </div>
+                    <div className="max-w-none text-neutral-300">
+                      <ul className="list-disc pl-5 space-y-1">{description.split('\n').map((line: string, i: number) => (line.trim() && <li key={i}>{line.replace(/^- /, '')}</li>))}</ul>
+                    </div>
+                  </div>
+                ))}
+              </section>
+
+              <section className="pt-8 mt-8 flex justify-end">
+                <div className="w-full max-w-xs space-y-4">
+                  <div className="flex justify-between"><span className="text-neutral-400">Subtotal</span><span>{formatCurrency(results.subtotal)}</span></div>
+                  <div className="flex justify-between"><span className="text-neutral-400">Descuento</span><span className="text-red-400">-{formatCurrency(results.discountAmount)}</span></div>
+                  <div className="flex justify-between"><span className="text-neutral-400">IVA ({formData.vatPercentage}%)</span><span>{formatCurrency(results.vatAmount)}</span></div>
+                  <div className="flex justify-between text-2xl font-bold text-lime-400 pt-4 border-t border-neutral-700"><span>Total</span><span>{formatCurrency(results.total)}</span></div>
+                </div>
+              </section>
+            </>
+          )}
+
           <footer className="border-t border-neutral-700 pt-8 mt-12 text-sm text-neutral-400">
              {viewType === 'proforma' && formData.includePaymentInfo && formData.paymentInstructions && (
               <div className="mb-8 text-left"><h4 className="font-bold text-base text-white mb-2">Instrucciones de Pago:</h4><div className="whitespace-pre-wrap text-xs">{formData.paymentInstructions}</div></div>
@@ -100,7 +161,7 @@ const QuotePageClient = () => {
             )}
             <div className="text-center">
               <p>¡Será un honor ser parte de tu historia!</p>
-              <p className="mt-4">{formData.companyWebsite} | {formData.companyEmail} | {formData.companyPhone}</p>
+              {formData.companyWebsite && <p className="mt-4">{formData.companyWebsite} | {formData.companyEmail} | {formData.companyPhone}</p>}
             </div>
           </footer>
         </div>
@@ -114,3 +175,5 @@ const QuotePage = dynamic(() => Promise.resolve(QuotePageClient), {
 });
 
 export default QuotePage;
+
+    
