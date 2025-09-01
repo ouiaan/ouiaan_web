@@ -209,7 +209,7 @@ export function Header() {
               {desktopNavLinks.map((link) => (
                 <NavLink key={link.href} href={link.href} label={link.label} />
               ))}
-            </nav>
+            </motion.nav>
 
             {/* Mobile Navigation */}
             <div className="flex items-center md:hidden">
