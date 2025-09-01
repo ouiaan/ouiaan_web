@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
+import { BackgroundGradient } from '../ui/background-gradient';
 
 const InfoTooltip = ({ content }: { content: string }) => (
     <Tooltip>
@@ -30,32 +31,34 @@ export function DescriptionForm() {
   const { register } = useFormContext();
 
   return (
-    <Card className="border-neutral-800 bg-neutral-900">
-      <CardHeader>
-        <CardTitle className="font-headline text-xl flex items-center">
-          Descripción de Servicios por Categoría
-          <InfoTooltip content="Describe qué incluye cada fase del proyecto. Usa viñetas (guiones) para crear listas. Esta información es clave en la propuesta para el cliente." />
-        </CardTitle>
-        <p className="pt-1 text-sm text-muted-foreground">
-          Este texto aparecerá en la propuesta del cliente. Personalízalo para cada cotización.
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {descriptionCategories.map((category) => (
-          <div key={category.name} className="space-y-2">
-            <div className="flex items-center">
-                <Label htmlFor={`categoryDescriptions.${category.name}`}>{category.name}</Label>
-                <InfoTooltip content={category.tooltip} />
-            </div>
-            <Textarea
-              id={`categoryDescriptions.${category.name}`}
-              {...register(`categoryDescriptions.${category.name}` as const)}
-              className="min-h-[100px] bg-neutral-950"
-              placeholder={`Detalla los servicios incluidos en ${category.name.toLowerCase()}...`}
-            />
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+    <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground">
+        <Card className="bg-transparent border-none shadow-none">
+            <CardHeader>
+                <CardTitle className="font-headline text-xl flex items-center">
+                Descripción de Servicios por Categoría
+                <InfoTooltip content="Describe qué incluye cada fase del proyecto. Usa viñetas (guiones) para crear listas. Esta información es clave en la propuesta para el cliente." />
+                </CardTitle>
+                <p className="pt-1 text-sm text-muted-foreground">
+                Este texto aparecerá en la propuesta del cliente. Personalízalo para cada cotización.
+                </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                {descriptionCategories.map((category) => (
+                <div key={category.name} className="space-y-2">
+                    <div className="flex items-center">
+                        <Label htmlFor={`categoryDescriptions.${category.name}`}>{category.name}</Label>
+                        <InfoTooltip content={category.tooltip} />
+                    </div>
+                    <Textarea
+                    id={`categoryDescriptions.${category.name}`}
+                    {...register(`categoryDescriptions.${category.name}` as const)}
+                    className="min-h-[100px] bg-card"
+                    placeholder={`Detalla los servicios incluidos en ${category.name.toLowerCase()}...`}
+                    />
+                </div>
+                ))}
+            </CardContent>
+        </Card>
+    </BackgroundGradient>
   );
 }

@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { type FormValues } from '@/app/calculadora/schema';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
+import { BackgroundGradient } from '@/components/ui/background-gradient';
 
 const profileFields: { label: string, name: keyof FormValues }[] = [
   { label: 'Nombre de la Compañía', name: 'companyName' },
@@ -60,75 +61,77 @@ export function ProfileForm() {
   };
 
   return (
-    <Card className="border-neutral-800 bg-neutral-900">
-      <CardHeader>
-        <CardTitle className="font-headline text-xl">Ajustes de Perfil</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {profileFields.map(({ label, name }) => (
-            <div key={name} className="space-y-2">
-              <Label htmlFor={name}>{label}</Label>
-              <Input
-                id={name}
-                {...register(name)}
-                className="bg-neutral-950"
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
-            <div className="space-y-2">
-                <Label htmlFor="companyLogo">Logo de la Compañía (PNG/JPG)</Label>
-                <Input 
-                    id="companyLogoInput"
-                    type="file" 
-                    accept="image/png, image/jpeg" 
-                    onChange={handleLogoUpload} 
-                    className="file:text-white"
-                />
-            </div>
-            {logoPreview && (
-                <div className="flex justify-center items-center bg-neutral-950 rounded-md p-2 h-24">
-                    <Image
-                        src={logoPreview}
-                        alt="Vista previa del logo"
-                        width={120}
-                        height={60}
-                        className="object-contain max-h-full"
+    <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground">
+        <Card className="bg-transparent border-none shadow-none">
+            <CardHeader>
+                <CardTitle className="font-headline text-xl">Ajustes de Perfil</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                {profileFields.map(({ label, name }) => (
+                    <div key={name} className="space-y-2">
+                    <Label htmlFor={name}>{label}</Label>
+                    <Input
+                        id={name}
+                        {...register(name)}
+                        className="bg-card"
                     />
+                    </div>
+                ))}
                 </div>
-            )}
-        </div>
 
-        <div className="mt-6 space-y-2">
-          <Label htmlFor="companyNotes">Notas Importantes / Términos</Label>
-          <Textarea
-            id="companyNotes"
-            {...register('companyNotes')}
-            className="min-h-[120px] bg-neutral-950"
-          />
-        </div>
-        
-        <div className="mt-6 space-y-2">
-          <div className='flex items-center'>
-            <Label htmlFor="paymentInstructions">Información de Pago</Label>
-            <InfoTooltip content="Estos datos (CLABE, PayPal, etc.) se mostrarán en la Factura Proforma si marcas la casilla de abajo. Útil para que tus clientes sepan cómo pagarte." />
-          </div>
-          <Textarea
-            id="paymentInstructions"
-            {...register('paymentInstructions')}
-            className="min-h-[120px] bg-neutral-950"
-          />
-           <div className="flex items-center space-x-2 pt-2">
-            <Checkbox id="includePaymentInfo" {...register('includePaymentInfo')} />
-            <Label htmlFor="includePaymentInfo" className="text-sm font-light text-muted-foreground">
-              Incluir esta información en la Factura Proforma
-            </Label>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+                    <div className="space-y-2">
+                        <Label htmlFor="companyLogo">Logo de la Compañía (PNG/JPG)</Label>
+                        <Input 
+                            id="companyLogoInput"
+                            type="file" 
+                            accept="image/png, image/jpeg" 
+                            onChange={handleLogoUpload} 
+                            className="file:text-white bg-card"
+                        />
+                    </div>
+                    {logoPreview && (
+                        <div className="flex justify-center items-center bg-card/50 rounded-md p-2 h-24">
+                            <Image
+                                src={logoPreview}
+                                alt="Vista previa del logo"
+                                width={120}
+                                height={60}
+                                className="object-contain max-h-full"
+                            />
+                        </div>
+                    )}
+                </div>
+
+                <div className="mt-6 space-y-2">
+                <Label htmlFor="companyNotes">Notas Importantes / Términos</Label>
+                <Textarea
+                    id="companyNotes"
+                    {...register('companyNotes')}
+                    className="min-h-[120px] bg-card"
+                />
+                </div>
+                
+                <div className="mt-6 space-y-2">
+                <div className='flex items-center'>
+                    <Label htmlFor="paymentInstructions">Información de Pago</Label>
+                    <InfoTooltip content="Estos datos (CLABE, PayPal, etc.) se mostrarán en la Factura Proforma si marcas la casilla de abajo. Útil para que tus clientes sepan cómo pagarte." />
+                </div>
+                <Textarea
+                    id="paymentInstructions"
+                    {...register('paymentInstructions')}
+                    className="min-h-[120px] bg-card"
+                />
+                <div className="flex items-center space-x-2 pt-2">
+                    <Checkbox id="includePaymentInfo" {...register('includePaymentInfo')} />
+                    <Label htmlFor="includePaymentInfo" className="text-sm font-light text-muted-foreground">
+                    Incluir esta información en la Factura Proforma
+                    </Label>
+                </div>
+                </div>
+            </CardContent>
+        </Card>
+    </BackgroundGradient>
   );
 }
