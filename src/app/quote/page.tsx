@@ -1,3 +1,4 @@
+
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -44,13 +45,13 @@ const QuotePageClient = () => {
       <div id="proposal-container-for-pdf">
         <div className="mx-auto max-w-4xl rounded-lg border border-neutral-700 bg-neutral-800 p-8 md:p-16">
           <header className="flex justify-between items-start pb-8">
-            <div className="flex items-center gap-4">
+            <div>
               {formData.companyLogo && (
-                <Image src={formData.companyLogo} alt="Logo" width={80} height={80} className="object-contain" />
+                <div className="mb-4">
+                    <Image src={formData.companyLogo} alt="Logo" width={80} height={80} className="object-contain" />
+                </div>
               )}
-              <div>
-                <h1 className="text-4xl font-headline font-bold">{formData.companyName}</h1>
-              </div>
+              <h1 className="text-2xl font-headline font-bold">{formData.companyName}</h1>
             </div>
             <div className="text-right">
               <h2 className="text-2xl font-headline font-bold">{documentTitle}</h2>
@@ -61,7 +62,7 @@ const QuotePageClient = () => {
             </div>
           </header>
 
-          <section className="py-8 border-t border-neutral-700">
+          <section className="py-8">
             <h2 className="text-sm uppercase tracking-widest text-neutral-400">Preparado para</h2>
             <p className="text-xl font-bold text-white mt-1">{formData.clientName}</p>
             <p className="text-neutral-300">{formData.eventType}</p>
