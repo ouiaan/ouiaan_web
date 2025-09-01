@@ -38,21 +38,21 @@ const QuotePageClient = () => {
   const documentTitle = viewType === 'proforma' ? 'Factura Proforma' : viewType === 'internal' ? 'Desglose Interno' : 'Propuesta de Servicios';
 
   // Componente para la tabla de costos internos
-  const InternalCostsTable = ({ title, items, columns }: { title: string; items: any[]; columns: { header: string; accessor: string }[] }) => (
+  const InternalCostsTable = ({ title, items, columns }: { title: string; items: any[]; columns: { header: string; accessor: string, align?: 'left' | 'right' }[] }) => (
     <div className="border-b border-neutral-700 pb-6 mb-6">
       <h3 className="text-xl font-headline font-semibold mb-3">{title}</h3>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left">
+        <table className="w-full text-sm">
           <thead className="bg-neutral-700/50">
             <tr>
-              {columns.map(col => <th key={col.header} className="p-2 font-semibold">{col.header}</th>)}
+              {columns.map(col => <th key={col.header} className={`p-2 font-semibold text-${col.align || 'left'}`}>{col.header}</th>)}
               <th className="p-2 font-semibold text-right">Total</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, index) => (
               <tr key={index} className="border-b border-neutral-700/50">
-                {columns.map(col => <td key={col.accessor} className="p-2">{item[col.accessor]}</td>)}
+                {columns.map(col => <td key={col.accessor} className={`p-2 text-${col.align || 'left'}`}>{item[col.accessor]}</td>)}
                 <td className="p-2 text-right font-mono">{formatCurrency((item.hours || item.quantity) * (item.rate || item.cost))}</td>
               </tr>
             ))}
@@ -93,17 +93,31 @@ const QuotePageClient = () => {
               <InternalCostsTable 
                 title="Mano de Obra" 
                 items={formData.laborItems} 
-                columns={[{header: 'Descripción', accessor: 'description'}, {header: 'Horas', accessor: 'hours'}, {header: 'Tarifa', accessor: 'rate'}, {header: 'Categoría', accessor: 'category'}]}
+                columns={[
+                  {header: 'Descripción', accessor: 'description', align: 'left'}, 
+                  {header: 'Horas', accessor: 'hours', align: 'right'}, 
+                  {header: 'Tarifa', accessor: 'rate', align: 'right'}, 
+                  {header: 'Categoría', accessor: 'category', align: 'left'}
+                ]}
               />
               <InternalCostsTable 
                 title="Costos Variables" 
                 items={formData.variableCostItems} 
-                columns={[{header: 'Descripción', accessor: 'description'}, {header: 'Cantidad', accessor: 'quantity'}, {header: 'Costo', accessor: 'cost'}, {header: 'Categoría', accessor: 'category'}]}
+                columns={[
+                  {header: 'Descripción', accessor: 'description', align: 'left'}, 
+                  {header: 'Cantidad', accessor: 'quantity', align: 'right'}, 
+                  {header: 'Costo', accessor: 'cost', align: 'right'}, 
+                  {header: 'Categoría', accessor: 'category', align: 'left'}
+                ]}
               />
               <InternalCostsTable 
                 title="Costos Fijos" 
                 items={formData.fixedCostItems} 
-                columns={[{header: 'Descripción', accessor: 'description'}, {header: 'Cantidad', accessor: 'quantity'}, {header: 'Costo', accessor: 'cost'}]}
+                columns={[
+                  {header: 'Descripción', accessor: 'description', align: 'left'}, 
+                  {header: 'Cantidad', accessor: 'quantity', align: 'right'}, 
+                  {header: 'Costo', accessor: 'cost', align: 'right'}
+                ]}
               />
 
               <div className="pt-8 mt-8 flex justify-end">
