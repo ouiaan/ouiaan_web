@@ -18,7 +18,6 @@ import {
 const desktopNavLinks = [
   { href: '/gear', label: 'Mi Equipo' },
   { href: '/freebies', label: 'Gratis' },
-  { href: '/color-ai', label: 'Reverse Grade AI' },
   { href: '/contact', label: 'Contacto' },
 ];
 
@@ -26,9 +25,10 @@ const mobileNavLinks = [
   { href: '/', label: 'Inicio' },
   { href: '/store/photo', label: 'Foto' },
   { href: '/store/video', label: 'Video' },
+  { href: '/calculadora', label: 'Calculadora' },
+  { href: '/color-ai', label: 'Reverse Grade AI' },
   { href: '/gear', label: 'Mi Equipo' },
   { href: '/freebies', label: 'Gratis' },
-  { href: '/color-ai', label: 'Reverse Grade AI' },
   { href: '/contact', label: 'Contacto' },
 ];
 
@@ -59,6 +59,7 @@ export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [storeMenuOpen, setStoreMenuOpen] = React.useState(false);
+  const [toolsMenuOpen, setToolsMenuOpen] = React.useState(false);
 
   const [isMounted, setIsMounted] = React.useState(false);
   React.useEffect(() => {
@@ -176,11 +177,39 @@ export function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+              
+              <div
+                onMouseEnter={() => setToolsMenuOpen(true)}
+                onMouseLeave={() => setToolsMenuOpen(false)}
+                className="relative"
+              >
+                <DropdownMenu open={toolsMenuOpen} onOpenChange={setToolsMenuOpen}>
+                  <DropdownMenuTrigger
+                    className={cn(
+                      'group flex items-center gap-1 font-headline uppercase tracking-wider text-xl transition-colors duration-300 outline-none cursor-pointer',
+                      pathname.startsWith('/calculadora') || pathname.startsWith('/color-ai')
+                        ? 'text-accent'
+                        : 'text-foreground/70 hover:text-foreground'
+                    )}
+                  >
+                    Herramientas
+                    <ChevronDown className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent sideOffset={0}>
+                    <DropdownMenuItem asChild>
+                      <Link href="/calculadora">Calculadora</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/color-ai">Reverse Grade AI</Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
 
               {desktopNavLinks.map((link) => (
                 <NavLink key={link.href} href={link.href} label={link.label} />
               ))}
-            </motion.nav>
+            </nav>
 
             {/* Mobile Navigation */}
             <div className="flex items-center md:hidden">
