@@ -3,8 +3,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ActionButtons } from './ActionButtons';
-import { type FormValues } from '@/app/calculadora/schema';
 import { BackgroundGradient } from '../ui/background-gradient';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
+
 
 const formatCurrency = (value: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value || 0);
 
@@ -25,13 +27,36 @@ interface SummaryCardProps {
   results: CalculationResults;
 }
 
+const InfoTooltip = ({ content }: { content: React.ReactNode }) => (
+    <Tooltip>
+        <TooltipTrigger asChild>
+            <span className="ml-2 cursor-help"><Info className="h-4 w-4 text-muted-foreground" /></span>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+            <div className="text-sm text-left">{content}</div>
+        </TooltipContent>
+    </Tooltip>
+);
+
 export function SummaryCard({ results }: SummaryCardProps) {
   return (
     <div className="sticky top-24">
         <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground">
             <Card className="bg-transparent border-none shadow-none">
                 <CardHeader>
-                    <CardTitle className="font-headline text-xl">Resumen del Presupuesto</CardTitle>
+                    <CardTitle className="font-headline text-xl flex items-center">
+                        Resumen del Presupuesto
+                        <InfoTooltip content={
+                           <>
+                                <p className='font-bold mb-2'>Genera 3 tipos de documentos:</p>
+                                <ul className="list-disc pl-4 space-y-1">
+                                    <li><b>Propuesta:</b> El documento oficial para el cliente. Incluye descripción de servicios y totales.</li>
+                                    <li><b>Factura Proforma:</b> Una versión simplificada, ideal para mostrar los detalles de pago.</li>
+                                    <li><b>Desglose Interno:</b> Solo para tus ojos. Muestra todos tus costos, la contribución a fijos y tu ganancia real.</li>
+                                </ul>
+                           </>
+                        } />
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-4">
