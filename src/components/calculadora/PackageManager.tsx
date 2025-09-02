@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -78,7 +79,7 @@ export function PackageManager({ onReset, onLoadPackage }: PackageManagerProps) 
     <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground p-4">
         <div className="flex items-center mb-4">
             <h3 className="font-headline text-lg">Gestor de Paquetes</h3>
-            <InfoTooltip content="Guarda tus configuraciones de presupuesto como 'Paquetes' para cargarlas rápidamente en el futuro. Ideal para bodas, sesiones de retrato, etc." />
+            <InfoTooltip content="Usa esta sección para guardar tus presupuestos como plantillas. Haz clic en 'Guardar Paquete' para guardar la configuración actual, y luego usa el menú 'Cargar un Paquete' para rellenar el formulario en el futuro. Ideal para distintos tipos de servicio (bodas, retratos, etc.)." />
         </div>
         <div className="flex flex-wrap items-center gap-4">
             <Dialog open={openSaveDialog} onOpenChange={setOpenSaveDialog}>
