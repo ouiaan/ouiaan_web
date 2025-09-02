@@ -77,84 +77,85 @@ export function PackageManager({ onReset, onLoadPackage }: PackageManagerProps) 
 
   return (
     <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground p-4">
-        <div className="flex items-center mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center">
             <h3 className="font-headline text-lg">Gestor de Paquetes</h3>
             <InfoTooltip content="Usa esta sección para guardar tus presupuestos como plantillas. Haz clic en 'Guardar Paquete' para guardar la configuración actual, y luego usa el menú 'Cargar un Paquete' para rellenar el formulario en el futuro. Ideal para distintos tipos de servicio (bodas, retratos, etc.)." />
         </div>
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2">
             <Dialog open={openSaveDialog} onOpenChange={setOpenSaveDialog}>
-            <DialogTrigger asChild>
-                <Button>
-                <Save className="mr-2 h-4 w-4" />
-                Guardar Paquete
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                <DialogTitle>Guardar Paquete Nuevo</DialogTitle>
-                <DialogDescription>
-                    Dale un nombre único a tu configuración actual para poder cargarla más tarde.
-                </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">Nombre</Label>
-                    <Input
-                    id="name"
-                    value={packageName}
-                    onChange={(e) => setPackageName(e.target.value)}
-                    className="col-span-3"
-                    placeholder="Ej: Boda Esencial"
-                    />
-                </div>
-                </div>
-                <DialogFooter>
-                <Button type="button" onClick={handleSave}>Guardar</Button>
-                </DialogFooter>
-            </DialogContent>
+              <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Save className="mr-2 h-4 w-4" />
+                    Guardar
+                  </Button>
+              </DialogTrigger>
+              <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Guardar Paquete Nuevo</DialogTitle>
+                    <DialogDescription>
+                        Dale un nombre único a tu configuración actual para poder cargarla más tarde.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="name" className="text-right">Nombre</Label>
+                        <Input
+                          id="name"
+                          value={packageName}
+                          onChange={(e) => setPackageName(e.target.value)}
+                          className="col-span-3"
+                          placeholder="Ej: Boda Esencial"
+                        />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" onClick={handleSave}>Guardar Paquete</Button>
+                  </DialogFooter>
+              </DialogContent>
             </Dialog>
 
             <Select onValueChange={handleLoad} disabled={packages.length === 0}>
-            <SelectTrigger className="w-full sm:w-[280px]">
-                <FolderDown className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Cargar un Paquete..." />
-            </SelectTrigger>
-            <SelectContent>
-                {packages.map(pkg => (
-                <SelectItem key={pkg.name} value={pkg.name}>{pkg.name}</SelectItem>
-                ))}
-            </SelectContent>
+              <SelectTrigger className="w-full sm:w-[180px] h-9">
+                  <SelectValue placeholder="Cargar Paquete..." />
+              </SelectTrigger>
+              <SelectContent>
+                  {packages.map(pkg => (
+                    <SelectItem key={pkg.name} value={pkg.name}>{pkg.name}</SelectItem>
+                  ))}
+              </SelectContent>
             </Select>
 
-            <Button variant="outline" onClick={onReset}>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Resetear
+            <Button variant="outline" size="sm" onClick={onReset}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Resetear
             </Button>
 
             <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="default" disabled={packages.length === 0}>
-                <Settings className="mr-2 h-4 w-4" />
-                Gestionar
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                <DialogTitle>Gestionar Paquetes Guardados</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-2 py-4 max-h-[300px] overflow-y-auto">
-                {packages.length > 0 ? packages.map(pkg => (
-                    <div key={pkg.name} className="flex items-center justify-between rounded-md border p-3">
-                    <span>{pkg.name}</span>
-                    <Button type="button" variant="ghost" size="icon" onClick={() => deletePackage(pkg.name)}>
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                    </div>
-                )) : <p className="text-sm text-muted-foreground text-center">No tienes paquetes guardados.</p>}
-                </div>
-            </DialogContent>
+              <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" disabled={packages.length === 0}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Gestionar
+                  </Button>
+              </DialogTrigger>
+              <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Gestionar Paquetes Guardados</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-2 py-4 max-h-[300px] overflow-y-auto">
+                    {packages.length > 0 ? packages.map(pkg => (
+                        <div key={pkg.name} className="flex items-center justify-between rounded-md border p-3">
+                          <span>{pkg.name}</span>
+                          <Button type="button" variant="ghost" size="icon" onClick={() => deletePackage(pkg.name)}>
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
+                    )) : <p className="text-sm text-muted-foreground text-center">No tienes paquetes guardados.</p>}
+                  </div>
+              </DialogContent>
             </Dialog>
         </div>
+      </div>
     </BackgroundGradient>
   );
 }
