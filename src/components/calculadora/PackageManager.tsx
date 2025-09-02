@@ -133,7 +133,7 @@ export function PackageManager({ onReset, onLoadPackage }: PackageManagerProps) 
 
             <Dialog>
             <DialogTrigger asChild>
-                <Button variant="default" disabled={packages.length === 0} className="ml-auto">
+                <Button variant="default" disabled={packages.length === 0}>
                 <Settings className="mr-2 h-4 w-4" />
                 Gestionar
                 </Button>
