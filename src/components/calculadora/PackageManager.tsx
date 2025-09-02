@@ -77,10 +77,10 @@ export function PackageManager({ onReset, onLoadPackage }: PackageManagerProps) 
 
   return (
     <BackgroundGradient containerClassName="rounded-2xl" className="rounded-2xl bg-card text-card-foreground p-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center">
             <h3 className="font-headline text-lg">Gestor de Paquetes</h3>
-            <InfoTooltip content="Usa esta sección para guardar tus presupuestos como plantillas. Haz clic en 'Guardar Paquete' para guardar la configuración actual, y luego usa el menú 'Cargar un Paquete' para rellenar el formulario en el futuro. Ideal para distintos tipos de servicio (bodas, retratos, etc.)." />
+            <InfoTooltip content="Usa esta sección para guardar presupuestos como plantillas. Haz clic en 'Guardar' para crear una nueva plantilla con la configuración actual. Luego, cárgala desde el menú desplegable para rellenar el formulario. Ideal para distintos tipos de servicio (bodas, retratos, etc.)." />
         </div>
         <div className="flex flex-wrap items-center gap-2">
             <Dialog open={openSaveDialog} onOpenChange={setOpenSaveDialog}>

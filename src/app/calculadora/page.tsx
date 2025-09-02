@@ -34,7 +34,7 @@ export default function CalculadoraPage() {
             <SectionTitle>Calculadora de Presupuestos</SectionTitle>
             <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">Una herramienta para creativos. Define tus costos, establece tu ganancia y genera propuestas profesionales en minutos.</p>
           </div>
-          <div className="my-12"><PackageManager onReset={handleReset} onLoadPackage={handleLoadPackage} /></div>
+          <div className="my-12 max-w-4xl mx-auto"><PackageManager onReset={handleReset} onLoadPackage={handleLoadPackage} /></div>
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
               <div className="lg:col-span-2"><div className="space-y-8"><ProfileForm /><ClientForm /><DescriptionForm /><FinancialsForm /><CostTables /><TotalsForm /></div></div>
