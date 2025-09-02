@@ -16,18 +16,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const desktopNavLinks = [
-  { href: '/gear', label: 'Mi Equipo' },
+  // { href: '/gear', label: 'Mi Equipo' },
   { href: '/freebies', label: 'Gratis' },
   { href: '/contact', label: 'Contacto' },
 ];
 
 const mobileNavLinks = [
   { href: '/', label: 'Inicio' },
-  { href: '/store/photo', label: 'Foto' },
-  { href: '/store/video', label: 'Video' },
+  // { href: '/store/photo', label: 'Foto' },
+  // { href: '/store/video', label: 'Video' },
   { href: '/calculadora', label: 'Calculadora' },
   { href: '/color-ai', label: 'Reverse Grade AI' },
-  { href: '/gear', label: 'Mi Equipo' },
+  // { href: '/gear', label: 'Mi Equipo' },
   { href: '/freebies', label: 'Gratis' },
   { href: '/contact', label: 'Contacto' },
 ];
@@ -150,6 +150,7 @@ export function Header() {
             >
               <NavLink href="/" label="Inicio" />
 
+              {/*
               <div
                 onMouseEnter={() => setStoreMenuOpen(true)}
                 onMouseLeave={() => setStoreMenuOpen(false)}
@@ -177,6 +178,7 @@ export function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+              */}
               
               <div
                 onMouseEnter={() => setToolsMenuOpen(true)}
